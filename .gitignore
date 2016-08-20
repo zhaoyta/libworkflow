@@ -1,3 +1,9 @@
+# Mac OS files ...
+*.xcodeproj
+*.xcodeproj/*
+*.DS_Store
+*.sw*
+
 # Compiled Object files
 *.slo
 *.lo
