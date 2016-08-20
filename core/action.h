@@ -1,5 +1,7 @@
 #ifndef __ACTION_H_
 #define __ACTION_H_
+
+
 #pragma GCC visibility push(default)
 
 SHARED_PTR(StateMachine);
@@ -7,7 +9,6 @@ SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
 SHARED_PTR(Context);
 
-class ActionPriv;
 class PutDefinition;
 class ActionMetaPriv;
 class Result;
@@ -27,13 +28,13 @@ class Action {
     int32_t action_id;
     std::string name;
     
-    //!  Internal Data on inputs / outputs management.
-    ActionPriv * p;
-    
     //!  Internal MetaData
     ActionMetaPriv * pmeta;
     
-    PropertySetPtr properties;
+    PropertySetPtr propertyset;
+    
+    std::set<PutDefinition> inputs;
+    std::set<PutDefinition> outputs;
     
 
 public:
@@ -56,6 +57,8 @@ public:
     //! This is a non input related check. will always be called before execution.
     //! @return true by default, if set to false, it's expected @error_report to be set.
     virtual bool canPerform(SessionPtr, ErrorReport &) const;
+    
+    virtual bool canHandleError(SessionPtr) const;
     
     //! some accessors ...
     const std::string & getName() const;
@@ -128,6 +131,11 @@ protected:
     
     void setOutput(SessionPtr, const std::string & name, ContextPtr);
     
+    const std::set<PutDefinition> & getInputs() const;
+    const std::set<PutDefinition> & getOutputs() const;
+    
+    void clearInputs();
+    void clearOutputs();
     
 };
 
