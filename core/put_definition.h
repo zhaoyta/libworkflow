@@ -21,8 +21,10 @@ struct PutDefinition : public Jsonable {
     //! Note: if it can live without it, but still provided, it still need to meet TypeChecker requirement.
     bool mandatory = false;
     //! If provided input is a list, and this is set to true, then, action WONT be executed.
+    //! This is an input only property.
     bool ignoreEmpty = false;
     //! if set to true, won't raise error if input is "Skiped" @sa StateMachine
+    // Note, this is an Output only property.
     bool allowSkip = false;
     
     void save(boost::property_tree::ptree & root) const override;

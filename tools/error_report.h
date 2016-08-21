@@ -29,6 +29,13 @@ public:
     ErrorReport(const Target & target, ErrorReportPtr, const std::string & error_key = "", const std::string & error_msg = "");
     virtual ~Errorreport();
     
+    //! set error content.
+    void setError(const std::string & error_key, const std::string & error_message);
+    
+    //! An error is concidered unset if no error_key has been provided and no parent have been assigned.
+    bool isSet() const;
+    
+    
     //! @return topmost error message.
     const std::string & getErrorMessage() const;
     //! @return topmost error key

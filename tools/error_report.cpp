@@ -34,3 +34,12 @@ const std::vector<ErrorReportPtr> ErrorReport::getAncestry() const {
         return ancestry;
     }
 }
+
+
+void ErrorReport::save(boost::property_tree::ptree & root) const {
+    
+}
+
+void ErrorReport::load(const boost::property_tree::ptree & root) {
+    
+}

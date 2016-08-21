@@ -16,6 +16,8 @@ public:
     Session();
     virtual ~Session();
     
+    PropertySetPtr getBypass();
+    PropertySetPtr getBypass(int32_t action_id);
     
     
 };

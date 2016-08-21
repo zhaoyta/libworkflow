@@ -80,14 +80,14 @@ protected:
     Result wait() const;
     //! Tells state machine that WE are not finished yet, but it should expect a call from us anytime.
     Result async() const;
-    //! Tells state machine that something failed. Provided @a error_report will provide informations.
-    Result error(const ErrorReport &) const;
+    //! Tells state machine that something failed.
+    Result error(const std::string & err_key, const std::string & error_message) const;
     //! When in async mode, this contacts the state machine and tell we're done.
     void asyncDone() const;
     //! async counterpart of wait()
     void asyncWait() const;
     //! async counterpart of error()
-    void asyncError(const ErrorReport &) const;
+    void asyncError(const std::string & err_key, const std::string & err_message) const;
     
     
     //! For loggin, provide informations on which Workflow is running, and what request is being executed
@@ -96,7 +96,7 @@ protected:
     //! properties accessors
     //! @sa PropertySet
     //! Properties can be accessed from multiples sources, prioritized as follow
-    //! Request > Session > Action
+    //! Session (byAction) > Session > Action
     
     //! Fetch a double value for @a key
     double doubleValue(SessionPtr, const std::string & key, double default = 0.) const;
@@ -136,7 +136,11 @@ protected:
     
     void clearInputs();
     void clearOutputs();
+private:
     
+    //! This should only be called by StateMachine ..;
+    void setActionId(int32_t action_id) const;
+    friend class StateMachine;
 };
 
 OSTREAM_HELPER_DECL(Action);
