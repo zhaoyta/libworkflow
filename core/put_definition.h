@@ -5,7 +5,7 @@
 
 #pragma GCC visibility push(default)
 
-class TypeChecker;
+SHARED_PTR(TypeChecker);
 
 /**
     PutDefinition will describe inputs and outputs.
@@ -16,12 +16,14 @@ struct PutDefinition : public Jsonable {
     //! This is purely meta information
     std::string description;
     //! Used by actions to check if what has been provided meet the requirements.
-    TypeChecker * checker = NULL;
+    TypeCheckerPtr checker;
     //! Tell whether this put is mandatory (ahah)
     //! Note: if it can live without it, but still provided, it still need to meet TypeChecker requirement.
     bool mandatory = false;
     //! If provided input is a list, and this is set to true, then, action WONT be executed.
     bool ignoreEmpty = false;
+    //! if set to true, won't raise error if input is "Skiped" @sa StateMachine
+    bool allowSkip = false;
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override; 

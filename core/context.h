@@ -6,10 +6,13 @@
 
 SHARED_PTR(Context);
 class Context : public Jsonable {
+    const std::string type;
 public:
-    Context();
+    Context(const std::string & type);
     virtual ~Context();
     
+    const std::string & getType() const;
+
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

@@ -4,14 +4,14 @@
 #include <tools/defines.h>
 
 SHARED_PTR(Session);
-class PropertySet;
+SHARED_PTR(PropertySet);
 
 /**
  Session stores request long execution informations. Mostly used by StateMachine to store it's status, but can be used also by actions to set some internal stuff, like counter, and such. 
  */
 class Session {
-    PropertySet bypass;
-    std::map<int32_t, PropertySet> action_bypasses;
+    PropertySetPtr bypass;
+    std::map<int32_t, PropertySetPtr> action_bypasses;
 public:
     Session();
     virtual ~Session();

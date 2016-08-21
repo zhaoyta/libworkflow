@@ -2,7 +2,7 @@
 #include <core/action_priv.h>
 #include <core/action_meta_priv.h>
 #include <core/context.h>
-#include <core/property_set.h>
+#include <tools/property_set.h>
 #include <core/request.h>
 #include <core/session.h>
 #include <core/state_machine.h>

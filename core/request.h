@@ -5,11 +5,11 @@
 #include <tools/defines.h>
 #include <core/target.h>
 #include <boost/uuids/uuid.hpp>
-#include <core/property_set.h>
 #include <map>
 
 SHARED_PTR(Request);
 SHARED_PTR(Context);
+SHARED_PTR(PropertySet);
 
 /**
     Request tells what is to be executed, whom asks it.
@@ -28,9 +28,9 @@ class Request: public Jsonable {
     //! this is initial (or callbacked) informations to be pushed to the workflow.
     ContextPtr context;
     //! This is a global bypass, it's less specific than action_bypasses, but then has a wider range of action.
-    PropertySet bypass;
+    PropertySetPtr bypass;
     //! This is a local bypass, it allows to override properties of actions by their ID. 
-    std::map<int32_t, PropertySet> action_bypasses;
+    std::map<int32_t, PropertySetPtr> action_bypasses;
 pbulic:
     Request();
     Request(const Target & target);
