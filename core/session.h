@@ -12,6 +12,14 @@ SHARED_PTR(PropertySet);
 class Session {
     PropertySetPtr bypass;
     std::map<int32_t, PropertySetPtr> action_bypasses;
+    
+    std::set<Target> subqueries;
+    std::set<int32_t> pendings;
+    std::set<int32_t> nexts;
+    
+    std::map<int32_t, std::map<std::string, ContextPtr> > inputs;
+    std::map<int32_t, std::map<std::string, ContextPtr> > outputs;
+    
 public:
     Session();
     virtual ~Session();
@@ -19,7 +27,24 @@ public:
     PropertySetPtr getBypass();
     PropertySetPtr getBypass(int32_t action_id);
     
+    std::set<int32_t> & getNexts();
+    std::set<int32_t> & getPendings();
+    std::set<Target>  & getSubQueries();
     
+    std::map<int32_t, std::map<std::string, ContextPtr> > & getInputs();
+    std::map<int32_t, std::map<std::string, ContextPtr> > & getOutputs();
+    
+    void setOutput(int32_t, const std::string & output, ContextPtr );
+    void setInput(int32_t, const std::string & input, ContextPtr);
+    
+    ContextPtr getInput( int32_t, const std::string & input);
+    template<class T>
+    boost::shared_ptr<T> getCastedInput(int32_t action_id, const std::string & input) {
+        return boost::dynamic_pointer_cast<T>(getInput(action_id, input));
+    }
+    
+    void addSubQuery(const Target & t);
+    void removeSubQuery(const Target & t);
 };
 
 OSTREAM_HELPER_DECL(Session);

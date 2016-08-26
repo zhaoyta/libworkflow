@@ -23,11 +23,14 @@ struct Target: public Jsonable {
         Error //!< This prompt the Error state, unless expected action can handle Error. 
     } target = DefaultAction;
     
+
+    bool operator<(const Target & t);
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
     
 };
+
 
 OSTREAM_HELPER_DECL(Target);
 
