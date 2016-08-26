@@ -87,6 +87,23 @@ const Target & Request::getReply() const {
     return reply;
 }
 
+
+Target & Request::getTarget() {
+    return target;
+}
+
+Target & Request::getReply() {
+    return reply;
+}
+
+void Request::setErrorReport(ErrorReportPtr er) {
+    report = er;
+}
+
+ErrorReportPtr Request::getErrorReport() {
+    return report;
+}
+
 void Request::save(boost::property_tree::ptree & root) const {
     
 }

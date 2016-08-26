@@ -10,6 +10,8 @@ SHARED_PTR(PropertySet);
  Session stores request long execution informations. Mostly used by StateMachine to store it's status, but can be used also by actions to set some internal stuff, like counter, and such. 
  */
 class Session {
+    RequestPtr request;
+    std::vector<RequestPtr> requests;
     PropertySetPtr bypass;
     std::map<int32_t, PropertySetPtr> action_bypasses;
     
@@ -28,6 +30,10 @@ public:
     
     PropertySetPtr getBypass();
     PropertySetPtr getBypass(int32_t action_id);
+    
+    RequestPtr getOriginalRequest() const;
+    const std::vector<RequestPtr> & getRequests() const;
+    RequestPtr getLastRequest() const;
     
     std::set<int32_t> & getNexts();
     std::set<int32_t> & getPendings();

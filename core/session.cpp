@@ -66,3 +66,18 @@ uint32_t Session::getCurrentExecutionLevel() const {
 void Session::upCurrentExecutionLevel() {
     current_execution_level++;
 }
+
+RequestPtr Session::getOriginalRequest() const {
+    return request;
+}
+
+const std::vector<RequestPtr> & Session::getRequests() const {
+    return requests;
+}
+
+RequestPtr Session::getLastRequest() const {
+    if(requests.size() == 0)
+        return RequestPtr();
+    return * requests.last();
+}
+

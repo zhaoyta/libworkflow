@@ -67,20 +67,37 @@ void ActionWrapper::wrapPostReplyReceived(SessionPtr, RequestPtr) {
 
 InterruptWrapper::InterruptWrapper(ActionPtr action) : ActionWrapper(action) {}
 void InterruptWrapper::wrapPerform(SessionPtr session) {
-    
+    session->upCurrentExecutionLevel();
+    for(const auto & target: session->getSubQueries()) {
+        auto req = RequestPtr(new Request(target));
+        //! this is redondant, as Interrupt are always accepted, no matter what EL.
+        req->getTarget().execution_level = 0;
+        req->getTarget().target = Target::Interrupt;
+        //! this ensure we don't get any intel as to what happend from the interrupted request.
+        req->getReply().target = Target::NoReply;
+        req->setRequestId(session->getOriginalRequest()->getRequestId());
+        //! @todo Get controller manager, execute action.
+    }
 }
 
-FinishWrapper::FinishWrapper(ActionPtr action): ActionWrapper(action) {}
+FinishWrapper::FinishWrapper(ActionPtr action): InterruptWrapper(action) {}
 void FinishWrapper::wrapPerform(SessionPtr session) {
-
+    InterruptWrapper::wrapPerform(session);
+    auto reply = Request::reply(session->getOriginalRequest());
 }
 
-ErrorWrapper::ErrorWrapper(ActionPtr action) : ActionWrapper(action) {}
+ErrorWrapper::ErrorWrapper(ActionPtr action) : InterruptWrapper(action) {}
 void ErrorWrapper::wrapPerform(SessionPtr session) {
+    InterruptWrapper::wrapPerform(session);
+    
+    auto er = session->getLastRequest()->getErrorReport();
+    auto reply = Request::reply(session->getOriginalRequest());
+    reply->setErrorReport(session->getOriginalRequest()->getTarget(),
+                          er);
 }
 
-CleanupWrapper::CleanupWrapper(ActionPtr action): ActionWrapper(action) {}
+CleanupWrapper::CleanupWrapper(ActionPtr action): InterruptWrapper(action) {}
 void CleanupWrapper::wrapPerform(SessionPtr session) {
-    
+    InterruptWrapper::wrapPerform(session);
 }
 

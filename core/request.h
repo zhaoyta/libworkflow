@@ -6,10 +6,12 @@
 #include <core/target.h>
 #include <boost/uuids/uuid.hpp>
 #include <map>
+#include <tools/error_report.h>
 
 SHARED_PTR(Request);
 SHARED_PTR(Context);
 SHARED_PTR(PropertySet);
+
 
 /**
     Request tells what is to be executed, whom asks it.
@@ -33,6 +35,8 @@ class Request: public Jsonable {
     PropertySetPtr bypass;
     //! This is a local bypass, it allows to override properties of actions by their ID. 
     std::map<int32_t, PropertySetPtr> action_bypasses;
+    
+    ErrorReportPtr report;
 pbulic:
     Request();
     Request(const Target & target);
@@ -51,6 +55,9 @@ pbulic:
     void setRequestId(const boost::uuids::uuid & id);
     void setClientId(const boost::uuids::uuid & id);
     
+    void setErrorReport(ErrorReportPtr);
+    ErrorReportPtr getErrorReport();
+    
     PropertySetPtr getBypass();
     std::map<int32_t, PropertySetPtr> & getActionBypasses();
     
@@ -62,6 +69,9 @@ pbulic:
     
     const Target & getTarget() const;
     const Target & getReply() const;
+    
+    Target & getTarget();
+    Target & getReply();
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
