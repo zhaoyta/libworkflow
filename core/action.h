@@ -64,11 +64,13 @@ public:
     const std::string & getName() const;
     void setName(const std::string & name);
     
-    int32_t getActionId() const;
+    void setActionId(int32_t action_id);
+    virtual int32_t getActionId() const;
     
     PropertySetPtr properties();
     
 protected:
+    
     //! no need to expose that one ;)
     StateMachinePtr getStateMachine() const;
 

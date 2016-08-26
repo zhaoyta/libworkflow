@@ -30,7 +30,7 @@ SHARED_PTR(ListCtx);
 class ListCtx : public Context {
     std::vector<ContextPtr> contexts;
 public:
-    ListCtx();
+    ListCtx(const std::string &);
     virtual ~ListCtx();
     
     template<class T>

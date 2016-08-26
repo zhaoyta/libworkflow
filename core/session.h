@@ -20,6 +20,8 @@ class Session {
     std::map<int32_t, std::map<std::string, ContextPtr> > inputs;
     std::map<int32_t, std::map<std::string, ContextPtr> > outputs;
     
+    uint32_t current_execution_level;
+    
 public:
     Session();
     virtual ~Session();
@@ -45,6 +47,9 @@ public:
     
     void addSubQuery(const Target & t);
     void removeSubQuery(const Target & t);
+    
+    uint32_t getCurrentExecutionLevel() const;
+    void upCurrentExecutionLevel();
 };
 
 OSTREAM_HELPER_DECL(Session);

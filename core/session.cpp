@@ -1,5 +1,5 @@
 
-Session::Session() {
+Session::Session(), current_execution_level(1) {
     
 }
 
@@ -57,4 +57,12 @@ void Session::addSubQuery(const Target & t) {
 
 void Session::removeSubQuery(const Target & t) {
     subqueries.erase(t);
+}
+
+uint32_t Session::getCurrentExecutionLevel() const {
+    return current_execution_level;
+}
+
+void Session::upCurrentExecutionLevel() {
+    current_execution_level++;
 }

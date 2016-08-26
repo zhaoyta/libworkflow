@@ -16,6 +16,11 @@ struct Target: public Jsonable {
     //! This is the unique id by which this instance will be called.
     boost::uuids::uuid id;
     
+    //! This is mostly usefull for reply, it's checked when the reply gets registered.
+    //! if this is different than what's stored in session, this request gets ignored.
+    //! note, if set to 0, it'll be accepted nonetheless (default level is 1)
+    uint32_t execution_level;
+    
     enum TargetAction : uint32_t {
         DefaultAction, //!< This, according state machine state, will either, start the workflow from the begining, or continue it.
         Status, //!< This is a blind state, which allow access to Session ( if an id has been provided ) OR access to internal Workflow data.
