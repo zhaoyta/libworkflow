@@ -93,8 +93,13 @@ ControllerSpawnPtr Session::getControllerSpawn() {
 }
 
 void Session::pushRequest(RequestPtr req) {
-    if(not request)
+    if(not request) {
+        // initial request found !
         request = req;
+        //! recovering bypasses ...
+        bypass = req->getBypass();
+        bypasses = req->getActionBypasses();
+    }
     request.push_back(req);
 }
 

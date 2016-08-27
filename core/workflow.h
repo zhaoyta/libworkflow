@@ -43,24 +43,39 @@ class Workflow : public Jsonable {
     StateMachinePtr stateMachine;
     ControllerPtr controller;
     
+    std::string name;
+    
     std::map<boost::uuids::uuid, RunningSession> sessions;
     
     double timeout;
     
 public:
-    Workflow(ControllerPtr);
+    Workflow(const std::string &);
     virtual ~Workflow();
     
+    //! bind thiw workflow to the controller;
+    void setController(ControllerPtr);
+    
+    //! main entrypoint of a workflow, will check executability and execute the request.
     bool perform(RequestPtr);
     
+    //! @return statemachine
+    //! allow definition of the process to execute.
     StateMachinePtr getStateMachine();
     
-    void setTimeout(double);
+    //! initial configuration ... tell how long a request can last.
+    //! default to 60 s.
+    void setTimeout(double = 60);
 
 protected:
+    //! check whether a request can be executed or not.
     bool canExecuteRequest(RequestPtr);
     
+    //! a request as timed out.
     void requestTimedOut(boost::uuids::uuid id);
+    
+    //! reply with error.
+    void errorReply(RequestPtr, ErrorReport *);
 };
 
 #endif // __WORKFLOW_H_

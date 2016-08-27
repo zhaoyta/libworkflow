@@ -25,11 +25,13 @@ namespace boost {
 class ActiveObject : public boost::enable_shared_from_this<ActiveObject> {
     const std::string name;
     IOServicePtr service;
-    boost::shared_ptr<boost::thread> thread;
+    std::vector< boost::shared_ptr<boost::thread> > threads;
     boost::shared_ptr<boost::asio::io_service::work> worker;
     boost::shared_ptr<boost::recursive_mutex> mutex;
+    
+    uint32_t thread_pool;
 public:
-    ActiveObject(const std::string &name, bool delay_start = false);
+    ActiveObject(const std::string &name, uint32_t thread_pool = 1, bool delay_start = false);
     ActiveObject(const ActiveObject &) = delete; // disallow copy.
     virtual ~ActiveObject();
     
@@ -52,6 +54,7 @@ protected:
 
 private:
     void run();
+    void startPool();
 };
 
 OSTREAM_HELPER_DECL(ActiveObject);

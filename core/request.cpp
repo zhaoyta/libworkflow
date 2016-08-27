@@ -4,11 +4,12 @@
 
 
 Request::Request(): Jsonable() {
-    
+    reply.type = Target::NoReply;
+    target.type = Target::NoReply;
 }
 
 Request::Request(const Target & target): Jsonable(), target(target), request_id(target.id) , bypass(new PropertySet()){
-    
+    reply.type = Target::NoReply;
 }
 
 Request::Request(const Target & target, const Target & reply): Jsonable(), target(target), reply(reply), request_id(target.id)  , bypass(new PropertySet()){
