@@ -1,15 +1,16 @@
 #ifndef __REQUEST_H_
 #define __REQUEST_H_
 
+#include <core/target.h>
 #include <tools/jsonable.h>
 #include <tools/defines.h>
-#include <core/target.h>
-#include <boost/uuids/uuid.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <map>
 #include <tools/error_report.h>
 
 SHARED_PTR(Request);
 SHARED_PTR(Context);
+SHARED_PTR(ControllerSpawn);
 SHARED_PTR(PropertySet);
 
 
@@ -41,13 +42,13 @@ class Request: public Jsonable {
     
     //! stores controller data.
     ControllerSpawnPtr spawn;
-pbulic:
+public:
     Request();
     Request(const Target & target);
     Request(const Target & target, const Target & reply);
     virtual ~Request();
     
-    static RequestPtr reply(RequestPtr);
+    static RequestPtr createReply(RequestPtr);
     
     boost::uuids::uuid getClientId() const;
     boost::uuids::uuid getRequestId() const;

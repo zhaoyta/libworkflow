@@ -1,3 +1,7 @@
+#include <core/action_wrappers.h>
+#include <core/session.h>
+#include <core/request.h>
+#include <tools/error_report.h>
 #include <core/action.h>
 #include <core/result.h>
 

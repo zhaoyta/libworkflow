@@ -2,9 +2,10 @@
 #define __ERROR_REPORT_H_
 
 #include <tools/jsonable.h>
-#include <tools/shared_ptr.h>
+#include <tools/defines.h>
 #include <core/target.h>
-#include <boost/uuids/uuid.h>
+#include <vector>
+#include <boost/uuid/uuid.hpp>
 
 SHARED_PTR(ErrorReport);
 
@@ -27,7 +28,7 @@ public:
     ErrorReport(const Target & target, const std::string & error_key, const std::string & error_msg);
     //! This is rethrow version, add provided error report to the stack.
     ErrorReport(const Target & target, ErrorReportPtr, const std::string & error_key = "", const std::string & error_msg = "");
-    virtual ~Errorreport();
+    virtual ~ErrorReport();
     
     //! set error content.
     void setError(const std::string & error_key, const std::string & error_message);

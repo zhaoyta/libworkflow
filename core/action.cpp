@@ -1,6 +1,4 @@
 #include <core/action.h>
-#include <core/action_priv.h>
-#include <core/action_meta_priv.h>
 #include <core/context.h>
 #include <tools/property_set.h>
 #include <core/request.h>
@@ -9,14 +7,13 @@
 #include <core/state_machine.h>
 
 
-Action::Action(const std::string & name): action_id(0), name(name), p(new ActionPriv(this)), pmeta( new ActionMetaPriv(this)), properties(new PropertySet()) {
+Action::Action(const std::string & name): action_id(0), name(name),
+    properties(new PropertySet()) {
     propertyset->setGuarded(true);
     
 }
 
 Action::~Action() {
-    delete p;
-    delete pmeta;
 }
 
 bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
@@ -163,65 +160,65 @@ std::string Action::fingerprint(SessionPtr) const {
     
 }
 
-double Action::doubleValue(SessionPtr session, const std::string & key, double default) const {
-    // well default config is Session(byAction) > Session > Action
+double Action::doubleValue(SessionPtr session, const std::string & key, double def) const {
+    // well def config is Session(byAction) > Session > Action
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getDoubleValue(key, default);
+        return session->getBypass(getActionId())->getDoubleValue(key, def);
     if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getDoubleValue(key,default);
+       return session->getBypass()->getDoubleValue(key,def);
     if(propertyset->hasProperty(key))
-       return propertyset->getDoubleValue(key, default);
+       return propertyset->getDoubleValue(key, def);
        
-    return default;
+    return def;
 }
 
-bool Action::boolValue(SessionPtr, const std::string & key, bool default) const {
+bool Action::boolValue(SessionPtr, const std::string & key, bool def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getBoolValue(key, default);
+        return session->getBypass(getActionId())->getBoolValue(key, def);
     if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getBoolValue(key,default);
+       return session->getBypass()->getBoolValue(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getBoolValue(key, default);
+       return propertyset->getBoolValue(key, def);
        
-       return default;
+       return def;
 }
 
-std::string Action::stringValue(SessionPtr, const std::string & key, const std::string & default ) const {
+std::string Action::stringValue(SessionPtr, const std::string & key, const std::string & def ) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getStringValue(key, default);
+        return session->getBypass(getActionId())->getStringValue(key, def);
     if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getStringValue(key,default);
+       return session->getBypass()->getStringValue(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getStringValue(key, default);
+       return propertyset->getStringValue(key, def);
        
-       return default;
+       return def;
 }
 
-uint32_t Action::uintValue(SessionPtr, const std::string & key, uint32_t default) const {
+uint32_t Action::uintValue(SessionPtr, const std::string & key, uint32_t def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getUintValue(key, default);
+        return session->getBypass(getActionId())->getUintValue(key, def);
     if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getUintValue(key,default);
+       return session->getBypass()->getUintValue(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getUintValue(key, default);
+       return propertyset->getUintValue(key, def);
        
-       return default;
+       return def;
 }
 
-ContextPtr Action::customValue(SessionPtr, const std::string & key, ContextPtr default) const {
+ContextPtr Action::customValue(SessionPtr, const std::string & key, ContextPtr def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getCustomValue(key, default);
+        return session->getBypass(getActionId())->getCustomValue(key, def);
     if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getCustomValue(key,default);
+       return session->getBypass()->getCustomValue(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getCustomValue(key, default);
+       return propertyset->getCustomValue(key, def);
        
-       return default;
+       return def;
 }
 
 void Action::defineInput(const std::string & name, TypeCheckerPtr checker , bool mandatory) {

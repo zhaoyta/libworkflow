@@ -1,11 +1,11 @@
 #include <core/request.h>
-#include <boost/uuids/nil_generator.hpp>
+#include <boost/uuid/nil_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
-
+#include <tools/property_set.h>
 
 Request::Request(): Jsonable() {
-    reply.type = Target::NoReply;
-    target.type = Target::NoReply;
+    reply.type = ETargetAction::NoReply;
+    target.type = ETargetAction::NoReply;
 }
 
 Request::Request(const Target & target): Jsonable(), target(target), request_id(target.id) , bypass(new PropertySet()){
@@ -16,7 +16,7 @@ Request::Request(const Target & target, const Target & reply): Jsonable(), targe
     
 }
 
-RequestPtr Request::reply(RequestPtr request) {
+RequestPtr Request::createReply(RequestPtr request) {
     if(request) {
         auto rep = RequestPtr(new Request(request->getReply(), request->getTarget()));
         rep->setRequestId(request->getRequestId());

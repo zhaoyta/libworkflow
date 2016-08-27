@@ -2,6 +2,7 @@
 #define __CONTEXT_H_
 #include <tools/jsonable.h>
 #include <tools/defines.h>
+#include <vector>
 #pragma GCC visibility push(default)
 
 SHARED_PTR(Context);

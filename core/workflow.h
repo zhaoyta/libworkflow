@@ -2,7 +2,7 @@
 #define __WORKFLOW_H_
 
 #include <tools/defines.h>
-#include <boost/uuids/uuid.hpp>
+#include <boost/uuid/uuid.hpp>
 #include <queue>
 
 SHARED_PTR(Workflow);

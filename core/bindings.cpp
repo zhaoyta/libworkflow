@@ -61,7 +61,7 @@ int32_t OutputBinding::getToActionId() const {
 }
 
 const std::string & OutputBinding::getToActionInput() const {
-    return to_action_id;
+    return to_action_input;
 }
 
 void OutputBinding::save(boost::property_tree::ptree & root) const {

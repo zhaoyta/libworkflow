@@ -3,16 +3,20 @@
 
 
 #pragma GCC visibility push(default)
+#include <tools/defines.h>
+#include <set>
 
 SHARED_PTR(StateMachine);
 SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
 SHARED_PTR(Context);
+SHARED_PTR(Request);
 
 class PutDefinition;
 class ActionMetaPriv;
 class Result;
 class ErrorReport;
+class TypeChecker;
 
 /**
  Action is where the business code go. 
@@ -101,18 +105,18 @@ protected:
     //! Session (byAction) > Session > Action
     
     //! Fetch a double value for @a key
-    double doubleValue(SessionPtr, const std::string & key, double default = 0.) const;
+    double doubleValue(SessionPtr, const std::string & key, double def = 0.0) const;
     //! Fetch a bool value for @a key
-    bool boolValue(SessionPtr, const std::string & key, bool default = false) const;
+    bool boolValue(SessionPtr, const std::string & key, bool def = false) const;
     //! Fetch a string value for @a key
-    std::string stringValue(SessionPtr, const std::string & key, const std::string & default = "") const;
+    std::string stringValue(SessionPtr, const std::string & key, const std::string & def = "") const;
     //! Fetch a uint value for @a key
-    uint32_t uintValue(SessionPtr, const std::string & key, uint32_t default = 0) const;
+    uint32_t uintValue(SessionPtr, const std::string & key, uint32_t def = 0) const;
     //! Fetch a Context
-    ContextPtr customValue(SessionPtr, const std::string & key, ContextPtr default = ContextPtr()) const;
+    ContextPtr customValue(SessionPtr, const std::string & key, ContextPtr def = ContextPtr()) const;
     template<class T>
-    boost::shared_ptr<T> customCastedValue(SessionPtr session, const std::string & key, ContextPtr default= ContextPtr()) {
-        return boost::dynamic_pointer_cast<T>(customValue(session,key,default));
+    boost::shared_ptr<T> customCastedValue(SessionPtr session, const std::string & key, ContextPtr def= ContextPtr()) {
+        return boost::dynamic_pointer_cast<T>(customValue(session,key,def));
     }
     
     
@@ -149,4 +153,4 @@ OSTREAM_HELPER_DECL(Action);
 
 
 #pragma GCC visibility pop
-#endinf // __ACTION_H_
+#endif // __ACTION_H_

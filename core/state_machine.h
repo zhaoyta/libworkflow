@@ -2,8 +2,11 @@
 #define __STATE_MACHINE_H_
 
 #include <tools/defines.h>
+#include <tools/jsonable.h>
 #include <map>
-#include <boost/uuids/uuid.hpp>
+#include <set>
+#include <vector>
+#include <boost/uuid/uuid.hpp>
 
 SHARED_PTR(StateMachine);
 SHARED_PTR(Request);
@@ -11,6 +14,10 @@ SHARED_PTR(Session);
 SHARED_PTR(Action);
 SHARED_PTR(Binding);
 SHARED_PTR(Workflow);
+
+class InputBinding;
+class OutputBinding;
+class Result;
 
 /**
  StateMachine define how actions are interlinked, and define which action is running and what actions are expected to run.
@@ -57,7 +64,7 @@ protected:
     void execute(SessionPtr, int32_t action) ;
     
     //! this will check what result the action provided, and declare what comes next.
-    void actionExecuted(SessionPtr, int32_t action_id, Result) ;
+    void actionExecuted(SessionPtr, const Result &) ;
     
     //! @return -1 if none where found. Otherwise seek next in line.
     //! Note this removes it from nexts.

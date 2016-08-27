@@ -15,7 +15,7 @@ StateMachine::~StateMachine() {
     
 }
 
-bool StateMachine::execute(SessionPtr session, RequestPtr request) const {
+bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
     
 }
 
@@ -55,7 +55,7 @@ void StateMachine::execute(SessionPtr, int32_t action)  {
     
 }
 
-void StateMachine::actionExecuted(SessionPtr, int32_t action_id)  {
+void StateMachine::actionExecuted(SessionPtr, const Result & result)  {
     
 }
 

@@ -2,7 +2,7 @@
 #define __ACTIVE_OBJECT_H_
 
 
-#include <tools/shared_ptr.h>
+#include <tools/defines.h>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
