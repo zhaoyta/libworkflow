@@ -1,14 +1,15 @@
 #include <core/action.h>
+#include <core/request.h>
 #include <core/context.h>
 #include <tools/property_set.h>
-#include <core/request.h>
 #include <core/session.h>
 #include <core/put_definition.h>
 #include <core/state_machine.h>
+#include <tools/type_checker.h>
 
 
 Action::Action(const std::string & name): action_id(0), name(name),
-    properties(new PropertySet()) {
+    propertyset(new PropertySet()) {
     propertyset->setGuarded(true);
     
 }
@@ -53,10 +54,10 @@ bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
             
         }
     }
-    
+    return true;
 }
 
-bool Action::checkOutputs(SessionPtr, ErrorReport &) const {
+bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
     for(const auto & id: getOutputs()) {
         auto ctx = session->getOutput(getActionId(), id.put_name);
         
@@ -89,6 +90,7 @@ bool Action::checkOutputs(SessionPtr, ErrorReport &) const {
             
         }
     }
+    return true;
 }
 
 Result Action::perform(SessionPtr) const {

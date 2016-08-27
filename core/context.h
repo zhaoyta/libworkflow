@@ -12,6 +12,7 @@ SHARED_PTR(Context);
 class Context : public Jsonable {
     const std::string type;
 public:
+    Context();
     Context(const std::string & type);
     virtual ~Context();
     

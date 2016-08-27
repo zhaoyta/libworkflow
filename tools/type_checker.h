@@ -2,7 +2,7 @@
 #define __TYPE_CHECKER_H_
 
 #include <core/context.h>
-#include <tools/shared_ptr.h>
+#include <tools/defines.h>
 
 SHARED_PTR(TypeChecker);
 
@@ -27,13 +27,12 @@ public:
     }
 };
 
-SHARED_PTR(ContextTypeChecker);
 
 /**
     This checks against a Context Type, if provided context matches the one expected, then it succeed.
  */
 template <class T>
-class ContextTypeChecker {
+class ContextTypeChecker : public TypeChecker{
 public:
     ContextTypeChecker() {}
     virtual ~ContextTypeChecker() {}

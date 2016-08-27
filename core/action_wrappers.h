@@ -2,7 +2,7 @@
 #define __ACTION_WRAPPERS_H_
 
 #include <core/action.h>
-#include <tools/shared_ptr.h>
+#include <tools/defines.h>
 
 class Result;
 SHARED_PTR(ActionWrapper);

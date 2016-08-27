@@ -1,6 +1,7 @@
 #include <core/context.h>
 
 
+Context::Context(): Jsonable(), type("Context") {}
 Context::Context(const std::string & type) : Jsonable(),
 type(type) {
     

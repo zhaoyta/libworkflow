@@ -66,9 +66,9 @@ public:
     
     //! some accessors ...
     const std::string & getName() const;
-    void setName(const std::string & name);
+    virtual void setName(const std::string & name);
     
-    void setActionId(int32_t action_id);
+    virtual void setActionId(int32_t action_id);
     virtual int32_t getActionId() const;
     
     PropertySetPtr properties();

@@ -2,10 +2,14 @@
 #include <core/context.h>
 
 PropertySet::PropertySet() : Jsonable(), guarded(false) {
-    
+    setGuarded(false);
 }
 
 PropertySet::~PropertySet() {}
+
+void PropertySet::setGuarded(bool b) {
+    guarded = b;
+}
 
 bool PropertySet::hasProperty(const std::string & key) const {
     return

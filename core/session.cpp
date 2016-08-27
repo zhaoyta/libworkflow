@@ -45,6 +45,12 @@ void Session::setOutput(int32_t action_id, const std::string & output, ContextPt
     outputs[action_id][output] = ctx;
 }
 
+ContextPtr Session::getOutput( int32_t aid, const std::string & output) {
+    if(outputs.count(aid) > 0 and outputs[aid].count(output) > 0 )
+        return outputs[aid][output];
+    return ContextPtr();
+}
+
 void Session::setInput(int32_t action_id, const std::string & input, ContextPtr ctx) {
     inputs[action_id][input] = ctx;
 }

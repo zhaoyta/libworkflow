@@ -55,6 +55,8 @@ public:
     void setOutput(int32_t, const std::string & output, ContextPtr );
     void setInput(int32_t, const std::string & input, ContextPtr);
     
+    ContextPtr getOutput( int32_t, const std::string & output);
+    
     ContextPtr getInput( int32_t, const std::string & input);
     template<class T>
     boost::shared_ptr<T> getCastedInput(int32_t action_id, const std::string & input) {
