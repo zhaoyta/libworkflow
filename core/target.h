@@ -26,7 +26,8 @@ struct Target: public Jsonable {
         Status, //!< This is a blind state, which allow access to Session ( if an id has been provided ) OR access to internal Workflow data.
         Interrupt, //!< This will call the interrupt state
         Error, //!< This prompt the Error state, unless expected action can handle Error.
-        NoReply
+        Reply, //!< This tell that we're dealing with a reply, and not a request ;)
+        NoReply, //! This ensure that this request gets ignored.
     } target = DefaultAction;
     
 

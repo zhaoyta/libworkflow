@@ -1,5 +1,10 @@
+#include <core/session.h>
+#include <core/request.h>
+#include <tools/property_set.h>
+#include <core/context.h>
+#include <core/target.h>
 
-Session::Session(), current_execution_level(1) {
+Session::Session(), current_execution_level(1), finished(false) {
     
 }
 
@@ -79,5 +84,30 @@ RequestPtr Session::getLastRequest() const {
     if(requests.size() == 0)
         return RequestPtr();
     return * requests.last();
+}
+
+ControllerSpawnPtr Session::getControllerSpawn() {
+    if(request)
+        return request->getControllerSpawn();
+    return ControllerSpawnPtr();
+}
+
+void Session::pushRequest(RequestPtr req) {
+    if(not request)
+        request = req;
+    request.push_back(req);
+}
+
+bool Session::hasFinished() {
+    return finished;
+}
+
+void Session::setFinished() {
+    finished = true;
+}
+
+OSTREAM_HELPER_IMPL(Session, obj) {
+    out << "[Session]";
+    return out;
 }
 

@@ -112,6 +112,14 @@ void Request::load(const boost::property_tree::ptree & root) {
     
 }
 
+ControllerSpawnPtr Request::getControllerSpawn() {
+    return spawn;
+}
+
+void Request::setControllerSpawn(ControllerSpawnPtr sp) {
+    spawn = sp;
+}
+
 OSTREAM_HELPER_IMPL(Request, obj) {
     out << "[Request] { "
         << " id: " << obj.shortRequestId()

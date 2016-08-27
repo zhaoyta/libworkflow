@@ -37,6 +37,9 @@ public:
     //! thats all actions.
     const std::map<int32_t, ActionPtr> getActions() const;
     
+    //! tell whether this session has finished it's job.
+    bool finished(SessionPtr);
+    
 protected:
     
     //! first call  :) start everything.

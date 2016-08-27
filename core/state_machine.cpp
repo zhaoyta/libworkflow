@@ -94,3 +94,7 @@ void StateMachine::save(boost::property_tree::ptree & root) const {
 void StateMachine::load(const boost::property_tree::ptree & root) {
     
 }
+
+bool StateMachine::finished(SessionPtr session) {
+    return session->hasFinished();
+}

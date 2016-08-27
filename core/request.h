@@ -36,7 +36,11 @@ class Request: public Jsonable {
     //! This is a local bypass, it allows to override properties of actions by their ID. 
     std::map<int32_t, PropertySetPtr> action_bypasses;
     
+    //! Store error report for replies
     ErrorReportPtr report;
+    
+    //! stores controller data.
+    ControllerSpawnPtr spawn;
 pbulic:
     Request();
     Request(const Target & target);
@@ -66,6 +70,9 @@ pbulic:
     boost::shared_ptr<T> getCastedContext() {
         return boost::dynamic_pointer_cast<T>(getContext());
     }
+    
+    ControllerSpawnPtr getControllerSpawn();
+    void setControllerSpawn(ControllerSpawnPtr);
     
     const Target & getTarget() const;
     const Target & getReply() const;

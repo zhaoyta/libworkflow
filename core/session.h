@@ -5,6 +5,8 @@
 
 SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
+SHARED_PTR(ControllerSpawn);
+class Target;
 
 /**
  Session stores request long execution informations. Mostly used by StateMachine to store it's status, but can be used also by actions to set some internal stuff, like counter, and such. 
@@ -24,6 +26,7 @@ class Session {
     
     uint32_t current_execution_level;
     
+    bool finished;
 public:
     Session();
     virtual ~Session();
@@ -34,6 +37,13 @@ public:
     RequestPtr getOriginalRequest() const;
     const std::vector<RequestPtr> & getRequests() const;
     RequestPtr getLastRequest() const;
+    void pushRequest(RequestPtr);
+    
+    ControllerSpawnPtr getControllerSpawn();
+    template<class T>
+    boost::shared_ptr<T> getCastedControllerSpawn() {
+        return boost::dynamic_pointer_cast<T>(getControllerSpawn());
+    }
     
     std::set<int32_t> & getNexts();
     std::set<int32_t> & getPendings();
@@ -56,6 +66,9 @@ public:
     
     uint32_t getCurrentExecutionLevel() const;
     void upCurrentExecutionLevel();
+    
+    bool hasFinished();
+    void setFinished();
 };
 
 OSTREAM_HELPER_DECL(Session);
