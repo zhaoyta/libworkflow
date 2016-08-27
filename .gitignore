@@ -3,6 +3,7 @@
 *.xcodeproj/*
 *.DS_Store
 *.sw*
+build/*
 
 # Compiled Object files
 *.slo
