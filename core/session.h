@@ -2,9 +2,13 @@
 #define __SESSION_H_
 
 #include <tools/defines.h>
+#include <set>
+#include <vector>
+#include <map>
 
 SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
+SHARED_PTR(Request);
 SHARED_PTR(ControllerSpawn);
 class Target;
 

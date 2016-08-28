@@ -2,9 +2,10 @@
 #include <core/request.h>
 #include <tools/property_set.h>
 #include <core/context.h>
+#include <core/controller_spawn.h>
 #include <core/target.h>
 
-Session::Session(), current_execution_level(1), finished(false) {
+Session::Session(): current_execution_level(1), finished(false) {
     
 }
 

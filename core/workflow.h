@@ -66,6 +66,8 @@ public:
     //! initial configuration ... tell how long a request can last.
     //! default to 60 s.
     void setTimeout(double = 60);
+    
+    std::string getName() const;
 
 protected:
     //! check whether a request can be executed or not.

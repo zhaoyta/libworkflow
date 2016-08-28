@@ -6,6 +6,8 @@
 #include <core/put_definition.h>
 #include <core/state_machine.h>
 #include <tools/type_checker.h>
+#include <core/result.h>
+#include <core/workflow.h>
 
 
 Action::Action(const std::string & name): action_id(0), name(name),
@@ -29,7 +31,6 @@ bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
                 er.setError("action.input.nil", str.str());
                 return false;
             }
-            return true;
         } else {
             // A context was provided. Does it match requirements.
             if(id.checker->check(ctx)) {
@@ -69,7 +70,6 @@ bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
                 er.setError("action.output.nil", str.str());
                 return false;
             }
-            return true;
         } else {
             // A context was provided. Does it match requirements.
             if(id.checker->check(ctx)) {
@@ -79,7 +79,7 @@ bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
                 // test for skip !
                 if(boost::dynamic_pointer_cast<SkipCtx>(ctx) and id.allowSkip) {
                     // ahah ! that's a skip
-                    return true;
+                    continue;
                 }
                 
                 std::stringstream str;
@@ -93,15 +93,15 @@ bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
     return true;
 }
 
-Result Action::perform(SessionPtr) const {
-    return error("action.perform.unimplemented","Can't execute this action as Perform function wasn't implemented.");
+Result Action::perform(SessionPtr session) const {
+    return error(session, "action.perform.unimplemented","Can't execute this action as Perform function wasn't implemented.");
 }
 
-Result Action::replyReceived(SessionPtr, RequestPtr) const {
-    return error("action.reply.unimplemented","Didn't expect a reply to this action.");
+Result Action::replyReceived(SessionPtr session, RequestPtr) const {
+    return error(session, "action.reply.unimplemented","Didn't expect a reply to this action.");
 }
 
-bool Action::canPerform(SessionPtr, ErrorReport &) const {
+bool Action::canPerform(SessionPtr , ErrorReport & ) const {
     return true;
 }
 
@@ -130,36 +130,67 @@ StateMachinePtr Action::getStateMachine() const {
 }
 
 Result Action::done() const {
-    
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Done;
+    return r;
 }
 
 Result Action::wait() const {
-    
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Wait;
+    return r;
 }
 
 Result Action::async() const {
-    
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Async;
+    return r;
 }
 
-Result Action::error(const ErrorReport &) const {
-    
+Result Action::error(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Error;
+    r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
+    return r;
 }
 
 void Action::asyncDone() const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Done;
     
+    getStateMachine()->actionAsyncFinished(r);
 }
 
 void Action::asyncWait() const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Wait;
     
+    getStateMachine()->actionAsyncFinished(r);
 }
 
-void Action::asyncError(const ErrorReport &) const {
-    
+void Action::asyncError(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = Result::Error;
+    r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
+
+    getStateMachine()->actionAsyncFinished(r);
 }
 
 
-std::string Action::fingerprint(SessionPtr) const {
-    
+std::string Action::fingerprint(SessionPtr session) const {
+    std::stringstream str;
+    str << "[" << getStateMachine()->getWorkflow()->getName()
+       << "][" << getName()
+       << "][" << session->getOriginalRequest()->shortRequestId()
+       << "][" << shortId(session->getOriginalRequest()->getId()) << "]";
+    return str.str();
 }
 
 double Action::doubleValue(SessionPtr session, const std::string & key, double def) const {
@@ -167,7 +198,7 @@ double Action::doubleValue(SessionPtr session, const std::string & key, double d
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getDoubleValue(key, def);
-    if(session->getBypass()->hasProperty(key)
+    if(session->getBypass()->hasProperty(key))
        return session->getBypass()->getDoubleValue(key,def);
     if(propertyset->hasProperty(key))
        return propertyset->getDoubleValue(key, def);
@@ -175,11 +206,11 @@ double Action::doubleValue(SessionPtr session, const std::string & key, double d
     return def;
 }
 
-bool Action::boolValue(SessionPtr, const std::string & key, bool def) const {
+bool Action::boolValue(SessionPtr session, const std::string & key, bool def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getBoolValue(key, def);
-    if(session->getBypass()->hasProperty(key)
+    if(session->getBypass()->hasProperty(key))
        return session->getBypass()->getBoolValue(key,def);
        if(propertyset->hasProperty(key))
        return propertyset->getBoolValue(key, def);
@@ -187,11 +218,11 @@ bool Action::boolValue(SessionPtr, const std::string & key, bool def) const {
        return def;
 }
 
-std::string Action::stringValue(SessionPtr, const std::string & key, const std::string & def ) const {
+std::string Action::stringValue(SessionPtr session, const std::string & key, const std::string & def ) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getStringValue(key, def);
-    if(session->getBypass()->hasProperty(key)
+    if(session->getBypass()->hasProperty(key))
        return session->getBypass()->getStringValue(key,def);
        if(propertyset->hasProperty(key))
        return propertyset->getStringValue(key, def);
@@ -199,11 +230,11 @@ std::string Action::stringValue(SessionPtr, const std::string & key, const std::
        return def;
 }
 
-uint32_t Action::uintValue(SessionPtr, const std::string & key, uint32_t def) const {
+uint32_t Action::uintValue(SessionPtr session, const std::string & key, uint32_t def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getUintValue(key, def);
-    if(session->getBypass()->hasProperty(key)
+    if(session->getBypass()->hasProperty(key))
        return session->getBypass()->getUintValue(key,def);
        if(propertyset->hasProperty(key))
        return propertyset->getUintValue(key, def);
@@ -211,22 +242,22 @@ uint32_t Action::uintValue(SessionPtr, const std::string & key, uint32_t def) co
        return def;
 }
 
-ContextPtr Action::customValue(SessionPtr, const std::string & key, ContextPtr def) const {
+ContextPtr Action::customValue(SessionPtr session, const std::string & key, ContextPtr def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getCustomValue(key, def);
-    if(session->getBypass()->hasProperty(key)
-       return session->getBypass()->getCustomValue(key,def);
-       if(propertyset->hasProperty(key))
-       return propertyset->getCustomValue(key, def);
-       
-       return def;
+    if(session->getBypass()->hasProperty(key))
+        return session->getBypass()->getCustomValue(key,def);
+    if(propertyset->hasProperty(key))
+        return propertyset->getCustomValue(key, def);
+    
+    return def;
 }
 
-void Action::defineInput(const std::string & name, TypeCheckerPtr checker , bool mandatory) {
+void Action::defineInput(const std::string & name, TypeChecker* checker , bool mandatory) {
     PutDefinition d;
     d.put_name = name;
-    d.checker = checker;
+    d.checker.reset(checker);
     d.mandatory = mandatory;
     
     defineInput(d);
@@ -238,27 +269,27 @@ void Action::defineInput(const PutDefinition & d) {
     inputs.insert(d);
 }
 
-void Action::defineOutput(const std::string & name, TypeCheckerPtr, bool mandatory) {
+void Action::defineOutput(const std::string & name, TypeChecker * checker, bool mandatory) {
     
     PutDefinition d;
     d.put_name = name;
-    d.checker = checker;
+    d.checker.reset(checker);
     d.mandatory = mandatory;
     
     defineOutput(d);
     
 }
 
-void Action::defineOutput(const PutDefinition &) {
+void Action::defineOutput(const PutDefinition & d) {
     //! @todo check that there aren't twice the same put name defined.
     outputs.insert(d);
 }
 
-ContextPtr Action::getInput(SessionPtr, const std::string & name) {
+ContextPtr Action::getInput(SessionPtr session, const std::string & name) {
     return session->getInput(getActionId(), name);
 }
 
-void Action::setOutput(SessionPtr, const std::string & name, ContextPtr ctx) {
-    session->setOutput(getActionId(), name, ctx)
+void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr ctx) {
+    session->setOutput(getActionId(), name, ctx);
 }
 

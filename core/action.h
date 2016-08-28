@@ -87,13 +87,13 @@ protected:
     //! Tells state machine that WE are not finished yet, but it should expect a call from us anytime.
     Result async() const;
     //! Tells state machine that something failed.
-    Result error(const std::string & err_key, const std::string & error_message) const;
+    Result error(SessionPtr, const std::string & err_key, const std::string & error_message) const;
     //! When in async mode, this contacts the state machine and tell we're done.
     void asyncDone() const;
     //! async counterpart of wait()
     void asyncWait() const;
     //! async counterpart of error()
-    void asyncError(const std::string & err_key, const std::string & err_message) const;
+    void asyncError(SessionPtr, const std::string & err_key, const std::string & err_message) const;
     
     
     //! For loggin, provide informations on which Workflow is running, and what request is being executed

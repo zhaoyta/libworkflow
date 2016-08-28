@@ -47,6 +47,12 @@ public:
     //! tell whether this session has finished it's job.
     bool finished(SessionPtr);
     
+    //! This is called by action in async mode.
+    void actionAsyncFinished(const Result &);
+    
+    //! retrieve the workflow
+    WorkflowPtr getWorkflow();
+    
 protected:
     
     //! first call  :) start everything.

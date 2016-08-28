@@ -109,3 +109,7 @@ void Workflow::requestTimedOut(boost::uuids::uuid id) {
 void Workflow::setTimeout(double d) {
     timeout = d;
 }
+
+std::string Workflow::getName() const {
+    return name;
+}

@@ -19,7 +19,7 @@ struct Result {
     } type;
     
     //! well if result is an error, then it need to be reported here.
-    ErrorReport error;
+    ErrorReportPtr error;
 };
 
 

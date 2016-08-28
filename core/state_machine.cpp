@@ -2,6 +2,7 @@
 #include <core/request.h>
 #include <core/session.h>
 #include <core/action.h>
+#include <core/result.h>
 #include <core/bindings.h>
 #include <core/workflow.h>
 
@@ -13,6 +14,10 @@ StateMachine::StateMachine(WorkflowPtr workflow) : Jsonable(),
 
 StateMachine::~StateMachine() {
     
+}
+
+WorkflowPtr StateMachine::getWorkflow() {
+    return workflow;
 }
 
 bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
@@ -56,6 +61,10 @@ void StateMachine::execute(SessionPtr, int32_t action)  {
 }
 
 void StateMachine::actionExecuted(SessionPtr, const Result & result)  {
+    
+}
+
+void StateMachine::actionAsyncFinished(const Result & result) {
     
 }
 
