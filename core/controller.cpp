@@ -1,11 +1,12 @@
 #include <core/controller.h>
 #include <core/workflow.h>
 #include <core/controller_spawn.h>
+#include <core/request.h>
+#include <core/target.h>
 
 
 Controller::Controller(const std::string & name) :
-    ActiveObject(name),
-    boost::enable_shared_from_this<Controller>() {}
+    ActiveObject(name) {}
 Controller::~Controller() {}
 
 bool Controller::perform(RequestPtr request) {
@@ -16,12 +17,12 @@ bool Controller::perform(RequestPtr request) {
     return false;
 }
 
-ControllerSpawnPtr Controller::spawnForRequest(RequestPtr) {
-    return ControllerSpawnPtr(new ControllerSpawn());
+ControllerPtr Controller::shared_from_this() {
+    return boost::dynamic_pointer_cast<Controller>(ActiveObject::shared_from_this());
 }
 
-const std::string & Controller::getName() {
-    return name;
+ControllerSpawnPtr Controller::spawnForRequest(RequestPtr) {
+    return ControllerSpawnPtr(new ControllerSpawn());
 }
 
 void Controller::addWorkflow(WorkflowPtr workflow) {

@@ -6,6 +6,7 @@
 #include <boost/asio/deadline_timer.hpp>
 #include <boost/chrono.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 SHARED_PTR(Timed);
 typedef boost::shared_ptr<boost::asio::deadline_timer> TimerPtr;

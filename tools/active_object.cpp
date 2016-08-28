@@ -1,7 +1,8 @@
 #include <tools/active_object.h>
 #include <boost/thread/thread.hpp>
+#include <boost/thread/recursive_mutex.hpp>
 #include <boost/thread/mutex.hpp>
-#include <boost/interprocess/interprocess_fwd.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
 
 ActiveObject::ActiveObject(const std::string &name, uint32_t pool, bool delay_start):
     boost::enable_shared_from_this<ActiveObject>(),
@@ -18,7 +19,7 @@ ActiveObject::~ActiveObject() {
 }
 
 void ActiveObject::start() {
-    boost::mutex::scoped_lock<boost::recursive_mutex> sl(*mutex);
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     if( threads.size() == 0 ) {
         boost::shared_ptr<boost::thread> thread(new boost::thread(&ActiveObject::run, this));
         threads.push_back(thread);
@@ -26,14 +27,15 @@ void ActiveObject::start() {
 }
 
 void ActiveObject::stop() {
-    boost::mutex::scoped_lock<boost::recursive_mutex> sl(*mutex);
-    worker->reset();
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+    worker.reset();
 }
 
 void ActiveObject::terminate() {
-    boost::mutex::scoped_lock<boost::recursive_mutex> sl(*mutex);
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     stop();
-    thread->join();
+    for(auto thread: threads)
+        thread->join();
 }
 
 void ActiveObject::started() {
@@ -47,16 +49,17 @@ void ActiveObject::stopped() {
 void ActiveObject::run() {
     service.reset( new boost::asio::io_service());
     started();
-    worker.reset(new )boost::asio::io_service::work(*service));
-    service->post(&ActiveObject::startPool, this);
+    worker.reset(new boost::asio::io_service::work(*service));
+    service->post(boost::bind(&ActiveObject::startPool, this));
     service->run();
     stopped();
-    thread->stop();
+    for(auto thread: threads)
+        thread->interrupt();
 }
 
 void ActiveObject::startPool() {
     while(threads.size() < thread_pool) {
-        boost::shared_ptr<boost::thread> thread(new boost::thread(&boost::asio::io_service::run, *service)));
+        boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, service.get())));
         threads.push_back(thread);
     }
 }

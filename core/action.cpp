@@ -1,4 +1,5 @@
 #include <core/action.h>
+#include <service/controller_manager.h>
 #include <core/request.h>
 #include <core/context.h>
 #include <tools/property_set.h>
@@ -292,6 +293,27 @@ void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr 
 }
 
 
+Result Action::executeSyncRequest(SessionPtr session, RequestPtr req) {
+    req = prepareSyncRequest(session, req);
+    ControllerManager::getInstance()->perform(req);
+    return wait();
+}
+
+RequestPtr Action::prepareSyncRequest(SessionPtr session, RequestPtr req) {
+    if(not req)
+        req.reset(new Request());
+    req->setReply(session->getOriginalRequest()->getTarget());
+    req->getReply().execution_level = session->getCurrentExecutionLevel();
+    req->getReply().action = getActionId();
+    req->getReply().target = ETargetAction::Reply;
+    req->setRequestId(session->getOriginalRequest()->getRequestId());
+    return req;
+}
+
+void Action::executeAsyncRequest(RequestPtr req) {
+    ControllerManager::getInstance()->perform(req);
+}
+
 DefaultNextAction::DefaultNextAction() : Action("Next") {
     
 }
@@ -300,6 +322,6 @@ DefaultNextAction::~DefaultNextAction() {
     
 }
 
-Result DefaultNextAction::perform(SessionPtr) {
+Result DefaultNextAction::perform(SessionPtr) const {
     return done();
 }

@@ -32,11 +32,11 @@ class StateMachine : public Jsonable {
     std::map<int32_t, std::set<int32_t> > inputs_map;
     std::vector<InputBinding> starters;
 public:
-    StateMachine(WorkflowPtr);
+    StateMachine();
     virtual ~StateMachine();
     
     //! begin execution of request. will sort out if its a new one or not, and dispatch request to appropriate handler.
-    virtual bool execute(SessionPtr, RequestPtr) ;
+    virtual bool execute(SessionPtr, RequestPtr) ;    
     
     //! this is a configuration method, will store action in this state machine, and connect it to other actions.
     void addAction(Step step, Action *, const std::vector<OutputBinding> & );
@@ -57,6 +57,7 @@ public:
     
     //! retrieve the workflow
     WorkflowPtr getWorkflow();
+    void setWorkflow(WorkflowPtr);
     
 protected:
     

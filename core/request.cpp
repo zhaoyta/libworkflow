@@ -4,15 +4,15 @@
 #include <tools/property_set.h>
 
 Request::Request(): Jsonable() {
-    reply.type = ETargetAction::NoReply;
-    target.type = ETargetAction::NoReply;
+    reply.target = ETargetAction::NoReply;
+    target.target = ETargetAction::NoReply;
 }
 
-Request::Request(const Target & target): Jsonable(), target(target), request_id(target.id) , bypass(new PropertySet()){
-    reply.type = Target::NoReply;
+Request::Request(const Target & target): Jsonable(), target(target), request_id(target.identifier) , bypass(new PropertySet()){
+    reply.target = ETargetAction::NoReply;
 }
 
-Request::Request(const Target & target, const Target & reply): Jsonable(), target(target), reply(reply), request_id(target.id)  , bypass(new PropertySet()){
+Request::Request(const Target & target, const Target & reply): Jsonable(), target(target), reply(reply), request_id(target.identifier)  , bypass(new PropertySet()){
     
 }
 
@@ -45,19 +45,19 @@ boost::uuids::uuid Request::getClientId() const {
 }
 
 boost::uuids::uuid Request::getRequestId() const {
-    return target.id;
-}
-
-boost::uuids::uuid Request::getId() const {
     return request_id;
 }
 
+boost::uuids::uuid Request::getId() const {
+    return target.identifier;
+}
+
 std::string Request::shortRequestId() const {
-    std::string id = to_string(request_id).substr(1,8); // extract only the first 8 digit.
+    return shortId(getRequestId());
 }
 
 void Request::setId(const boost::uuids::uuid & id) {
-    target.id = id;
+    target.identifier = id;
 }
 
 void Request::setRequestId(const boost::uuids::uuid & id) {
@@ -119,6 +119,15 @@ ControllerSpawnPtr Request::getControllerSpawn() {
 
 void Request::setControllerSpawn(ControllerSpawnPtr sp) {
     spawn = sp;
+}
+
+
+void Request::setTarget(const Target & t) {
+    target = t;
+}
+
+void Request::setReply(const Target & t) {
+    reply = t;
 }
 
 OSTREAM_HELPER_IMPL(Request, obj) {

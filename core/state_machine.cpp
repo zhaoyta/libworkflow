@@ -11,8 +11,7 @@
 #include <core/action.h>
 
 
-StateMachine::StateMachine(WorkflowPtr workflow) : Jsonable(),
-    workflow(workflow) {
+StateMachine::StateMachine() : Jsonable() {
         
         // define basic workflow.
         
@@ -39,6 +38,9 @@ WorkflowPtr StateMachine::getWorkflow() {
     return workflow;
 }
 
+void StateMachine::setWorkflow(WorkflowPtr wk) {
+    workflow = wk;
+}
 
 void StateMachine::addAction(Step action_id, Action* action, const std::vector<OutputBinding> & bindings) {
     addAction((int32_t)action_id, ActionPtr(action), bindings);

@@ -95,6 +95,13 @@ protected:
     //! async counterpart of error()
     void asyncError(SessionPtr, const std::string & err_key, const std::string & err_message) const;
     
+    //! send request to be executed.
+    Result executeSyncRequest(SessionPtr, RequestPtr);
+    //! ensure the request knows how to come back here.
+    //! If none is provided, will simply create a new one.
+    RequestPtr prepareSyncRequest(SessionPtr, RequestPtr = RequestPtr());
+    //! will execute this request and dont expect it to reply anytime.
+    void executeAsyncRequest(RequestPtr);
     
     //! For loggin, provide informations on which Workflow is running, and what request is being executed
     std::string fingerprint(SessionPtr) const;

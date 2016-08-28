@@ -20,6 +20,8 @@ public:
     Controller(const std::string & name);
     virtual ~Controller();
     
+    //! cast helper :)
+    ControllerPtr shared_from_this();
     //! try to find an appropriate workflow to execute this request.
     virtual bool perform(RequestPtr);
 
@@ -29,8 +31,6 @@ public:
     
     //! register a workflow in this controller
     void addWorkflow(WorkflowPtr);
-    
-    const std::string & getName();
 };
 
 #endif // __CONTROLLER_H_

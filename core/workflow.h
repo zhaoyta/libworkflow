@@ -1,6 +1,7 @@
 #ifndef __WORKFLOW_H_
 #define __WORKFLOW_H_
 
+#include <tools/jsonable.h>
 #include <tools/defines.h>
 #include <boost/uuid/uuid.hpp>
 #include <queue>
@@ -9,6 +10,29 @@ SHARED_PTR(Workflow);
 SHARED_PTR(Timed);
 SHARED_PTR(StateMachine);
 SHARED_PTR(Controller);
+SHARED_PTR(Request);
+SHARED_PTR(Session);
+class ErrorReport;
+
+struct RunningSession {
+    RunningSession();
+    virtual ~RunningSession();
+    
+    //! original request, for tracking purpose
+    RequestPtr original;
+    //! Well the session, essential.
+    SessionPtr session;
+    //! Queued requests.
+    std::queue<RequestPtr> pendingRequests;
+    //! Workflow will control also maximum duration of it's requests.
+    TimedPtr timed;
+    
+    bool active;
+};
+
+namespace boost {
+    class recursive_mutex;
+};
 
 /**
  Whereas StateMachine guaranties execution order, Workflow ensure executability. as such, state machine are exclusively monothreaded.
@@ -24,25 +48,14 @@ SHARED_PTR(Controller);
  
     Also, Workflow is responsible for it's request timeout.
  */
-class Workflow : public Jsonable {
+class Workflow : public Jsonable, public boost::enable_shared_from_this<Workflow> {
     //! Stores session related meta data.
-    struct RunningSession {
-        RunningSession();
-        virtual ~RunningSession();
-        
-        //! original request, for tracking purpose
-        RequestPtr original;
-        //! Well the session, essential.
-        SessionPtr session;
-        //! Queued requests.
-        std::queue<RequestPtr> pendingRequests;
-        //! Workflow will control also maximum duration of it's requests.
-        TimedPtr timed;
-    };
+    
     
     StateMachinePtr stateMachine;
     ControllerPtr controller;
-    
+    boost::shared_ptr<boost::recursive_mutex> mutex;
+
     std::string name;
     
     std::map<boost::uuids::uuid, RunningSession> sessions;
@@ -55,6 +68,8 @@ public:
     
     //! bind thiw workflow to the controller;
     void setController(ControllerPtr);
+    
+    const RunningSession & getRunningSession(boost::uuids::uuid & id) const;
     
     //! main entrypoint of a workflow, will check executability and execute the request.
     bool perform(RequestPtr);
@@ -78,6 +93,10 @@ protected:
     
     //! reply with error.
     void errorReply(RequestPtr, ErrorReport *);
+    
+    bool shouldMakePending(RequestPtr);
+    
+    void addToPending(RequestPtr);
 };
 
 #endif // __WORKFLOW_H_

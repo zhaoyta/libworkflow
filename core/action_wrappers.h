@@ -28,13 +28,13 @@ public:
     
 protected:
     //! This get called whenever a perform is requested.
-    virtual void wrapPerform(SessionPtr);
+    virtual void wrapPerform(SessionPtr) const;
     //! This get called after a perform is requested.
-    virtual void wrapPostPerform(SessionPtr);
+    virtual void wrapPostPerform(SessionPtr) const;
     //! This get called whenever a reply received is requested.
-    virtual void wrapReplyReceived(SessionPtr, RequestPtr);
+    virtual void wrapReplyReceived(SessionPtr, RequestPtr) const;
     //! This get called after a reply received is requested.
-    virtual void wrapPostReplyReceived(SessionPtr, RequestPtr);
+    virtual void wrapPostReplyReceived(SessionPtr, RequestPtr) const;
 };
 
 /** 
@@ -45,39 +45,42 @@ public:
     InterruptWrapper(ActionPtr);
     
 protected:
-    virtual void wrapPerform(SessionPtr);
+    void wrapPerform(SessionPtr) const override;
 };
 
 /**
  This will ensure that all pending request are aborted.
+ Gather contexts linked to finish action, and send them
  */
 class FinishWrapper : public InterruptWrapper {
 public:
     FinishWrapper(ActionPtr);
     
 protected:
-    virtual void wrapPerform(SessionPtr);
+    void wrapPerform(SessionPtr) const override;
 };
 
 /**
  This will ensure that all pending request are aborted.
+ Record provided error and reply to caller.
  */
 class ErrorWrapper : public InterruptWrapper {
 public:
     ErrorWrapper(ActionPtr);
     
 protected:
-    virtual void wrapPerform(SessionPtr);
+    void wrapPerform(SessionPtr) const override;
 };
 
 /**
  This will ensure that all pending request are aborted.
+ Does nothing atm :)
  */
-class CleanupWrapper : public ActionWrapper {
+class CleanupWrapper : public InterruptWrapper {
 public:
     CleanupWrapper(ActionPtr);
     
 protected:
-    virtual void wrapPerform(SessionPtr);
+    void wrapPerform(SessionPtr) const override;
 };
 #endif // __ACTION_WRAPPERS_H_

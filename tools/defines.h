@@ -8,8 +8,8 @@
 #include <map>
 #include <boost/uuid/uuid_io.hpp>
 
-std::string shortId(const boost::uuids::uuid & uid) {
-    return to_string(uid).substr(1,8);
+std::string shortId(const boost::uuids::uuid & uid, int length = 8) {
+    return to_string(uid).substr(1,length);
 }
 
 //! Concat helper macro.

@@ -75,6 +75,9 @@ public:
     ControllerSpawnPtr getControllerSpawn();
     void setControllerSpawn(ControllerSpawnPtr);
     
+    void setTarget(const Target & );
+    void setReply(const Target & );
+    
     const Target & getTarget() const;
     const Target & getReply() const;
     
