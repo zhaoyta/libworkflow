@@ -65,6 +65,34 @@ public:
     virtual ~SkipCtx();
 };
 
+SHARED_PTR(GroupedCtx);
+
+/**
+Grouped Ctx allow to store multiple contexts within one.
+ */
+class GroupedCtx: public Context {
+    std::map<std::string, ContextPtr> contexts;
+public:
+    GroupedCtx();
+    virtual ~GroupedCtx();
+    
+    //! @return numbers of contexts
+    size_t size();
+    
+    ContextPtr getContext(const std::string &);
+    template<class T>
+    boost::shared_ptr<T> getCastedContext(const std::string & ctx) {
+        return boost::dynamic_pointer_cast<T>(getContext(ctx));
+    }
+    
+    void setContext(const std::string &, ContextPtr);
+    
+    std::map<std::string, ContextPtr> & getContexts();
+    
+    
+    
+};
+
 OSTREAM_HELPER_DECL(Context);
 
 #pragma GCC visibility pop

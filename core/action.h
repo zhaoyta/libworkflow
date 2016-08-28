@@ -89,9 +89,9 @@ protected:
     //! Tells state machine that something failed.
     Result error(SessionPtr, const std::string & err_key, const std::string & error_message) const;
     //! When in async mode, this contacts the state machine and tell we're done.
-    void asyncDone() const;
+    void asyncDone(SessionPtr) const;
     //! async counterpart of wait()
-    void asyncWait() const;
+    void asyncWait(SessionPtr) const;
     //! async counterpart of error()
     void asyncError(SessionPtr, const std::string & err_key, const std::string & err_message) const;
     
@@ -150,6 +150,14 @@ private:
 };
 
 OSTREAM_HELPER_DECL(Action);
+
+class DefaultNextAction: public Action {
+public:
+    DefaultNextAction();
+    virtual ~DefaultNextAction();
+    
+    Result perform(SessionPtr) const override;
+};
 
 
 #pragma GCC visibility pop

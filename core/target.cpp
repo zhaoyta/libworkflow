@@ -14,7 +14,8 @@ END_ENUM_IMPL(TargetAction);
 Target::Target() : Jsonable(),
     controller("default"),
     identifier(boost::uuids::random_generator()()),
-    target(ETargetAction::DefaultAction) {}
+    target(ETargetAction::DefaultAction),
+    action(-1){}
 Target::~Target() {}
 
 bool Target::operator<(const Target & t) {

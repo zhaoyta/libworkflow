@@ -8,6 +8,7 @@ enum class Step : int32_t {
     Finish = -1010, //!< Finish is the natural, OK ending of a state machine.
     Interrupt = -1005, //!< This state interrupt the flow of execution, aborting all current execution and ignoring async one as well.
     Status = -1000, //!< This special state allow one to access non session related stuff.
+    Initialisation = 0, //!< This is supposedly the first step.
 };
 
 #endif // __STEPS_H_

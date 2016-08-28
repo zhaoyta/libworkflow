@@ -6,6 +6,7 @@
 #include <map>
 #include <set>
 #include <vector>
+#include <core/steps.h>
 #include <boost/uuid/uuid.hpp>
 
 SHARED_PTR(StateMachine);
@@ -18,6 +19,7 @@ SHARED_PTR(Workflow);
 class InputBinding;
 class OutputBinding;
 class Result;
+class ErrorReport;
 
 /**
  StateMachine define how actions are interlinked, and define which action is running and what actions are expected to run.
@@ -37,6 +39,9 @@ public:
     virtual bool execute(SessionPtr, RequestPtr) ;
     
     //! this is a configuration method, will store action in this state machine, and connect it to other actions.
+    void addAction(Step step, Action *, const std::vector<OutputBinding> & );
+    virtual void addAction(Step step, ActionPtr, const std::vector<OutputBinding> & );
+    void addAction(int32_t action_id, Action *, const std::vector<OutputBinding> & );
     virtual void addAction(int32_t action_id, ActionPtr, const std::vector<OutputBinding> & );
     //! set initial actions of this state machine.
     virtual void addInput(const InputBinding & );
@@ -48,7 +53,7 @@ public:
     bool finished(SessionPtr);
     
     //! This is called by action in async mode.
-    void actionAsyncFinished(const Result &);
+    void actionAsyncFinished(SessionPtr, const Result &);
     
     //! retrieve the workflow
     WorkflowPtr getWorkflow();
@@ -62,12 +67,12 @@ protected:
     //! this handler is called upon receiving an error and execute error action.
     bool errorReceived(SessionPtr) ;
     //! this function is called upon receiving a status request, it should be overriden to have any effect ( atm reply with an empty reply )
-    virtual bool statusReceived(SessionPtr, RequestPtr) ;
+    bool statusReceived(SessionPtr) ;
     //! this handler is called when a reply has been received, check whether it was expected or not.
     bool replyReceived(SessionPtr, RequestPtr);
     
     //! this function does all check prior executing the action.
-    void execute(SessionPtr, int32_t action) ;
+    bool executeAction(SessionPtr, int32_t action) ;
     
     //! this will check what result the action provided, and declare what comes next.
     void actionExecuted(SessionPtr, const Result &) ;
@@ -92,6 +97,16 @@ protected:
     //! Used in case of no next nor pending available.
     //! will check if sufficient conditions are met for finish to get executed.(means at least one guy hit finish.)
     bool canExecuteFinish(SessionPtr);
+    
+    //! Check whether this action can be exectued.
+    bool canExecuteAction(SessionPtr, ActionPtr, ErrorReport &);
+    //! check whether this action can be set to pending.
+    bool canPendAction(SessionPtr, ActionPtr);
+    
+    //! will transpose outputs of given action to inputs of its bound actions.
+    //! will also add items to pendings and nexts.
+    void bindResults(SessionPtr, int32_t action_id);
+    
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

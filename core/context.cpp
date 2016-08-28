@@ -53,3 +53,27 @@ void ListCtx::save(boost::property_tree::ptree & root) const {
 void ListCtx::load(const boost::property_tree::ptree & root) {
     
 }
+
+
+GroupedCtx::GroupedCtx() : Context("GroupedCtx") {}
+GroupedCtx::~GroupedCtx() {}
+
+size_t GroupedCtx::size() {
+    return contexts.size();
+}
+
+ContextPtr GroupedCtx::getContext(const std::string & ctx){
+    if(contexts.count(ctx) > 0)
+        return contexts[ctx];
+    return ContextPtr();
+}
+
+void GroupedCtx::setContext(const std::string & ctx_name, ContextPtr ctx) {
+    if(ctx)
+        contexts[ctx_name] = ctx;
+}
+
+std::map<std::string, ContextPtr> & GroupedCtx::getContexts() {
+    return contexts;
+}
+

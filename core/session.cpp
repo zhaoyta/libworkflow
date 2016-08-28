@@ -5,6 +5,17 @@
 #include <core/controller_spawn.h>
 #include <core/target.h>
 
+BEGIN_ENUM_IMPL(ExecutionStatus) {
+    {"Unplanned",   (uint32_t)EExecutionStatus::Unplanned},
+    {"Pending",     (uint32_t)EExecutionStatus::Pending},
+    {"Planned",     (uint32_t)EExecutionStatus::Planned},
+    {"Skipped",     (uint32_t)EExecutionStatus::Skipped},
+    {"Waiting",     (uint32_t)EExecutionStatus::Waiting},
+    {"Async",       (uint32_t)EExecutionStatus::Async},
+    {"Done",        (uint32_t)EExecutionStatus::Done},
+};
+END_ENUM_IMPL(ExecutionStatus);
+
 Session::Session(): current_execution_level(1), finished(false) {
     
 }
@@ -31,6 +42,10 @@ std::set<int32_t> & Session::getPendings() {
 
 std::set<Target> & Session::getSubQueries() {
     return subqueries;
+}
+
+std::map<int32_t, EExecutionStatus> & Session::getStatus() {
+    return status;
 }
 
 std::map<int32_t, std::map<std::string, ContextPtr> > & Session::getInputs() {

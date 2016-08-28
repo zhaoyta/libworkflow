@@ -37,6 +37,29 @@ OutputBinding::OutputBinding() {
     
 }
 
+
+
+OutputBinding::OutputBinding(const std::string & from_action_output,
+                             Step to_action_id, const std::string & to_action_input) :
+    from_action_output(from_action_output),
+to_action_id((int32_t)to_action_id), to_action_input(to_action_input) {
+    
+}
+
+OutputBinding::OutputBinding(const std::string & from_action_output,
+                             int32_t to_action_id, const std::string & to_action_input) :
+    from_action_output(from_action_output),
+to_action_id(to_action_id), to_action_input(to_action_input) {
+    
+}
+
+OutputBinding::OutputBinding(Step from_action_id, const std::string & from_action_output,
+                             Step to_action_id, const std::string & to_action_input) :
+from_action_id((int32_t)from_action_id), from_action_output(from_action_output),
+to_action_id((int32_t)to_action_id), to_action_input(to_action_input) {
+
+}
+
 OutputBinding::OutputBinding(int32_t from_action_id, const std::string & from_action_output,
                              int32_t to_action_id, const std::string & to_action_input) :
     from_action_id(from_action_id), from_action_output(from_action_output),
@@ -46,6 +69,15 @@ OutputBinding::OutputBinding(int32_t from_action_id, const std::string & from_ac
 
 OutputBinding::~OutputBinding() {
     
+}
+
+
+void OutputBinding::setFromActionId(int32_t aid) {
+    from_action_id = aid;
+}
+
+void OutputBinding::setFromActionId(Step s) {
+    from_action_id = (int32_t)s;
 }
 
 int32_t OutputBinding::getFromActionId() const {

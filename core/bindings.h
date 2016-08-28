@@ -3,6 +3,7 @@
 
 #include <tools/defines.h>
 #include <tools/jsonable.h>
+#include <core/steps.h>
 
 /**
  Meta information as to how inputs are handled from Workflow to first items to execute.
@@ -40,7 +41,16 @@ public:
     OutputBinding();
     OutputBinding(int32_t from_action_id, const std::string & from_action_output,
                   int32_t to_action_id, const std::string & to_action_input);
+    OutputBinding(Step from_action_id, const std::string & from_action_output,
+                  Step to_action_id, const std::string & to_action_input);
+    OutputBinding(const std::string & from_action_output,
+                  int32_t to_action_id, const std::string & to_action_input);
+    OutputBinding(const std::string & from_action_output,
+                  Step to_action_id, const std::string & to_action_input);
     virtual ~OutputBinding();
+    
+    void setFromActionId(int32_t);
+    void setFromActionId(Step);
     
     int32_t getFromActionId() const;
     const std::string & getFromActionOutput() const;

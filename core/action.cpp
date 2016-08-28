@@ -158,20 +158,20 @@ Result Action::error(SessionPtr session, const std::string & err_key, const std:
     return r;
 }
 
-void Action::asyncDone() const {
+void Action::asyncDone(SessionPtr session) const {
     Result r;
     r.action_id = getActionId();
     r.type = Result::Done;
     
-    getStateMachine()->actionAsyncFinished(r);
+    getStateMachine()->actionAsyncFinished(session, r);
 }
 
-void Action::asyncWait() const {
+void Action::asyncWait(SessionPtr session) const {
     Result r;
     r.action_id = getActionId();
     r.type = Result::Wait;
     
-    getStateMachine()->actionAsyncFinished(r);
+    getStateMachine()->actionAsyncFinished(session, r);
 }
 
 void Action::asyncError(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
@@ -180,7 +180,7 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
     r.type = Result::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
 
-    getStateMachine()->actionAsyncFinished(r);
+    getStateMachine()->actionAsyncFinished(session, r);
 }
 
 
@@ -270,14 +270,12 @@ void Action::defineInput(const PutDefinition & d) {
 }
 
 void Action::defineOutput(const std::string & name, TypeChecker * checker, bool mandatory) {
-    
     PutDefinition d;
     d.put_name = name;
     d.checker.reset(checker);
     d.mandatory = mandatory;
-    
+
     defineOutput(d);
-    
 }
 
 void Action::defineOutput(const PutDefinition & d) {
@@ -293,3 +291,15 @@ void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr 
     session->setOutput(getActionId(), name, ctx);
 }
 
+
+DefaultNextAction::DefaultNextAction() : Action("Next") {
+    
+}
+
+DefaultNextAction::~DefaultNextAction() {
+    
+}
+
+Result DefaultNextAction::perform(SessionPtr) {
+    return done();
+}
