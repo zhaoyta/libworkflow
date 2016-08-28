@@ -198,11 +198,11 @@ double Action::doubleValue(SessionPtr session, const std::string & key, double d
     // well def config is Session(byAction) > Session > Action
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getDoubleValue(key, def);
+        return session->getBypass(getActionId())->getDoubleProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getDoubleValue(key,def);
+       return session->getBypass()->getDoubleProperty(key,def);
     if(propertyset->hasProperty(key))
-       return propertyset->getDoubleValue(key, def);
+       return propertyset->getDoubleProperty(key, def);
        
     return def;
 }
@@ -210,11 +210,11 @@ double Action::doubleValue(SessionPtr session, const std::string & key, double d
 bool Action::boolValue(SessionPtr session, const std::string & key, bool def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getBoolValue(key, def);
+        return session->getBypass(getActionId())->getBoolProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getBoolValue(key,def);
+       return session->getBypass()->getBoolProperty(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getBoolValue(key, def);
+       return propertyset->getBoolProperty(key, def);
        
        return def;
 }
@@ -222,11 +222,11 @@ bool Action::boolValue(SessionPtr session, const std::string & key, bool def) co
 std::string Action::stringValue(SessionPtr session, const std::string & key, const std::string & def ) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getStringValue(key, def);
+        return session->getBypass(getActionId())->getStringProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getStringValue(key,def);
+       return session->getBypass()->getStringProperty(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getStringValue(key, def);
+       return propertyset->getStringProperty(key, def);
        
        return def;
 }
@@ -234,11 +234,11 @@ std::string Action::stringValue(SessionPtr session, const std::string & key, con
 uint32_t Action::uintValue(SessionPtr session, const std::string & key, uint32_t def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getUintValue(key, def);
+        return session->getBypass(getActionId())->getUintProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getUintValue(key,def);
+       return session->getBypass()->getUintProperty(key,def);
        if(propertyset->hasProperty(key))
-       return propertyset->getUintValue(key, def);
+       return propertyset->getUintProperty(key, def);
        
        return def;
 }
@@ -246,11 +246,11 @@ uint32_t Action::uintValue(SessionPtr session, const std::string & key, uint32_t
 ContextPtr Action::customValue(SessionPtr session, const std::string & key, ContextPtr def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getCustomValue(key, def);
+        return session->getBypass(getActionId())->getCustomProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-        return session->getBypass()->getCustomValue(key,def);
+        return session->getBypass()->getCustomProperty(key,def);
     if(propertyset->hasProperty(key))
-        return propertyset->getCustomValue(key, def);
+        return propertyset->getCustomProperty(key, def);
     
     return def;
 }

@@ -1,12 +1,15 @@
-#include <services/controller_manager.h>
+#include <service/controller_manager.h>
 #include <core/controller.h>
 #include <core/request.h>
 
 ControllerManager * ControllerManager::instance = NULL;
 
-ControllerManager::ControllerManager(uint32_t default_pool) : ActiveObject("ControllerManager") {
-    
-    
+ControllerManager::ControllerManager(uint32_t default_pool) :
+    ActiveObject("ControllerManager"),
+    default_pool(default_pool)
+{
+    if(default_pool == 0)
+        default_pool = 1;
 }
 ControllerManager::~ControllerManager() {}
 
@@ -18,7 +21,7 @@ ControllerManager * ControllerManager::getInstance() {
 
 void ControllerManager::perform(RequestPtr req) {
     getIOService()->dispatch(boost::bind<void>([&](RequestPtr req) {
-        if(req->getTarget().type == Target::NoReply) {
+        if(req->getTarget().target == ETargetAction::NoReply) {
             //! @todo log nothing to do :)
             return;
         }
@@ -27,14 +30,13 @@ void ControllerManager::perform(RequestPtr req) {
         if(controllers.count(req->getTarget().controller) > 0 )
             able = controllers[req->getTarget().controller]->perform(req);
         else {
-            able = controllers["default"]->perform(req)
+            able = controllers["default"]->perform(req);
         }
         
         if(not able) {
             //! @todo add log stating impossibility to find an apt controller.
         }
-    }
-    ), req);
+    } , req));
 }
 
 void ControllerManager::started() {

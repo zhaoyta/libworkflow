@@ -6,7 +6,7 @@
 Jsonable::Jsonable() {}
 Jsonable::~Jsonable(){}
 
-void Jsonable::save(std::string & str) const {
+void Jsonable::str_save(std::string & str) const {
     boost::property_tree::ptree root;
     save(root);
     
@@ -16,8 +16,9 @@ void Jsonable::save(std::string & str) const {
     
 }
 
-void Jsonable::load(const std::string & str) {
+void Jsonable::str_load(const std::string & str) {
     boost::property_tree::ptree root;
     std::stringstream ss(str);
-    load_json(ss, root);
+    read_json(ss, root);
+    load(root);
 }

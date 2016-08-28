@@ -12,20 +12,20 @@ template<typename T> class Property;
 /** Helper to declare all appropriate property functions for each type of data.
  
     Declares:
- type getTypeValue(const std::string &key) const;
- type getTypeValue(const std::string &key, const type & default_value) const;
- type getTypeValue(const std::string &key, const type & default_value, bool & is_present) const;
+ type getTypeProperty(const std::string &key) const;
+ type getTypeProperty(const std::string &key, const type & default_value) const;
+ type getTypeProperty(const std::string &key, const type & default_value, bool & is_present) const;
  
- void defineTypeValue(const std::string & key, const type & value, const std::string & description, bool exposed = false);
+ void defineTypeProperty(const std::string & key, const type & value, const std::string & description, bool exposed = false);
  
  //! @return false if the propertyset is guarded and value hasn't been defined.
- bool setTypeValue(const std::string & key, const type & value);
+ bool setTypeProperty(const std::string & key, const type & value);
  
  */
 #define DECLARE_PROPERTY_FUNCTIONS(Name,type) \
-type __CAT(__CAT(get,Name),Value)(const std::string & key) const; \
-type __CAT(__CAT(get,Name),Value)(const std::string & key, const type & default_value) const; \
-type __CAT(__CAT(get,Name),Value)(const std::string & key, const type & default_value, bool & is_present) const; \
+type __CAT(__CAT(get,Name),Property)(const std::string & key) const; \
+type __CAT(__CAT(get,Name),Property)(const std::string & key, const type & default_value) const; \
+type __CAT(__CAT(get,Name),Property)(const std::string & key, const type & default_value, bool & is_present) const; \
 \
 void __CAT(__CAT(define,Name),Property)(const std::string & key, const type & value, const std::string & description, bool exposed = false); \
 \

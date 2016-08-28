@@ -2,22 +2,24 @@
 #define __PROPERTY_H_
 
 #include <tools/jsonable.h>
+#include <core/context.h>
 #include <string>
 
-/**
-    Define a Property of a PropertySet.
- Property is a key, a value, a description, and tell whether this value is exposed to the world or not.
- */
-template<typename T>
-class Property : public Jsonable{
-public:
-    enum Type: uint32_t {
+BEGIN_ENUM_DECL(PropertyType) {
         Uint,
         Bool,
         String,
         Double,
         Custom
-    } type;
+};
+END_ENUM_DECL(PropertyType, Uint, "Uint");
+
+/**
+    Define a Property of a PropertySet.
+ Property is a key, a value, a description, and tell whether this value is exposed to the world or not.
+ */
+template<typename T> class Property : public Jsonable{
+public:
     
     std::string key;
     //! Actual value.
@@ -27,67 +29,68 @@ public:
     //! Should this value be exposed outside it's action current worklow.
     bool exposed;
     
+    EPropertyType type;
+    
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
 };
 
-template<typename T>
-void Property::save(boost::property_tree::ptree & root) const {
+template<typename T> void Property<T>::save(boost::property_tree::ptree & root) const {
     // Log: unable to store this ... well, shouldn't happend anyway :)
 }
 
 template<>
-void Property::save<bool>(boost::property_tree::ptree & root) const {
+void Property<bool>::save(boost::property_tree::ptree & root) const {
     
 }
 
 template<>
-void Property::save<std::string>(boost::property_tree::ptree & root) const {
+void Property<std::string>::save(boost::property_tree::ptree & root) const {
     
 }
 
 template<>
-void Property::save<uint32_t>(boost::property_tree::ptree & root) const {
+void Property<uint32_t>::save(boost::property_tree::ptree & root) const {
     
 }
 
 template<>
-void Property::save<double>(boost::property_tree::ptree & root) const {
+void Property<double>::save(boost::property_tree::ptree & root) const {
     
 }
 
 template<>
-void Property::save<ContextPtr>(boost::property_tree::ptree & root) const {
+void Property<ContextPtr>::save(boost::property_tree::ptree & root) const {
     
 }
 
 template<typename T>
-void Property::load(const boost::property_tree::ptree & root) {
+void Property<T>::load(const boost::property_tree::ptree & root) {
     // Log: unable to store this ... well, shouldn't happend anyway :)
 }
 
 template<>
-void Property::load<bool>(const boost::property_tree::ptree & root) {
+void Property<bool>::load(const boost::property_tree::ptree & root) {
     
 }
 
 template<>
-void Property::load<std::string>(const boost::property_tree::ptree & root) {
+void Property<std::string>::load(const boost::property_tree::ptree & root) {
     
 }
 
 template<>
-void Property::load<uint32_t>(const boost::property_tree::ptree & root) {
+void Property<uint32_t>::load(const boost::property_tree::ptree & root) {
     
 }
 
 template<>
-void Property::load<double>(const boost::property_tree::ptree & root) {
+void Property<double>::load(const boost::property_tree::ptree & root) {
     
 }
 
 template<>
-void Property::load<ContextPtr>(const boost::property_tree::ptree & root) {
+void Property<ContextPtr>::load(const boost::property_tree::ptree & root) {
     
 }
 

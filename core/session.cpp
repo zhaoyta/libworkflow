@@ -105,7 +105,7 @@ const std::vector<RequestPtr> & Session::getRequests() const {
 RequestPtr Session::getLastRequest() const {
     if(requests.size() == 0)
         return RequestPtr();
-    return * requests.last();
+    return * requests.end();
 }
 
 ControllerSpawnPtr Session::getControllerSpawn() {
@@ -120,9 +120,9 @@ void Session::pushRequest(RequestPtr req) {
         request = req;
         //! recovering bypasses ...
         bypass = req->getBypass();
-        bypasses = req->getActionBypasses();
+        action_bypasses = req->getActionBypasses();
     }
-    request.push_back(req);
+    requests.push_back(req);
 }
 
 bool Session::hasFinished() {

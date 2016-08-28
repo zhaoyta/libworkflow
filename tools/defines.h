@@ -58,7 +58,8 @@ public:\
     static __CAT(E,Enum) valueFromString(const std::string &, __CAT(E,Enum) def = __CAT(E,Enum)::DefaultValue); \
     \
     static std::map<std::string, uint32_t> getConvertion(); \
-};
+}; \
+std::ostream& operator<<(std::ostream& out,__CAT(E,Enum));
 
 //! This begins implementation of all this, First step is to fill the conversion map, string to uint32_t
 #define BEGIN_ENUM_IMPL(Enum) std::map<std::string, uint32_t>  __CAT(Enum,Alpha) =
@@ -67,7 +68,7 @@ public:\
 //! @todo add log in every conversion failure.
 //! this implement convertion
 #define END_ENUM_IMPL(Enum) \
-std::string __CAT(C,Enum)::valueToString(uint32_t, const std::string & def) { \
+std::string __CAT(C,Enum)::valueToString(uint32_t key, const std::string & def) { \
     for(const auto & kv: __CAT(Enum,Alpha)) {\
         if(kv.second == (uint32_t)key)\
             return kv.first;\
@@ -83,15 +84,19 @@ std::string __CAT(C,Enum)::valueToString(__CAT(E,Enum) key, const std::string & 
     return def;\
 }\
 \
-__(E,Enum) __CAT(C,Enum)::valueFromString(const std::string & key, __CAT(E,Enum) def) { \
+__CAT(E,Enum) __CAT(C,Enum)::valueFromString(const std::string & key, __CAT(E,Enum) def) { \
     if(getConvertion().count(key))\
         return (__CAT(E,Enum))getConvertion().at(key);\
     return def; \
 } \
 \
 std::map<std::string, uint32_t> __CAT(C,Enum)::getConvertion() { \
-    return __CAT(Enum, Alpha); \
+    return __CAT(Enum,Alpha); \
 } \
+std::ostream& operator<<(std::ostream& out,__CAT(E,Enum) e) { \
+out << __CAT(C,Enum)::valueToString(e); \
+return out; \
+}
 
 
 #endif // __SHARED_PTR_H_

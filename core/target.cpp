@@ -1,5 +1,5 @@
 #include <core/target.h>
-#include <boost/uuid/uuid_generator.hpp>
+#include <boost/uuid/uuid_generators.hpp>
 
 BEGIN_ENUM_IMPL(TargetAction) {
     {"DefaultAction",   (uint32_t)ETargetAction::DefaultAction},
@@ -11,6 +11,7 @@ BEGIN_ENUM_IMPL(TargetAction) {
 };
 END_ENUM_IMPL(TargetAction);
 
+
 Target::Target() : Jsonable(),
     controller("default"),
     identifier(boost::uuids::random_generator()()),
@@ -18,7 +19,7 @@ Target::Target() : Jsonable(),
     action(-1){}
 Target::~Target() {}
 
-bool Target::operator<(const Target & t) {
+bool Target::operator<(const Target & t) const{
     return identifier < t.identifier;
 }
 

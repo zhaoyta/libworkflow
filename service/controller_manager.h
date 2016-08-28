@@ -17,6 +17,7 @@ class ControllerManager : public ActiveObject {
     static ControllerManager * instance;
     
     std::map<std::string, ControllerPtr> controllers;
+    uint32_t default_pool;
 public:
     ControllerManager(uint32_t default_pool = 10);
     virtual ~ControllerManager();

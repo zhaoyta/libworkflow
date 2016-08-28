@@ -17,7 +17,7 @@ class Controller: public ActiveObject,
                   public boost::enable_shared_from_this<Controller> {
     std::map<std::string, WorkflowPtr> workflows;
 public:
-    Controller(const std::string & name);
+    Controller(const std::string & name, uint32_t pool);
     virtual ~Controller();
     
     //! cast helper :)

@@ -38,13 +38,13 @@ public:
     
     
     //! @return topmost error message.
-    const std::string & getErrorMessage() const;
+    const std::string & getErrorMessage() ;
     //! @return topmost error key
-    const std::string & getErrorKey() const;
+    const std::string & getErrorKey() ;
     //! @return ErrorReport parent.
-    const ErrorReportPtr getParent() const;
+    const ErrorReportPtr getParent() ;
     //! @return a vector of all error report ancestry of this error.
-    const std::vector<ErrorReportPtr> getAncestry() const;
+    const std::vector<ErrorReportPtr> getAncestry();
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

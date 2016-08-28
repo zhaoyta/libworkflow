@@ -41,7 +41,7 @@ public:
     
     int32_t action;
     
-    bool operator<(const Target & t);
+    bool operator<(const Target & t) const;
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
     

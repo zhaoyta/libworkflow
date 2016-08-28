@@ -5,8 +5,8 @@
 #include <core/target.h>
 
 
-Controller::Controller(const std::string & name) :
-    ActiveObject(name) {}
+Controller::Controller(const std::string & name, uint32_t pool) :
+    ActiveObject(name, pool) {}
 Controller::~Controller() {}
 
 bool Controller::perform(RequestPtr request) {

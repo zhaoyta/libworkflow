@@ -21,14 +21,14 @@ void Timed::setDuration(double ms) {
 
 void Timed::start() {
     if(timer) {
-        timer.expires_from_now(boost::posix_time::milliseconds(ms_timeout));
-        my_timer.async_wait(timeoutFunction);
+        timer->expires_from_now(boost::posix_time::milliseconds(ms_timeout));
+        timer->async_wait(timeoutFunction);
     }
 }
 
 void Timed::stop() {
     if(timer) {
-        timer.cancel();
+        timer->cancel();
     }
 }
 
@@ -36,7 +36,7 @@ void Timed::setIOService(IOServicePtr service) {
     timer.reset(new boost::asio::deadline_timer(*service));
 }
 
-void setTimeoutFunction(const boost::function<void(const boost::system::error_code&)> & to) {
+void Timed::setTimeoutFunction(const boost::function<void(const boost::system::error_code&)> & to) {
     timeoutFunction = to;
 }
 

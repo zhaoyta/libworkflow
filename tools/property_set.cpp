@@ -1,4 +1,5 @@
 #include <tools/property_set.h>
+#include <tools/property.h>
 #include <core/context.h>
 
 PropertySet::PropertySet() : Jsonable(), guarded(false) {
@@ -36,41 +37,43 @@ bool PropertySet::isExposed(const std::string & key) const {
     if(custom_values.count(key)> 0 ) {
         return custom_values.at(key).exposed;
     }
+    return false;
 }
 
-std::string PropertySet::getDescription(const std::string &) const {
+std::string PropertySet::getDescription(const std::string & key) const {
     if(bool_values.count(key)> 0 ) {
-        return bool_values.at(key).exposed;
+        return bool_values.at(key).description;
     }
     if(double_values.count(key)> 0 ) {
-        return double_values.at(key).exposed;
+        return double_values.at(key).description;
     }
     if(uint_values.count(key)> 0 ) {
-        return uint_values.at(key).exposed;
+        return uint_values.at(key).description;
     }
     if(string_values.count(key)> 0 ) {
-        return string_values.at(key).exposed;
+        return string_values.at(key).description;
     }
     if(custom_values.count(key)> 0 ) {
-        return custom_values.at(key).exposed;
+        return custom_values.at(key).description;
     }
+    return "";
 }
 
 // #########################
 // ##### BOOL PROPERTIES ###
 // #########################
 
-bool PropertySet::getBoolValue(const std::string &key) const {
+bool PropertySet::getBoolProperty(const std::string &key) const {
     bool defaultv = false;
-    return getBoolValue(key,defaulv);
+    return getBoolProperty(key,defaultv);
 }
 
-bool PropertySet::getBoolValue(const std::string &key, const bool & default_value) const {
+bool PropertySet::getBoolProperty(const std::string &key, const bool & default_value) const {
     bool is_present = false;
-    return getBoolValue(key,default_value,is_present);
+    return getBoolProperty(key,default_value,is_present);
 }
 
-bool PropertySet::getBoolValue(const std::string &key, const bool & default_value, bool & is_present) const {
+bool PropertySet::getBoolProperty(const std::string &key, const bool & default_value, bool & is_present) const {
     is_present = false;
     if(bool_values.count(key)> 0) {
         is_present = true;
@@ -79,18 +82,18 @@ bool PropertySet::getBoolValue(const std::string &key, const bool & default_valu
     return default_value;
 }
 
-void PropertySet::defineBoolValue(const std::string & key, const bool & value, const std::string & description, bool exposed) {
+void PropertySet::defineBoolProperty(const std::string & key, const bool & value, const std::string & description, bool exposed) {
     Property<bool> prop;
     prop.key = key;
     prop.value = value;
-    prop.type = Bool;
+    prop.type = EPropertyType::Bool;
     prop.description = description;
     prop.exposed = exposed;
     
-    bool_values[key] = property;
+    bool_values[key] = prop;
 }
 
-bool PropertySet::setBoolValue(const std::string & key, const bool & value) {
+bool PropertySet::setBoolProperty(const std::string & key, const bool & value) {
     if(not guarded or (guarded and bool_values.count(key) > 0 )) {
         bool_values[key].value = value;
         return true;
@@ -105,17 +108,17 @@ bool PropertySet::setBoolValue(const std::string & key, const bool & value) {
 // ##### DOUBLE PROPERTIES ###
 // ###########################
 
-double PropertySet::getDoubleValue(const std::string &key) const {
+double PropertySet::getDoubleProperty(const std::string &key) const {
     double defaultv = 0;
-    return getDoubleValue(key,defaulv);
+    return getDoubleProperty(key,defaultv);
 }
 
-double PropertySet::getDoubleValue(const std::string &key, const double & default_value) const {
+double PropertySet::getDoubleProperty(const std::string &key, const double & default_value) const {
     bool is_present = false;
-    return getDoubleValue(key,default_value,is_present);
+    return getDoubleProperty(key,default_value,is_present);
 }
 
-double PropertySet::getDoubleValue(const std::string &key, const double & default_value, bool & is_present) const {
+double PropertySet::getDoubleProperty(const std::string &key, const double & default_value, bool & is_present) const {
     is_present = false;
     if(double_values.count(key)> 0) {
         is_present = true;
@@ -124,18 +127,18 @@ double PropertySet::getDoubleValue(const std::string &key, const double & defaul
     return default_value;
 }
 
-void PropertySet::defineDoubleValue(const std::string & key, const double & value, const std::string & description, bool exposed) {
+void PropertySet::defineDoubleProperty(const std::string & key, const double & value, const std::string & description, bool exposed) {
     Property<double> prop;
     prop.key = key;
     prop.value = value;
-    prop.type = Double;
+    prop.type = EPropertyType::Double;
     prop.description = description;
     prop.exposed = exposed;
     
-    double_values[key] = property;
+    double_values[key] = prop;
 }
 
-double PropertySet::setDoubleValue(const std::string & key, const double & value) {
+bool PropertySet::setDoubleProperty(const std::string & key, const double & value) {
     if(not guarded or (guarded and double_values.count(key) > 0 )) {
         double_values[key].value = value;
         return true;
@@ -150,17 +153,17 @@ double PropertySet::setDoubleValue(const std::string & key, const double & value
 // ##### UINT PROPERTIES #####
 // ###########################
 
-uint32_t PropertySet::getUintValue(const std::string &key) const {
+uint32_t PropertySet::getUintProperty(const std::string &key) const {
     uint32_t defaultv = 0;
-    return getUintValue(key,defaulv);
+    return getUintProperty(key,defaultv);
 }
 
-uint32_t PropertySet::getUintValue(const std::string &key, const uint32_t & default_value) const {
+uint32_t PropertySet::getUintProperty(const std::string &key, const uint32_t & default_value) const {
     bool is_present = false;
-    return getUintValue(key,default_value,is_present);
+    return getUintProperty(key,default_value,is_present);
 }
 
-uint32_t PropertySet::getUintValue(const std::string &key, const uint32_t & default_value, bool & is_present) const {
+uint32_t PropertySet::getUintProperty(const std::string &key, const uint32_t & default_value, bool & is_present) const {
     is_present = false;
     if(custom_values.count(key)> 0) {
         is_present = true;
@@ -169,18 +172,18 @@ uint32_t PropertySet::getUintValue(const std::string &key, const uint32_t & defa
     return default_value;
 }
 
-void PropertySet::defineUintValue(const std::string & key, const uint32_t & value, const std::string & description, bool exposed) {
+void PropertySet::defineUintProperty(const std::string & key, const uint32_t & value, const std::string & description, bool exposed) {
     Property<uint32_t> prop;
     prop.key = key;
     prop.value = value;
-    prop.type = Double;
+    prop.type = EPropertyType::Uint;
     prop.description = description;
     prop.exposed = exposed;
     
-    uint_values[key] = property;
+    uint_values[key] = prop;
 }
 
-uint32_t PropertySet::setUintValue(const std::string & key, const uint32_t & value) {
+bool PropertySet::setUintProperty(const std::string & key, const uint32_t & value) {
     if(not guarded or (guarded and uint_values.count(key) > 0 )) {
         uint_values[key].value = value;
         return true;
@@ -196,39 +199,39 @@ uint32_t PropertySet::setUintValue(const std::string & key, const uint32_t & val
 // ##### STRING PROPERTIES #####
 // #############################
 
-std::string PropertySet::getStringValue(const std::string &key) const {
+std::string PropertySet::getStringProperty(const std::string &key) const {
     std::string defaultv;
-    return getStringValue(key,defaulv);
+    return getStringProperty(key,defaultv);
 }
 
-std::string PropertySet::getStringValue(const std::string &key, const std::string & default_value) const {
+std::string PropertySet::getStringProperty(const std::string &key, const std::string & default_value) const {
     bool is_present = false;
-    return getStringValue(key,default_value,is_present);
+    return getStringProperty(key,default_value,is_present);
 }
 
-std::string PropertySet::getStringValue(const std::string &key, const std::string & default_value, bool & is_present) const {
+std::string PropertySet::getStringProperty(const std::string &key, const std::string & default_value, bool & is_present) const {
     is_present = false;
-    if(std::stringvalues.count(key)> 0) {
+    if(string_values.count(key)> 0) {
         is_present = true;
-        return std::stringvalues.at(key).value;
+        return string_values.at(key).value;
     }
     return default_value;
 }
 
-void PropertySet::defineStringValue(const std::string & key, const std::string & value, const std::string & description, bool exposed) {
+void PropertySet::defineStringProperty(const std::string & key, const std::string & value, const std::string & description, bool exposed) {
     Property<std::string> prop;
     prop.key = key;
     prop.value = value;
-    prop.type = Double;
+    prop.type = EPropertyType::String;
     prop.description = description;
     prop.exposed = exposed;
     
-    std::stringvalues[key] = property;
+    string_values[key] = prop;
 }
 
-std::string PropertySet::setStringValue(const std::string & key, const std::string & value) {
-    if(not guarded or (guarded and std::stringvalues.count(key) > 0 )) {
-        std::stringvalues[key].value = value;
+bool PropertySet::setStringProperty(const std::string & key, const std::string & value) {
+    if(not guarded or (guarded and string_values.count(key) > 0 )) {
+        string_values[key].value = value;
         return true;
     } else {
         // Log: unable to set value of a guarded and undefined property.
@@ -241,17 +244,17 @@ std::string PropertySet::setStringValue(const std::string & key, const std::stri
 // ##### CUSTOM PROPERTIES #####
 // #############################
 
-ContextPtr PropertySet::getCustomValue(const std::string &key) const {
+ContextPtr PropertySet::getCustomProperty(const std::string &key) const {
     ContextPtr defaultv;
-    return getCustomValue(key,defaulv);
+    return getCustomProperty(key,defaultv);
 }
 
-ContextPtr PropertySet::getCustomValue(const std::string &key, const ContextPtr & default_value) const {
+ContextPtr PropertySet::getCustomProperty(const std::string &key, const ContextPtr & default_value) const {
     bool is_present = false;
-    return getCustomValue(key,default_value,is_present);
+    return getCustomProperty(key,default_value,is_present);
 }
 
-ContextPtr PropertySet::getCustomValue(const std::string &key, const ContextPtr & default_value, bool & is_present) const {
+ContextPtr PropertySet::getCustomProperty(const std::string &key, const ContextPtr & default_value, bool & is_present) const {
     is_present = false;
     if(custom_values.count(key)> 0) {
         is_present = true;
@@ -260,18 +263,18 @@ ContextPtr PropertySet::getCustomValue(const std::string &key, const ContextPtr 
     return default_value;
 }
 
-void PropertySet::defineCustomValue(const std::string & key, const ContextPtr & value, const std::string & description, bool exposed) {
+void PropertySet::defineCustomProperty(const std::string & key, const ContextPtr & value, const std::string & description, bool exposed) {
     Property<ContextPtr> prop;
     prop.key = key;
     prop.value = value;
-    prop.type = Double;
+    prop.type = EPropertyType::Custom;
     prop.description = description;
     prop.exposed = exposed;
     
-    custom_values[key] = property;
+    custom_values[key] = prop;
 }
 
-ContextPtr PropertySet::setCustomValue(const std::string & key, const ContextPtr & value) {
+bool PropertySet::setCustomProperty(const std::string & key, const ContextPtr & value) {
     if(not guarded or (guarded and custom_values.count(key) > 0 )) {
         custom_values[key].value = value;
         return true;
