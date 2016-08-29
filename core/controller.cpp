@@ -3,11 +3,10 @@
 #include <core/controller_spawn.h>
 #include <core/request.h>
 #include <core/target.h>
-
+#include <iostream>
 
 Controller::Controller(const std::string & name, uint32_t pool) :
-    ActiveObject(name, pool),
-    boost::enable_shared_from_this<Controller>() {}
+    ActiveObject(name, pool) {}
 Controller::~Controller() {}
 
 bool Controller::perform(RequestPtr request) {
@@ -27,6 +26,13 @@ ControllerSpawnPtr Controller::spawnForRequest(RequestPtr) {
 }
 
 void Controller::addWorkflow(WorkflowPtr workflow) {
+    std::cout << this << " Add workflow : " << workflow << std::endl;
     workflow->setController(shared_from_this());
     workflows[workflow->getName()] = workflow;
+}
+
+
+OSTREAM_HELPER_IMPL(Controller, obj) {
+    out << "[Controller] name: " << obj.getName() << ", pool: " << obj.getPoolSize();
+    return out;
 }

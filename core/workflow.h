@@ -106,6 +106,7 @@ protected:
     
 };
 
+OSTREAM_HELPER_DECL(Workflow);
 
 #pragma GCC visibility pop
 

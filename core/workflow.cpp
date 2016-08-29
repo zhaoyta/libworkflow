@@ -171,3 +171,8 @@ void Workflow::save(boost::property_tree::ptree & root) const {
 void Workflow::load(const boost::property_tree::ptree & root) {
     
 }
+
+OSTREAM_HELPER_IMPL(Workflow, obj) {
+    out << "[Workflow] name: " << obj.getName();
+    return out;
+}

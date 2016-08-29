@@ -58,6 +58,8 @@ public:
     
     const std::string & getName() const;
     
+    size_t getPoolSize() const;
+    
 protected:
     virtual void started();
     virtual void stopped();

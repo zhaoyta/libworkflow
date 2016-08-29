@@ -31,7 +31,7 @@ IOServicePtr ActiveObject::getIOService() {
 void ActiveObject::start() {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     if( threads.size() == 0 ) {
-        std::cout << "Starting active object ..." << std::endl;
+        std::cout << this << " Starting active object ..." << std::endl;
         boost::shared_ptr<boost::thread> thread(new boost::thread(&ActiveObject::run, this));
         threads.push_back(thread);
     }
@@ -58,21 +58,23 @@ void ActiveObject::stopped() {
 }
 
 void ActiveObject::setStoppedFunction(boost::function<void(ActiveObjectPtr)> fn) {
-    start_function = fn;
+    stop_function = fn;
 }
 
 void ActiveObject::setStartedFunction(boost::function<void(ActiveObjectPtr)> fn) {
-    stop_function= fn;
+    std::cout <<  this  <<" Setting start function" << std::endl;
+    start_function= fn;
 }
 
 void ActiveObject::run() {
-    std::cout << "Starting active object ... Run called" << std::endl;
+    std::cout <<  this  <<" Starting active object ... Run called" << std::endl;
     service.reset( new boost::asio::io_service());
     started();
     if(start_function) {
-        std::cout << "Starting active object ... calling start_function" << std::endl;
-        
+        std::cout <<  this  <<" Starting active object ... calling start_function" << std::endl;
         start_function(shared_from_this());
+    } else  {
+        std::cout <<  this  <<" Start function unset ..." << std::endl;
     }
     worker.reset(new boost::asio::io_service::work(*service));
     service->post(boost::bind(&ActiveObject::startPool, this));
@@ -89,6 +91,10 @@ void ActiveObject::startPool() {
         boost::shared_ptr<boost::thread> thread(new boost::thread(boost::bind(&boost::asio::io_service::run, service.get())));
         threads.push_back(thread);
     }
+}
+
+size_t ActiveObject::getPoolSize() const {
+    return thread_pool;
 }
 
 OSTREAM_HELPER_IMPL(ActiveObject, obj) {

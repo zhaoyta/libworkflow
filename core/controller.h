@@ -14,8 +14,7 @@ SHARED_PTR(Workflow);
     Stores workflows, can add some meta data to requests.
     You may add here some scheduling mecanism or request perform control
  */
-class Controller: public ActiveObject,
-                  public boost::enable_shared_from_this<Controller> {
+class Controller: public ActiveObject {
     std::map<std::string, WorkflowPtr> workflows;
 public:
     Controller(const std::string & name, uint32_t pool);
@@ -33,6 +32,8 @@ public:
     //! register a workflow in this controller
     void addWorkflow(WorkflowPtr);
 };
+
+OSTREAM_HELPER_DECL(Controller);
 
 #pragma GCC visibility pop
 

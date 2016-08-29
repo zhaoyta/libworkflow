@@ -50,9 +50,15 @@ void ControllerManager::perform(RequestPtr req) {
 
 void ControllerManager::started() {
     auto controller = ControllerPtr(new Controller("default", default_pool));
+    std::cout << this << " Setting new controller " << controller;
     registerController(controller);
 }
 
 void ControllerManager::registerController(ControllerPtr controller) {
     controllers[controller->getName()] = controller;
+}
+
+OSTREAM_HELPER_IMPL(ControllerManager, obj) {
+    out << "[ControllerManager]";
+    return out;
 }
