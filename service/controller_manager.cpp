@@ -8,6 +8,7 @@ ControllerManager::ControllerManager(uint32_t default_pool) :
     ActiveObject("ControllerManager",3, true),
     default_pool(default_pool)
 {
+    setNamespace("ctrl.mngr");
     if(default_pool == 0)
         default_pool = 1;
     
@@ -50,11 +51,12 @@ void ControllerManager::perform(RequestPtr req) {
 
 void ControllerManager::started() {
     auto controller = ControllerPtr(new Controller("default", default_pool));
-    std::cout << this << " Setting new controller " << controller;
+    
     registerController(controller);
 }
 
 void ControllerManager::registerController(ControllerPtr controller) {
+    BOOST_LOG_SEV(logger, Info) << " Setting new controller " << controller;
     controllers[controller->getName()] = controller;
 }
 

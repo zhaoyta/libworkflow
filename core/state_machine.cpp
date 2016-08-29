@@ -11,7 +11,7 @@
 #include <core/action.h>
 
 
-StateMachine::StateMachine() : Jsonable() {
+StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm") {
         
         // define basic workflow.
         

@@ -6,6 +6,7 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
+#include <tools/logged.h>
 
 
 #pragma GCC visibility push(default)
@@ -26,7 +27,7 @@ namespace boost {
  Thus, expect started() to be called from the thread once it's well started.
  stopped() will be called on this thread as well just before it's closure.
  */
-class ActiveObject : public boost::enable_shared_from_this<ActiveObject> {
+class ActiveObject : public boost::enable_shared_from_this<ActiveObject>, public Logged {
     const std::string name;
     IOServicePtr service;
     std::vector< boost::shared_ptr<boost::thread> > threads;

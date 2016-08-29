@@ -12,9 +12,11 @@
 
 
 Workflow::Workflow(const std::string & name) :
+    Jsonable(),
+    boost::enable_shared_from_this<Workflow>(),
+    Logged("wkf"),
     stateMachine(new StateMachine()),
     mutex(new boost::recursive_mutex()),
-    boost::enable_shared_from_this<Workflow>(),
     name(name){
     
 }

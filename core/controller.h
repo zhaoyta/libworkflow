@@ -14,7 +14,7 @@ SHARED_PTR(Workflow);
     Stores workflows, can add some meta data to requests.
     You may add here some scheduling mecanism or request perform control
  */
-class Controller: public ActiveObject {
+class Controller: public ActiveObject{
     std::map<std::string, WorkflowPtr> workflows;
 public:
     Controller(const std::string & name, uint32_t pool);

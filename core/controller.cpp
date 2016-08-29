@@ -6,7 +6,9 @@
 #include <iostream>
 
 Controller::Controller(const std::string & name, uint32_t pool) :
-    ActiveObject(name, pool) {}
+    ActiveObject(name, pool){
+        setNamespace("ctrl");
+    }
 Controller::~Controller() {}
 
 bool Controller::perform(RequestPtr request) {
@@ -26,7 +28,7 @@ ControllerSpawnPtr Controller::spawnForRequest(RequestPtr) {
 }
 
 void Controller::addWorkflow(WorkflowPtr workflow) {
-    std::cout << this << " Add workflow : " << workflow << std::endl;
+    BOOST_LOG_SEV(logger, Info) << getName() << " Add workflow : " << workflow << std::endl;
     workflow->setController(shared_from_this());
     workflows[workflow->getName()] = workflow;
 }

@@ -12,6 +12,7 @@
 #include <core/request.h>
 #include <core/context.h>
 #include <core/result.h>
+#include <tools/logged.h>
 
 SHARED_PTR(StateMachine);
 SHARED_PTR(Session);
@@ -33,7 +34,7 @@ class TypeChecker;
  The action will ensure this contract is met.
  
  */
-class Action {
+class Action : public Logged, public Jsonable {
     StateMachinePtr state_machine;
     int32_t action_id;
     std::string name;
@@ -152,6 +153,10 @@ protected:
     
     void clearInputs();
     void clearOutputs();
+    
+    
+    void save(boost::property_tree::ptree & root) const override;
+    void load(const boost::property_tree::ptree & root) override;
 private:
     
     //! This should only be called by StateMachine ..;

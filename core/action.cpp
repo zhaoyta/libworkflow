@@ -11,7 +11,10 @@
 #include <core/workflow.h>
 
 
-Action::Action(const std::string & name): action_id(0), name(name),
+Action::Action(const std::string & name):
+    Logged("wkf.action"),
+    Jsonable(),
+    action_id(0), name(name),
     propertyset(new PropertySet()) {
     propertyset->setGuarded(true);
     
@@ -324,6 +327,15 @@ void Action::executeAsyncRequest(RequestPtr req) {
 
 bool Action::canHandleError(SessionPtr) const {
     return false;
+}
+
+
+void Action::save(boost::property_tree::ptree & root) const {
+    
+}
+
+void Action::load(const boost::property_tree::ptree & root) {
+    
 }
 
 DefaultNextAction::DefaultNextAction() : Action("Next") {

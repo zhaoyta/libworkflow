@@ -45,6 +45,9 @@ std::ostream& operator<<(std::ostream& out, const Klass & obj)
 
 //! Declare an enum, named EEnum
 #define BEGIN_ENUM_DECL(Enum) enum class __CAT(E,Enum) : uint32_t
+
+//! Declare an enum, named EEnum Weak version doesn't have class restriction
+#define BEGIN_WEAK_ENUM_DECL(Enum) enum __CAT(E,Enum) : uint32_t
 //! Declare convertionclass, accessible through CEnum
 #define END_ENUM_DECL(Enum, DefaultValue, DefaultString) \
 class __CAT(C,Enum) { \

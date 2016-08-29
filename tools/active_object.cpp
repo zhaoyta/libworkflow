@@ -8,6 +8,7 @@
 
 ActiveObject::ActiveObject(const std::string &name, uint32_t pool, bool delay_start):
     boost::enable_shared_from_this<ActiveObject>(),
+    Logged("act.obj"),
     name(name),
     mutex(new boost::recursive_mutex()),
     thread_pool(pool)
@@ -31,7 +32,7 @@ IOServicePtr ActiveObject::getIOService() {
 void ActiveObject::start() {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     if( threads.size() == 0 ) {
-        std::cout << this << " Starting active object ..." << std::endl;
+        BOOST_LOG_SEV(logger, Info) << getName() << " Starting active object ...";
         boost::shared_ptr<boost::thread> thread(new boost::thread(&ActiveObject::run, this));
         threads.push_back(thread);
     }
@@ -62,19 +63,17 @@ void ActiveObject::setStoppedFunction(boost::function<void(ActiveObjectPtr)> fn)
 }
 
 void ActiveObject::setStartedFunction(boost::function<void(ActiveObjectPtr)> fn) {
-    std::cout <<  this  <<" Setting start function" << std::endl;
+    BOOST_LOG_SEV(logger, Trace) << getName()  <<" Setting start function";
     start_function= fn;
 }
 
 void ActiveObject::run() {
-    std::cout <<  this  <<" Starting active object ... Run called" << std::endl;
+    BOOST_LOG_SEV(logger, Info) << getName()  <<" Starting active object ... Run called";
     service.reset( new boost::asio::io_service());
     started();
     if(start_function) {
-        std::cout <<  this  <<" Starting active object ... calling start_function" << std::endl;
+        BOOST_LOG_SEV(logger, Debug) << getName() <<" Starting active object ... calling start_function";
         start_function(shared_from_this());
-    } else  {
-        std::cout <<  this  <<" Start function unset ..." << std::endl;
     }
     worker.reset(new boost::asio::io_service::work(*service));
     service->post(boost::bind(&ActiveObject::startPool, this));

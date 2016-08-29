@@ -4,6 +4,7 @@
 #include <tools/jsonable.h>
 #include <tools/defines.h>
 #include <boost/uuid/uuid.hpp>
+#include <tools/logged.h>
 #include <queue>
 
 #pragma GCC visibility push(default)
@@ -49,7 +50,7 @@ namespace boost {
  
     Also, Workflow is responsible for it's request timeout.
  */
-class Workflow : public Jsonable, public boost::enable_shared_from_this<Workflow> {
+class Workflow : public Jsonable, public boost::enable_shared_from_this<Workflow>, public Logged {
     //! Stores session related meta data.
     
     

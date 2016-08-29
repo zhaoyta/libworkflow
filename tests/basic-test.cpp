@@ -6,12 +6,14 @@
 #include <service/controller_manager.h>
 #include <core/controller.h>
 #include <tools/timed.h>
+#include <tools/logged.h>
 
 /**
     This should be the simplest of test.
     Create a new workflow with one Action. 
     Execute it and that's it.
  */
+
 
 class TestActionA: public Action {
 public:
@@ -25,10 +27,9 @@ public:
 };
         
 boost::shared_ptr<boost::asio::io_service::work> work;
-        
+boost::shared_ptr<boost::asio::io_service> service;
         
 void terminate(const boost::system::error_code & ) {
-    std::cout << " Killing main controller" << std::endl;
     ControllerManager::getInstance()->terminate();
     work.reset();
 }
@@ -37,12 +38,10 @@ void terminate(const boost::system::error_code & ) {
 void delayed(ActiveObjectPtr) {
     // timeout execution.
     Timed t;
-    t.setIOService(ControllerManager::getInstance()->getIOService());
+    t.setIOService(service);
     t.setDuration(1000);
     t.setTimeoutFunction(&terminate);
     t.start();
-    
-    std::cout << " Loading main controller" << std::endl;
     
     WorkflowPtr workflow(new Workflow("test-workflow-a"));
     auto sm = workflow->getStateMachine();
@@ -55,24 +54,21 @@ void delayed(ActiveObjectPtr) {
     
     ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
-    bool done = workflow->perform(request);
-    
-    std::cout << " Done ? : " << done;
+    workflow->perform(request);
 }
 
         
 int main(int argc, const char * argv[]) {
     // maybe we should wait for controller to have started ...
-    std::cout << " Start" << std::endl;
+    service.reset(new boost::asio::io_service());
+    Logged::loadConfiguration("");
     ControllerManager::getInstance()->setStartedFunction(&delayed);
-    std::cout << " Starting main controller" << std::endl;
     ControllerManager::getInstance()->start();
     
     
     // keep alive.
-    boost::asio::io_service service;
-    work.reset(new boost::asio::io_service::work(service));
-    service.run();
+    work.reset(new boost::asio::io_service::work(*service));
+    service->run();
     
     return 0;
 }

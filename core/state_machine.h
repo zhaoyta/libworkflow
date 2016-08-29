@@ -7,6 +7,7 @@
 #include <set>
 #include <vector>
 #include <core/steps.h>
+#include <tools/logged.h>
 #include <boost/uuid/uuid.hpp>
 
 
@@ -26,7 +27,7 @@ class ErrorReport;
 /**
  StateMachine define how actions are interlinked, and define which action is running and what actions are expected to run.
  */
-class StateMachine : public Jsonable {
+class StateMachine : public Jsonable , public Logged {
     WorkflowPtr workflow;
     
     std::map<int32_t, ActionPtr> actions;
