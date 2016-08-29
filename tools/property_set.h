@@ -4,6 +4,9 @@
 #include <tools/jsonable.h>
 #include <tools/defines.h>
 
+
+#pragma GCC visibility push(default)
+
 SHARED_PTR(PropertySet);
 SHARED_PTR(Context);
 
@@ -72,5 +75,7 @@ public:
     
 };
 
+
+#pragma GCC visibility pop
 
 #endif // __PROPERTY_SET_H_

@@ -78,7 +78,7 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
     actions[action_id] = action;
     outputs[action_id] = bindings;
     // ensure that we know what actions are necessary for execution of another one.
-    for(const auto & output: bindings) {
+    for(auto & output: bindings) {
         inputs_map[output.getToActionId()].insert(action_id);
     }
 }
@@ -101,7 +101,7 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
     if(session->getStatus().size() == 0)
         return firstCall(session); // we're in an uninitialized state ... this is a firstcall :)
     if(request->getTarget().target == ETargetAction::Error)
-        return errorReceived(session);
+        return errorReceived(session, request);
     if(request->getTarget().target == ETargetAction::Interrupt)
         return interruptReceived(session);
     if(request->getTarget().target == ETargetAction::Status)
@@ -128,7 +128,22 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
 bool StateMachine::canExecuteAction(SessionPtr session, ActionPtr action, ErrorReport & er) {
     if(action->checkInputs(session, er)) {
         // guess it's okay ...
-        return action->canPerform(session, er);
+        if(action->canPerform(session, er)) {
+            // now last check, all inputs must be done.
+            for(const auto & input: inputs_map.at(action->getActionId())) {
+                if(session->getStatus(input) != EExecutionStatus::Done)
+                    return false;
+            }
+            return true;
+        }
+    }
+    return false;
+}
+
+bool StateMachine::canPendAction(SessionPtr session, ActionPtr action){
+    ErrorReport er;
+    if(action->checkInputs(session, er)) {
+        return true;
     }
     return false;
 }
@@ -178,7 +193,16 @@ bool StateMachine::interruptReceived(SessionPtr session)  {
     return executeAction(session, getNext(session));
 }
 
-bool StateMachine::errorReceived(SessionPtr session)  {
+bool StateMachine::errorReceived(SessionPtr session, RequestPtr request)  {
+    
+    if(actions.count(request->getTarget().action) > 0 ) {
+        if(session->getStatus(request->getTarget().action) == EExecutionStatus::Waiting) {
+            if(actions[request->getTarget().action]->canHandleError(session)) {
+                actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
+                return true;
+            }
+        }
+    }
     session->getStatus().clear();
     session->getNexts().clear();
     session->getPendings().clear();

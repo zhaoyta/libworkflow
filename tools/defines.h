@@ -8,6 +8,7 @@
 #include <map>
 #include <boost/uuid/uuid_io.hpp>
 
+#pragma GCC visibility push(default)
 std::string shortId(const boost::uuids::uuid & uid, int length = 8) {
     return to_string(uid).substr(1,length);
 }
@@ -62,7 +63,7 @@ public:\
 std::ostream& operator<<(std::ostream& out,__CAT(E,Enum));
 
 //! This begins implementation of all this, First step is to fill the conversion map, string to uint32_t
-#define BEGIN_ENUM_IMPL(Enum) std::map<std::string, uint32_t>  __CAT(Enum,Alpha) =
+#define BEGIN_ENUM_IMPL(Enum) std::map<std::string, uint32_t>  __CAT(C,Enum)::__CAT(Enum,Alpha) =
 
 
 //! @todo add log in every conversion failure.
@@ -98,5 +99,6 @@ out << __CAT(C,Enum)::valueToString(e); \
 return out; \
 }
 
+#pragma GCC visibility pop
 
 #endif // __SHARED_PTR_H_

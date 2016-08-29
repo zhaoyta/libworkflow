@@ -7,6 +7,8 @@
 #include <vector>
 #include <boost/uuid/uuid.hpp>
 
+#pragma GCC visibility push(default)
+
 SHARED_PTR(ErrorReport);
 
 /**
@@ -49,5 +51,8 @@ public:
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
 };
+
+
+#pragma GCC visibility pop
 
 #endif // __ERROR_REPORT_H_

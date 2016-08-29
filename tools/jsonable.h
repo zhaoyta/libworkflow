@@ -2,6 +2,7 @@
 #define __JSONABLE_H_
 #include <boost/property_tree/ptree.hpp>
 
+#pragma GCC visibility push(default)
 /**
  This class allow other to be serialized to JSON format.
  Seek boost property tree doc for more infos.
@@ -25,5 +26,6 @@ public:
     
 };
 
+#pragma GCC visibility pop
 
 #endif // __JSONABLE_H_

@@ -23,6 +23,10 @@ bool Target::operator<(const Target & t) const{
     return identifier < t.identifier;
 }
 
+std::string Target::shortId() const {
+    return ::shortId(identifier);
+}
+
 void Target::save(boost::property_tree::ptree & root) const {
     
 }

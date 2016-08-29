@@ -9,6 +9,8 @@
 #include <core/steps.h>
 #include <boost/uuid/uuid.hpp>
 
+
+#pragma GCC visibility push(default)
 SHARED_PTR(StateMachine);
 SHARED_PTR(Request);
 SHARED_PTR(Session);
@@ -66,7 +68,7 @@ protected:
     //! this handler is called when an interrupt has be received. will up current execution level and execute interrupt action.
     bool interruptReceived(SessionPtr) ;
     //! this handler is called upon receiving an error and execute error action.
-    bool errorReceived(SessionPtr) ;
+    bool errorReceived(SessionPtr, RequestPtr) ;
     //! this function is called upon receiving a status request, it should be overriden to have any effect ( atm reply with an empty reply )
     bool statusReceived(SessionPtr) ;
     //! this handler is called when a reply has been received, check whether it was expected or not.
@@ -115,5 +117,8 @@ protected:
 };
 
 OSTREAM_HELPER_DECL(StateMachine);
+
+
+#pragma GCC visibility pop
 
 #endif //__STATE_MACHINE_H_

@@ -19,6 +19,11 @@ ErrorReport::ErrorReport(const Target & target, ErrorReportPtr parent, const std
 
 ErrorReport::~ErrorReport() {}
 
+void ErrorReport::setError(const std::string & errk, const std::string & errm) {
+    error_message = errm;
+    error_key = errk;
+}
+
 const std::string & ErrorReport::getErrorMessage()  {
     if(not parent)
         return error_message;

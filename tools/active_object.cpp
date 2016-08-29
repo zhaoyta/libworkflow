@@ -18,6 +18,14 @@ ActiveObject::~ActiveObject() {
     
 }
 
+const std::string & ActiveObject::getName() const {
+    return name;
+}
+
+IOServicePtr ActiveObject::getIOService() {
+    return service;
+}
+
 void ActiveObject::start() {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     if( threads.size() == 0 ) {

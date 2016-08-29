@@ -4,6 +4,8 @@
 #include <core/context.h>
 #include <tools/defines.h>
 
+#pragma GCC visibility push(default)
+
 SHARED_PTR(TypeChecker);
 
 /**
@@ -52,5 +54,8 @@ public:
 };
 
 #define CHECKER(Klass) TypeCheckerPtr(new ContextTypeChecker<Klass>())
+
+
+#pragma GCC visibility pop
 
 #endif // __TYPE_CHECKER_H_

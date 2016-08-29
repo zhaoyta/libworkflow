@@ -6,6 +6,8 @@
 #include <vector>
 #include <map>
 
+
+#pragma GCC visibility push(default)
 SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
 SHARED_PTR(Request);
@@ -56,7 +58,7 @@ public:
     RequestPtr getLastRequest() const;
     void pushRequest(RequestPtr);
     
-    EExecutionStatus getStatus(int32_t action_id);
+    EExecutionStatus getStatus(int32_t action_id) const;
     void setStatus(int32_t action_id, EExecutionStatus);
     
     ControllerSpawnPtr getControllerSpawn();
@@ -95,5 +97,7 @@ public:
 };
 
 OSTREAM_HELPER_DECL(Session);
+
+#pragma GCC visibility pop
 
 #endif // __SESSION_H_

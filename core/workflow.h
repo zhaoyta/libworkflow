@@ -6,6 +6,7 @@
 #include <boost/uuid/uuid.hpp>
 #include <queue>
 
+#pragma GCC visibility push(default)
 SHARED_PTR(Workflow);
 SHARED_PTR(Timed);
 SHARED_PTR(StateMachine);
@@ -97,6 +98,15 @@ protected:
     bool shouldMakePending(RequestPtr);
     
     void addToPending(RequestPtr);
+    
+    
+    
+    void save(boost::property_tree::ptree & root) const override;
+    void load(const boost::property_tree::ptree & root) override;
+    
 };
+
+
+#pragma GCC visibility pop
 
 #endif // __WORKFLOW_H_

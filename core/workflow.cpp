@@ -161,3 +161,13 @@ void Workflow::setTimeout(double d) {
 std::string Workflow::getName() const {
     return name;
 }
+
+
+
+void Workflow::save(boost::property_tree::ptree & root) const {
+    
+}
+
+void Workflow::load(const boost::property_tree::ptree & root) {
+    
+}

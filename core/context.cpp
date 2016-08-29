@@ -54,6 +54,8 @@ void ListCtx::load(const boost::property_tree::ptree & root) {
     
 }
 
+SkipCtx::SkipCtx() : Context("SkipCtx") {}
+SkipCtx::~SkipCtx(){}
 
 GroupedCtx::GroupedCtx() : Context("GroupedCtx") {}
 GroupedCtx::~GroupedCtx() {}

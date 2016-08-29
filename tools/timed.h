@@ -8,6 +8,7 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 
+#pragma GCC visibility push(default)
 SHARED_PTR(Timed);
 typedef boost::shared_ptr<boost::asio::deadline_timer> TimerPtr;
 typedef boost::shared_ptr<boost::asio::io_service> IOServicePtr;
@@ -49,5 +50,8 @@ public:
     double elapsed();
     
 };
+
+
+#pragma GCC visibility pop
 
 #endif // __TIMED_H_

@@ -5,6 +5,7 @@
 #include <tools/defines.h>
 #include <core/workflow.h>
 
+#pragma GCC visibility push(default)
 SHARED_PTR(Controller);
 SHARED_PTR(ControllerSpawn);
 SHARED_PTR(Workflow);
@@ -32,5 +33,7 @@ public:
     //! register a workflow in this controller
     void addWorkflow(WorkflowPtr);
 };
+
+#pragma GCC visibility pop
 
 #endif // __CONTROLLER_H_

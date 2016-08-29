@@ -8,6 +8,8 @@
 #include <map>
 #include <tools/error_report.h>
 
+
+#pragma GCC visibility push(default)
 SHARED_PTR(Request);
 SHARED_PTR(Context);
 SHARED_PTR(ControllerSpawn);
@@ -89,5 +91,7 @@ public:
 };
 
 OSTREAM_HELPER_DECL(Request);
+
+#pragma GCC visibility pop
 
 #endif // __REQUEST_H_

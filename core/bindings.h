@@ -5,6 +5,8 @@
 #include <tools/jsonable.h>
 #include <core/steps.h>
 
+
+#pragma GCC visibility push(default)
 /**
  Meta information as to how inputs are handled from Workflow to first items to execute.
  */
@@ -61,5 +63,8 @@ public:
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
 };
+
+
+#pragma GCC visibility pop
 
 #endif //! __BINDINGS_H_

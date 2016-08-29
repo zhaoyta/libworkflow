@@ -6,6 +6,13 @@
 #include <tools/defines.h>
 #include <set>
 
+//! added for convenience ...
+
+#include <core/session.h>
+#include <core/request.h>
+#include <core/context.h>
+#include <core/result.h>
+
 SHARED_PTR(StateMachine);
 SHARED_PTR(Session);
 SHARED_PTR(PropertySet);
@@ -13,7 +20,6 @@ SHARED_PTR(Context);
 SHARED_PTR(Request);
 
 class PutDefinition;
-class ActionMetaPriv;
 class Result;
 class ErrorReport;
 class TypeChecker;
@@ -31,9 +37,6 @@ class Action {
     StateMachinePtr state_machine;
     int32_t action_id;
     std::string name;
-    
-    //!  Internal MetaData
-    ActionMetaPriv * pmeta;
     
     PropertySetPtr propertyset;
     

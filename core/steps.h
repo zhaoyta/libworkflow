@@ -1,6 +1,8 @@
 #ifndef __STEPS_H_
 #define __STEPS_H_
 
+
+#pragma GCC visibility push(default)
 enum class Step : int32_t {
     Die = - 1666, //!< this step, once reached, declare the end of the session usage.
     Cleanup = -1020, //!< this is the last state in which the state machine can get.
@@ -10,5 +12,8 @@ enum class Step : int32_t {
     Status = -1000, //!< This special state allow one to access non session related stuff.
     Initialisation = 0, //!< This is supposedly the first step.
 };
+
+
+#pragma GCC visibility pop
 
 #endif // __STEPS_H_

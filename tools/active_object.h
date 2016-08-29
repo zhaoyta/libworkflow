@@ -6,6 +6,9 @@
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
 
+
+#pragma GCC visibility push(default)
+
 SHARED_PTR(ActiveObject);
 typedef boost::shared_ptr<boost::asio::io_service> IOServicePtr;
 namespace boost {
@@ -58,5 +61,8 @@ private:
 };
 
 OSTREAM_HELPER_DECL(ActiveObject);
+
+
+#pragma GCC visibility pop
 
 #endif // __ACTIVE_OBJECT_H_

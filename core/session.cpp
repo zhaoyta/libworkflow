@@ -48,6 +48,14 @@ std::map<int32_t, EExecutionStatus> & Session::getStatus() {
     return status;
 }
 
+EExecutionStatus Session::getStatus(int32_t action_id) const {
+    return status.at(action_id);
+}
+
+void Session::setStatus(int32_t action_id, EExecutionStatus s) {
+    status[action_id] = s;
+}
+
 std::map<int32_t, std::map<std::string, ContextPtr> > & Session::getInputs() {
     return inputs;
 }

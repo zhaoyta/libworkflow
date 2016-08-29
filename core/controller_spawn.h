@@ -3,6 +3,7 @@
 
 #include <tools/defines.h>
 
+#pragma GCC visibility push(default)
 SHARED_PTR(ControllerSpawn);
 
 /**
@@ -10,5 +11,7 @@ SHARED_PTR(ControllerSpawn);
  */
 struct ControllerSpawn {
 };
+
+#pragma GCC visibility pop
 
 #endif // __CONTROLLER_SPAWN_H_

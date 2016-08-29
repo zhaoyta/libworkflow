@@ -5,6 +5,8 @@
 #include <tools/defines.h>
 
 class Result;
+
+#pragma GCC visibility push(default)
 SHARED_PTR(ActionWrapper);
 
 /**
@@ -83,4 +85,7 @@ public:
 protected:
     void wrapPerform(SessionPtr) const override;
 };
+
+
+#pragma GCC visibility pop
 #endif // __ACTION_WRAPPERS_H_

@@ -4,6 +4,7 @@
 #include <tools/jsonable.h>
 #include <boost/uuid/uuid.hpp>
 
+#pragma GCC visibility push(default)
 SHARED_PTR(Target);
 
 BEGIN_ENUM_DECL(TargetAction) {
@@ -50,5 +51,7 @@ public:
 
 
 OSTREAM_HELPER_DECL(Target);
+
+#pragma GCC visibility pop
 
 #endif // __TARGET_H_

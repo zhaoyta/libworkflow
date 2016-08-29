@@ -293,6 +293,14 @@ void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr 
 }
 
 
+const std::set<PutDefinition> & Action::getInputs() const {
+    return inputs;
+}
+
+const std::set<PutDefinition> & Action::getOutputs() const {
+    return outputs;
+}
+
 Result Action::executeSyncRequest(SessionPtr session, RequestPtr req) {
     req = prepareSyncRequest(session, req);
     ControllerManager::getInstance()->perform(req);
@@ -312,6 +320,10 @@ RequestPtr Action::prepareSyncRequest(SessionPtr session, RequestPtr req) {
 
 void Action::executeAsyncRequest(RequestPtr req) {
     ControllerManager::getInstance()->perform(req);
+}
+
+bool Action::canHandleError(SessionPtr) const {
+    return false;
 }
 
 DefaultNextAction::DefaultNextAction() : Action("Next") {
