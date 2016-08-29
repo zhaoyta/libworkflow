@@ -10,6 +10,7 @@ ControllerManager::ControllerManager(uint32_t default_pool) :
 {
     if(default_pool == 0)
         default_pool = 1;
+    
 }
 ControllerManager::~ControllerManager() {}
 
@@ -17,6 +18,13 @@ ControllerManager * ControllerManager::getInstance() {
     if(not instance)
         instance = new ControllerManager();
     return instance;
+}
+
+
+ControllerPtr ControllerManager::getController(const std::string & ctrl) {
+    if(controllers.count(ctrl) > 0)
+        return controllers[ctrl];
+    return ControllerPtr();
 }
 
 void ControllerManager::perform(RequestPtr req) {

@@ -3,7 +3,8 @@
 #include <core/action.h>
 #include <core/state_machine.h>
 #include <core/bindings.h>
-
+#include <service/controller_manager.h>
+#include <core/controller.h>
 
 /**
     This should be the simplest of test.
@@ -23,6 +24,7 @@ public:
 };
 
 int main(int argc, const char * argv[]) {
+    ControllerManager::getInstance();
     WorkflowPtr workflow(new Workflow("test-workflow-a"));
     auto sm = workflow->getStateMachine();
     sm->addAction(0, new TestActionA(), {
@@ -30,6 +32,9 @@ int main(int argc, const char * argv[]) {
     });
     RequestPtr request(new Request());
     request->getTarget().workflow = "test-workflow-a";
+    
+    
+    ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
     bool done = workflow->perform(request);
     

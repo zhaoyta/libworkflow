@@ -9,10 +9,7 @@
 #include <boost/uuid/uuid_io.hpp>
 
 #pragma GCC visibility push(default)
-std::string shortId(const boost::uuids::uuid & uid, int length = 8) {
-    return to_string(uid).substr(1,length);
-}
-
+std::string shortId(const boost::uuids::uuid & uid, int length = 8);
 //! Concat helper macro.
 #define __CAT(A,B) __CAT__(A,B)
 #define __CAT__(A,B) A##B

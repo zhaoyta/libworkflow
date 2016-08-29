@@ -27,6 +27,7 @@ public:
     void perform(RequestPtr);
     
     void registerController(ControllerPtr);
+    ControllerPtr getController(const std::string & = "default");
 protected:
     
     void started() override;

@@ -6,7 +6,8 @@
 
 
 Controller::Controller(const std::string & name, uint32_t pool) :
-    ActiveObject(name, pool) {}
+    ActiveObject(name, pool),
+    boost::enable_shared_from_this<Controller>() {}
 Controller::~Controller() {}
 
 bool Controller::perform(RequestPtr request) {
