@@ -5,6 +5,7 @@
 #include <tools/defines.h>
 #include <boost/asio.hpp>
 #include <boost/bind.hpp>
+#include <boost/function.hpp>
 
 
 #pragma GCC visibility push(default)
@@ -32,11 +33,17 @@ class ActiveObject : public boost::enable_shared_from_this<ActiveObject> {
     boost::shared_ptr<boost::asio::io_service::work> worker;
     boost::shared_ptr<boost::recursive_mutex> mutex;
     
+    boost::function<void(ActiveObjectPtr)> start_function;
+    boost::function<void(ActiveObjectPtr)> stop_function;
+    
     uint32_t thread_pool;
 public:
     ActiveObject(const std::string &name, uint32_t thread_pool = 1, bool delay_start = false);
     ActiveObject(const ActiveObject &) = delete; // disallow copy.
     virtual ~ActiveObject();
+    
+    void setStoppedFunction(boost::function<void(ActiveObjectPtr)>);
+    void setStartedFunction(boost::function<void(ActiveObjectPtr)>);
     
     //! if not already running, will start the thread and io_service.
     void start();

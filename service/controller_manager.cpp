@@ -2,10 +2,10 @@
 #include <core/controller.h>
 #include <core/request.h>
 
-ControllerManager * ControllerManager::instance = NULL;
+static ControllerManagerPtr instance;
 
 ControllerManager::ControllerManager(uint32_t default_pool) :
-    ActiveObject("ControllerManager"),
+    ActiveObject("ControllerManager",3, true),
     default_pool(default_pool)
 {
     if(default_pool == 0)
@@ -14,9 +14,9 @@ ControllerManager::ControllerManager(uint32_t default_pool) :
 }
 ControllerManager::~ControllerManager() {}
 
-ControllerManager * ControllerManager::getInstance() {
+ControllerManagerPtr ControllerManager::getInstance() {
     if(not instance)
-        instance = new ControllerManager();
+        instance.reset(new ControllerManager());
     return instance;
 }
 
@@ -24,6 +24,7 @@ ControllerManager * ControllerManager::getInstance() {
 ControllerPtr ControllerManager::getController(const std::string & ctrl) {
     if(controllers.count(ctrl) > 0)
         return controllers[ctrl];
+    //! @todo add log failed to find controller ... 
     return ControllerPtr();
 }
 

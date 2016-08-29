@@ -13,16 +13,14 @@ SHARED_PTR(Request);
  ControllerManager is the starting point for everything Request.
  It'll check request for which controller they seek and redirect it to the appropriate one. 
  */
-class ControllerManager : public ActiveObject {
-    static ControllerManager * instance;
-    
+class ControllerManager : public ActiveObject {    
     std::map<std::string, ControllerPtr> controllers;
     uint32_t default_pool;
 public:
     ControllerManager(uint32_t default_pool = 10);
     virtual ~ControllerManager();
     
-    static ControllerManager * getInstance();
+    static ControllerManagerPtr getInstance();
     
     void perform(RequestPtr);
     
