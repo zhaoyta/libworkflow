@@ -35,6 +35,8 @@ class Logged {
         std::string file;
         bool output_to_console;
         
+        bool show_thread;
+        
         ELogSeverity severity;
         
         void save(boost::property_tree::ptree & root) const override;

@@ -39,10 +39,10 @@ END_ENUM_IMPL(LogSeverity);
 BOOST_LOG_ATTRIBUTE_KEYWORD(severity, "Severity", ELogSeverity)
 BOOST_LOG_ATTRIBUTE_KEYWORD(tag_attr, "Namespace", std::string)
 
-
 Logged::Configuration::Configuration():
     file(""),
     output_to_console(true),
+    show_thread(true),
     severity(Trace){
 }
 
@@ -97,10 +97,13 @@ void Logged::loadConfiguration(const std::string & filename) {
     
     boost::log::formatter fmt = boost::log::expressions::stream
     << expr::format_date_time< boost::posix_time::ptime >("TimeStamp", "%Y-%m-%d %H:%M:%S")
+    << " [" << expr::attr< boost::log::attributes::current_thread_id::value_type>("ThreadID") << "] "
     << " <" << std::setw(6) << std::setfill(' ') << severity << "> "
     << std::setw(10) << std::setfill(' ')
     << expr::attr<std::string>("Namespace") << " "
     << boost::log::expressions::smessage;
+    
+    
     
     boost::shared_ptr< logging::core > core = logging::core::get();
     
