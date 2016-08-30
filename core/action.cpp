@@ -10,6 +10,7 @@
 #include <core/result.h>
 #include <core/workflow.h>
 #include <iomanip>
+#include <iostream>
 
 
 Action::Action(const std::string & name):
@@ -99,10 +100,13 @@ bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
 }
 
 Result Action::perform(SessionPtr session) const {
+    
+    BOOST_LOG_SEV(logger, Error) << "Can't execute this action as Perform function wasn't implemented.";
     return error(session, "action.perform.unimplemented","Can't execute this action as Perform function wasn't implemented.");
 }
 
 Result Action::replyReceived(SessionPtr session, RequestPtr) const {
+    BOOST_LOG_SEV(logger, Error) << "Didn't expect a reply to this action.";
     return error(session, "action.reply.unimplemented","Didn't expect a reply to this action.");
 }
 

@@ -167,7 +167,6 @@ private:
 };
 
 OSTREAM_HELPER_DECL(Action);
-LOG_HELPER_DECL(Action);
 
 class DefaultNextAction: public Action {
 public:

@@ -6,6 +6,10 @@
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/attributes.hpp>
+#include <boost/log/utility/formatting_ostream.hpp>
+#include <boost/log/sources/logger.hpp>
+#include <boost/log/sources/record_ostream.hpp>
+
 namespace logging = boost::log;
 namespace expr = boost::log::expressions;
 
@@ -19,6 +23,11 @@ BEGIN_WEAK_ENUM_DECL(LogSeverity) {
     Critical
 };
 END_ENUM_DECL(LogSeverity, Info, "Info");
+
+#define GLOB_LOGGER(ns) \
+    boost::log::sources::severity_logger<ELogSeverity> logger; \
+    logger.add_attribute("Namespace", \
+                         boost::log::attributes::constant< std::string >(ns)); \
 
 
 /**
@@ -53,7 +62,11 @@ public:
     //! seek provided @a filename to load log configuration
     static void loadConfiguration(const std::string & filename);
   
-    boost::log::sources::severity_logger<ELogSeverity> logger;
+
+protected:
+    
+    mutable boost::log::sources::severity_logger<ELogSeverity> logger;
+
 };
 
 #endif //__LOGGED_H_
