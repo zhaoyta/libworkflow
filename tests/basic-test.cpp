@@ -20,8 +20,7 @@ public:
     TestActionA() : Action("TestActionA") {}
     
     Result perform(SessionPtr session) const override{
-        BOOST_LOG_SEV(logger, Info) ;
-        // fingerprint(session) << " Hello from Action Test A";
+        BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Hello from Action Test A";
         return done();
     }
     
@@ -47,8 +46,8 @@ void terminate(const boost::system::error_code & ec ) {
 void delayed(ActiveObjectPtr) {
     
     GLOB_LOGGER("general");
-
     BOOST_LOG_SEV(logger, Info) << " Setting up Tests workflow !";
+    
     // timeout execution.
     t.reset(new Timed());
     t->setIOService(service);
@@ -56,18 +55,22 @@ void delayed(ActiveObjectPtr) {
     t->setTimeoutFunction(&terminate);
     t->start();
     
+    // Workflow creation
+    // It's a pretty simple workflow that does absolutely nothing :)
+    // Aside printing hello
     WorkflowPtr workflow(new Workflow("test-workflow-a"));
     auto sm = workflow->getStateMachine();
     sm->addAction(0, new TestActionA(), {
         OutputBinding(0, "", (int32_t)Step::Finish, "")
     });
-    RequestPtr request(new Request(Target("test-workflow-a")));
-    request->getTarget().workflow = "test-workflow-a";
+    sm->addInput(InputBinding("", 0, ""));
     
-    
+    // registering it.
     ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
-    workflow->perform(request);
+    RequestPtr request(new Request(Target("test-workflow-a")));
+    request->getTarget().workflow = "test-workflow-a";
+    ControllerManager::getInstance()->perform(request);
 }
 
         

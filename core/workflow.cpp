@@ -19,6 +19,8 @@ Workflow::Workflow(const std::string & name) :
     mutex(new boost::recursive_mutex()),
     name(name){
     
+    stateMachine->init();
+    
 }
 
 Workflow::~Workflow() {
@@ -123,6 +125,7 @@ void Workflow::addToPending(RequestPtr request) {
 
 StateMachinePtr Workflow::getStateMachine() {
     stateMachine->setWorkflow(shared_from_this());
+    
     return stateMachine;
 }
 

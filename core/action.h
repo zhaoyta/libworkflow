@@ -79,10 +79,12 @@ public:
     
     std::string actionLog() const;
     
+    
+    void setStateMachine(StateMachinePtr);
+    StateMachinePtr getStateMachine() const;
+    
 protected:
     
-    //! no need to expose that one ;)
-    StateMachinePtr getStateMachine() const;
 
     //! Results
     

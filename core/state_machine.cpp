@@ -11,27 +11,29 @@
 #include <core/action.h>
 
 
-StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm") {
+StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm"), boost::enable_shared_from_this<StateMachine>() {
         
         // define basic workflow.
-        
-        addAction(Step::Initialisation, new Action("Action"), {
-            OutputBinding(Step::Initialisation, "", Step::Finish, "")
-        });
-        addAction(Step::Error, new DefaultNextAction(), {
-            OutputBinding(Step::Error, "", Step::Cleanup, "")
-        });
-        addAction(Step::Finish, new DefaultNextAction(), {
-            OutputBinding(Step::Finish, "", Step::Cleanup, "")
-        });
-        addAction(Step::Cleanup, new DefaultNextAction(), {
-            OutputBinding(Step::Cleanup, "", Step::Die, "")
-        });
     
 }
 
 StateMachine::~StateMachine() {
     
+}
+
+void StateMachine::init() {
+    addAction(Step::Initialisation, new Action("Action"), {
+        OutputBinding(Step::Initialisation, "", Step::Finish, "")
+    });
+    addAction(Step::Error, new DefaultNextAction(), {
+        OutputBinding(Step::Error, "", Step::Cleanup, "")
+    });
+    addAction(Step::Finish, new DefaultNextAction(), {
+        OutputBinding(Step::Finish, "", Step::Cleanup, "")
+    });
+    addAction(Step::Cleanup, new DefaultNextAction(), {
+        OutputBinding(Step::Cleanup, "", Step::Die, "")
+    });
 }
 
 WorkflowPtr StateMachine::getWorkflow() {
@@ -75,6 +77,9 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
         return;
     }
     
+    action->setStateMachine(shared_from_this());
+    action->setActionId(action_id);
+    
     actions[action_id] = action;
     outputs[action_id] = bindings;
     // ensure that we know what actions are necessary for execution of another one.
@@ -113,6 +118,7 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
     if(request->getTarget().execution_level != 0 and
        request->getTarget().execution_level != session->getCurrentExecutionLevel()) {
         //! @todo add log: ignore request due to invalid execution level.
+        BOOST_LOG_SEV(logger,Warn) << fingerprint(session) << request->logRequest() << " Unable to execute this request due to Inadequat execution level(requested: " << request->getTarget().execution_level << ", got: " << session->getCurrentExecutionLevel();
         return false;
     }
     
@@ -126,16 +132,27 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
 }
 
 bool StateMachine::canExecuteAction(SessionPtr session, ActionPtr action, ErrorReport & er) {
+    BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Checking ability to be executed now.";
+
     if(action->checkInputs(session, er)) {
         // guess it's okay ...
         if(action->canPerform(session, er)) {
             // now last check, all inputs must be done.
-            for(const auto & input: inputs_map.at(action->getActionId())) {
-                if(session->getStatus(input) != EExecutionStatus::Done)
-                    return false;
+            if(inputs_map.count(action->getActionId()) > 0 ) {
+                for(const auto & input: inputs_map.at(action->getActionId())) {
+                    if(session->getStatus(input) != EExecutionStatus::Done) {
+                        
+                        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't execute action right now. " << actions[input]->actionLog() << " Not done.";
+                        return false;
+                    }
+                }
             }
             return true;
+        } else {
+            BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Action refuses execution.";
         }
+    } else {
+        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't execute action right now.";
     }
     return false;
 }
@@ -144,6 +161,8 @@ bool StateMachine::canPendAction(SessionPtr session, ActionPtr action){
     ErrorReport er;
     if(action->checkInputs(session, er)) {
         return true;
+    } else {
+        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't make action pending right now.";
     }
     return false;
 }
@@ -156,13 +175,17 @@ std::string StateMachine::fingerprint(SessionPtr session) {
 
 bool StateMachine::firstCall(SessionPtr session)  {
     // this is a first call, mark all actions as unplanned to begin with.
+    BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " First call !";
     for(const auto & kv: actions)
         session->setStatus(kv.first, EExecutionStatus::Unplanned);
     
     // now map contexts.
     auto grouped_ctx = session->getOriginalRequest()->getCastedContext<GroupedCtx>();
     for(const auto & input: starters) {
-        session->setInput(input.getActionId(), input.getActionInput(), grouped_ctx->getContext(input.getWorkflowInput()));
+        // empty (action/workflow) input means a "simple" next.
+        // basically it's just ordering for execution plan.
+        if(not input.getWorkflowInput().empty() and not input.getActionInput().empty())
+            session->setInput(input.getActionId(), input.getActionInput(), grouped_ctx->getContext(input.getWorkflowInput()));
     }
     
     for(const auto & input: starters) {
@@ -186,7 +209,7 @@ bool StateMachine::firstCall(SessionPtr session)  {
 }
 
 bool StateMachine::interruptReceived(SessionPtr session)  {
-    
+    BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " Interrupt Received !";
     session->getStatus().clear();
     session->getNexts().clear();
     session->getPendings().clear();
@@ -203,11 +226,16 @@ bool StateMachine::errorReceived(SessionPtr session, RequestPtr request)  {
     if(actions.count(request->getTarget().action) > 0 ) {
         if(session->getStatus(request->getTarget().action) == EExecutionStatus::Waiting) {
             if(actions[request->getTarget().action]->canHandleError(session)) {
+                
+                BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->actionLog() << " Error Received ! but caught by action" ;
                 actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
                 return true;
             }
         }
     }
+    
+    
+    BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " Error Received !";
     session->getStatus().clear();
     session->getNexts().clear();
     session->getPendings().clear();
@@ -221,14 +249,19 @@ bool StateMachine::errorReceived(SessionPtr session, RequestPtr request)  {
 
 bool StateMachine::statusReceived(SessionPtr session)  {
     if(actions.count((int32_t)Step::Status)) {
+        BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " Status Received !";
         actions[(int32_t)Step::Status]->perform(session);
+    } else {
+        BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " Status Ignored !";
     }
     return true;
 }
 
 bool StateMachine::replyReceived(SessionPtr session, RequestPtr request) {
+    
     if(actions.count(request->getTarget().action) > 0 ) {
         if(session->getStatus(request->getTarget().action) == EExecutionStatus::Waiting) {
+            BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->actionLog() << " Reply Received !";
             actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
             return true;
         } else {
@@ -244,7 +277,7 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
     if(action_id == (int32_t) Step::Die)
         return true;
     
-    if(action_id != -1) {
+    if(action_id == -1) {
         //! @todo add log, no action found.
         BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " No action to execute provided ... checking for promoted pending. ";
 
@@ -298,12 +331,13 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
             
             auto result = actions[action_id]->perform(session);
             
-            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Executed " << result.type;
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Executed: " << result.type;
             
             actionExecuted(session, result);
 
             return true;
         } else {
+            BOOST_LOG_SEV(logger,Error) << fingerprint(session) << "Attempting to execute an unknown action: " << action_id;
             //! @todo add log: well that's an unknown action you want to execute.
             //! this should have been validated beforehand.
             return false;
@@ -328,16 +362,17 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
     
     switch(result.type) {
         case EType::Done:
-            bindResults(session, result.action_id);
             session->setStatus(result.action_id, EExecutionStatus::Done),
+            bindResults(session, result.action_id);
             executeAction(session, getNext(session));
             break;
         case EType::Async:
             session->setStatus(result.action_id, EExecutionStatus::Async);
             break;
         case EType::Finish:
-            bindResults(session, result.action_id);
+            
             session->setStatus(result.action_id, EExecutionStatus::Done);
+            bindResults(session, result.action_id);
             executeAction(session, (int32_t) Step::Finish);
             break;
         case EType::Wait:
@@ -345,8 +380,8 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
             break;
         case EType::Error:
             session->getLastRequest()->setErrorReport(result.error);
-            bindResults(session, result.action_id);
             session->setStatus(result.action_id, EExecutionStatus::Done);
+            bindResults(session, result.action_id);
             executeAction(session, (int32_t) Step::Error);
             break;
         default:
@@ -366,6 +401,8 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
     for(const auto & binding: bindings) {
         auto to_aid = binding.getToActionId();
         if(actions.count(to_aid) > 0) {
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Checking binding from: " << actions[action_id]->actionLog() << " to " << actions[to_aid]->actionLog() << " ?";
+
             session->setInput(to_aid, binding.getToActionInput(),
                               session->getOutput(action_id, binding.getFromActionOutput()));
             
@@ -404,10 +441,10 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
             
             
         } else {
+            if(to_aid == (int32_t)Step::Die) {
+                addToNext(session, to_aid);
+            } else
             BOOST_LOG_SEV(logger, Warn) << fingerprint(session) << " Unexpected absence of next action " << to_aid;
-
-            //! @todo add log here: unexpected absence of next.
-            // this again is a validation issue, should be handled elsewhere.
         }
     }
     
@@ -417,12 +454,29 @@ void StateMachine::actionAsyncFinished(SessionPtr session,const Result & result)
     actionExecuted(session, result);
 }
 
+bool StateMachine::tryPromotePending(SessionPtr session) {
+    auto pending = getNextPending(session);
+    if(pending != -1) {
+        // pending to promote :)
+        
+        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[pending]->actionLog() << " Promoting action to Planned !";
+        
+        removeFromPending(session, pending);
+        addToNext(session, pending);
+        return true;
+    }
+    return false;
+}
+
 int32_t StateMachine::getNext(SessionPtr session) {
-    auto nexts = session->getNexts();
+    auto & nexts = session->getNexts();
     
     // No next found.
-    if(nexts.size() == 0)
+    if(nexts.size() == 0) {
+        if(tryPromotePending(session))
+            return getNext(session);
         return -1;
+    }
     
     auto candidate_it = nexts.begin();
     int32_t candidate = * candidate_it;
@@ -433,16 +487,9 @@ int32_t StateMachine::getNext(SessionPtr session) {
         if(nexts.size() == 1) {
             // well there are no other options available.
             // but there might be something pending !
-            auto pending = getNextPending(session);
-            if(pending >= 0) {
-                // pending to promote :)
-                
-                BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[pending]->actionLog() << " Promoting action to Planned !";
-
-                removeFromPending(session, pending);
-                session->setStatus(pending, EExecutionStatus::Planned);
-                return pending;
-            } else {
+             if(tryPromotePending(session))
+                 return getNext(session);
+             else {
                 // well no pending available.
                 return candidate;
             }
@@ -485,7 +532,11 @@ void StateMachine::addToNext(SessionPtr session, int32_t action_id) {
     session->getNexts().insert(action_id);
     session->setStatus(action_id, EExecutionStatus::Planned);
     
+    if(action_id != (int32_t)Step::Die)
     BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Planned";
+    else
+        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Planned end of Workflow";
+        
 }
 
 void StateMachine::addToPending(SessionPtr session, int32_t action_id) {

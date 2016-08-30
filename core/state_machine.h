@@ -27,7 +27,7 @@ class ErrorReport;
 /**
  StateMachine define how actions are interlinked, and define which action is running and what actions are expected to run.
  */
-class StateMachine : public Jsonable , public Logged {
+class StateMachine : public Jsonable , public Logged, public boost::enable_shared_from_this<StateMachine> {
     WorkflowPtr workflow;
     
     std::map<int32_t, ActionPtr> actions;
@@ -37,6 +37,9 @@ class StateMachine : public Jsonable , public Logged {
 public:
     StateMachine();
     virtual ~StateMachine();
+    
+    //! Set default layout of a workflow.
+    void init();
     
     //! begin execution of request. will sort out if its a new one or not, and dispatch request to appropriate handler.
     virtual bool execute(SessionPtr, RequestPtr) ;    
@@ -110,6 +113,10 @@ protected:
     //! will transpose outputs of given action to inputs of its bound actions.
     //! will also add items to pendings and nexts.
     void bindResults(SessionPtr, int32_t action_id);
+    
+    //! Check if we're able to promote a pending to Execution.
+    //! @return true if one has been found.
+    bool tryPromotePending(SessionPtr);
     
     //! for logging purpose
     std::string fingerprint(SessionPtr);

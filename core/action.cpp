@@ -34,6 +34,8 @@ bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
             if(id.mandatory) {
                 std::stringstream str;
                 str << fingerprint(session) << " No context provided for input " << id.put_name;
+                
+                BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << " No context provided for input: " << id.put_name << " even if mandatory";
                 er.setError("action.input.nil", str.str());
                 return false;
             }
@@ -52,6 +54,8 @@ bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
                 
                 
             } else {
+                
+                BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << " Invalid context provided for input: " << id.put_name << " (provided: " << ctx->getType() << ", expected: " << id.checker->generate()->getType() <<")";
                 
                 std::stringstream str;
                 str << fingerprint(session) << " Invalid context provided for input " << id.put_name << " (provided: " << ctx->getType() << ", expected: " << id.checker->generate()->getType() <<")";
@@ -136,6 +140,10 @@ PropertySetPtr Action::properties() {
 
 StateMachinePtr Action::getStateMachine() const {
     return state_machine;
+}
+
+void Action::setStateMachine(StateMachinePtr sm) {
+    state_machine = sm;
 }
 
 Result Action::done() const {
@@ -335,8 +343,32 @@ bool Action::canHandleError(SessionPtr) const {
 }
 
 std::string Action::actionLog() const {
+    
     std::stringstream str;
-    str << "[" << std::setw(2) << std::setfill(' ') << getActionId() << " " << getName() << "]";
+    str << "[" << std::setw(2) << std::setfill(' ');
+    switch(getActionId()) {
+        case (int32_t)Step::Cleanup:
+            str << "C";
+            break;
+        case (int32_t)Step::Die:
+            str << "D";
+            break;
+        case (int32_t)Step::Error:
+            str << "E";
+            break;
+        case (int32_t)Step::Finish:
+            str << "F";
+            break;
+        case (int32_t)Step::Interrupt:
+            str << "I";
+            break;
+        case (int32_t)Step::Status:
+            str << "S";
+            break;
+        default:
+            str << getActionId();
+    };
+    str <<" " << getName() << "]";
     return str.str();
 }
 
@@ -347,6 +379,8 @@ void Action::save(boost::property_tree::ptree & root) const {
 void Action::load(const boost::property_tree::ptree & root) {
     
 }
+
+
 
 OSTREAM_HELPER_IMPL(Action, obj) {
     out << "[Action] name: " << obj.getName() << ", id: " << obj.getActionId() << " ";
