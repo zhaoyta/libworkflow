@@ -2,6 +2,16 @@
 #define __RESULT_H_
 
 #include <tools/error_report.h>
+#include <tools/defines.h>
+
+BEGIN_ENUM_DECL(Type){
+    Done,
+    Wait,
+    Error,
+    Finish,
+    Async
+};
+END_ENUM_DECL(Type, Done, "Done");
 
 #pragma GCC visibility push(default)
 /**
@@ -12,13 +22,7 @@ struct Result {
     int32_t action_id;
     
     //! result type
-    enum Type: uint32_t {
-        Done,
-        Wait,
-        Error,
-        Finish,
-        Async
-    } type;
+    EType type;
     
     //! well if result is an error, then it need to be reported here.
     ErrorReportPtr error;

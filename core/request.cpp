@@ -2,6 +2,7 @@
 #include <boost/uuid/nil_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <tools/property_set.h>
+#include <iomanip>
 
 Request::Request(): Jsonable() {
     reply.target = ETargetAction::NoReply;
@@ -128,6 +129,12 @@ void Request::setTarget(const Target & t) {
 
 void Request::setReply(const Target & t) {
     reply = t;
+}
+
+std::string Request::logRequest() const {
+    std::stringstream str;
+    str << "[R " << shortId(request_id,4) << "-" <<shortId(target.identifier, 4) << "]";
+    return str.str();
 }
 
 OSTREAM_HELPER_IMPL(Request, obj) {

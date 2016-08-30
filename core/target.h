@@ -23,6 +23,8 @@ END_ENUM_DECL(TargetAction, DefaultAction, "DefaultAction")
 class Target : public Jsonable {
 public:
     Target();
+    Target(const std::string & workflow);
+    Target(const std::string & controller, const std::string & workflow);
     virtual ~Target();
     //! what is the targeted controller. If left empty, the default controller will be used (same with "default")
     std::string controller;

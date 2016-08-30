@@ -48,7 +48,7 @@ void delayed(ActiveObjectPtr) {
     sm->addAction(0, new TestActionA(), {
         OutputBinding(0, "", (int32_t)Step::Finish, "")
     });
-    RequestPtr request(new Request());
+    RequestPtr request(new Request(Target("test-workflow-a")));
     request->getTarget().workflow = "test-workflow-a";
     
     

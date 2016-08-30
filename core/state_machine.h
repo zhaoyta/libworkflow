@@ -111,6 +111,8 @@ protected:
     //! will also add items to pendings and nexts.
     void bindResults(SessionPtr, int32_t action_id);
     
+    //! for logging purpose
+    std::string fingerprint(SessionPtr);
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

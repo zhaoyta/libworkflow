@@ -69,13 +69,15 @@ public:
     virtual bool canHandleError(SessionPtr) const;
     
     //! some accessors ...
-    const std::string & getName() const;
+    virtual const std::string & getName() const;
     virtual void setName(const std::string & name);
     
     virtual void setActionId(int32_t action_id);
     virtual int32_t getActionId() const;
     
-    PropertySetPtr properties();
+    virtual PropertySetPtr properties();
+    
+    std::string actionLog() const;
     
 protected:
     
@@ -165,6 +167,7 @@ private:
 };
 
 OSTREAM_HELPER_DECL(Action);
+LOG_HELPER_DECL(Action);
 
 class DefaultNextAction: public Action {
 public:

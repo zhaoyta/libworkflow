@@ -28,6 +28,32 @@ std::ostream& operator<<(std::ostream&, Klass *); \
 SHARED_PTR(Klass); \
 std::ostream& operator<<(std::ostream&, __CAT(Klass,Ptr)); 
 
+//! Helper to declare operator for logger stream.
+//! Ostream helper is compatible
+#define LOG_HELPER_DECL(Klass) \
+SHARED_PTR(Klass); \
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream& out, const Klass &); \
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream& out, Klass *); \
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream& out, __CAT(Klass,Ptr));
+
+
+//! Implementation simply need the basic const Klass & version to be implemented.
+#define LOG_HELPER_IMPL(Klass, obj) \
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream&& out, __CAT(Klass,Ptr) obj) { \
+out << *obj; \
+return out; \
+} \
+\
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream&& out, Klass * obj) { \
+out << *obj; \
+return out; \
+} \
+\
+boost::log::formatting_ostream& operator<<(boost::log::formatting_ostream& out, const Klass & obj)
+
+
+
+
 //! Implementation simply need the basic const Klass & version to be implemented.
 #define OSTREAM_HELPER_IMPL(Klass, obj) \
 std::ostream& operator<<(std::ostream& out, __CAT(Klass,Ptr) obj) { \

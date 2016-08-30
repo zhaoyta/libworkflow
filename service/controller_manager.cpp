@@ -56,7 +56,7 @@ void ControllerManager::started() {
 }
 
 void ControllerManager::registerController(ControllerPtr controller) {
-    BOOST_LOG_SEV(logger, Info) << " Setting new controller " << controller;
+    BOOST_LOG_SEV(logger, Info) << "Setting new controller " << controller;
     controllers[controller->getName()] = controller;
 }
 

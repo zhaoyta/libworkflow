@@ -17,6 +17,22 @@ Target::Target() : Jsonable(),
     identifier(boost::uuids::random_generator()()),
     target(ETargetAction::DefaultAction),
     action(-1){}
+
+Target::Target( const std::string & workflow) : Jsonable(),
+controller("default"),
+workflow(workflow),
+identifier(boost::uuids::random_generator()()),
+target(ETargetAction::DefaultAction),
+action(-1){}
+
+Target::Target(const std::string & controller, const std::string & workflow) : Jsonable(),
+    controller(controller),
+    workflow(workflow),
+    identifier(boost::uuids::random_generator()()),
+    target(ETargetAction::DefaultAction),
+    action(-1){}
+
+
 Target::~Target() {}
 
 bool Target::operator<(const Target & t) const{

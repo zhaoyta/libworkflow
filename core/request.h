@@ -57,6 +57,7 @@ public:
     boost::uuids::uuid getId() const;
     
     std::string shortRequestId() const;
+    std::string logRequest() const;
     
     void setId(const boost::uuids::uuid & id);
     void setRequestId(const boost::uuids::uuid & id);

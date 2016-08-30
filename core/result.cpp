@@ -1,9 +1,10 @@
-//
-//  result.cpp
-//  libworkflow
-//
-//  Created by Bastien Barcaioni on 30/08/2016.
-//  Copyright © 2016 Bastien Barcaioni. All rights reserved.
-//
+#include <core/result.h>
 
-#include <stdio.h>
+BEGIN_ENUM_IMPL(Type) {
+    {"Done",(uint32_t)EType::Done},
+{"Wait",(uint32_t)EType::Wait},
+{"Error",(uint32_t)EType::Error},
+{"Finish",(uint32_t)EType::Finish},
+{"Async",(uint32_t)EType::Async},
+};
+END_ENUM_IMPL(Type);

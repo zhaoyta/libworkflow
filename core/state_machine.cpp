@@ -71,7 +71,7 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
         action = ActionWrapperPtr(new CleanupWrapper(action));
     } else if(action_id < 0) {
         // reject negative id without reason.
-        //! @todo add log: reject action due to action_id being negative unduely.
+        BOOST_LOG_SEV(logger, Error) << workflow->getName() << action->actionLog() << " Failed to be added, due to invalid action_id on setup " << action_id;
         return;
     }
     
@@ -120,7 +120,7 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
         return replyReceived(session, request);
     
     // this call wasn't expected.
-    //! @todo add log
+    BOOST_LOG_SEV(logger, Error) << workflow->getName() << request->logRequest() << " Wasn't expecting this request now. This is totally unexpected. Ignoring it.";
     
     return false;
 }
@@ -148,6 +148,12 @@ bool StateMachine::canPendAction(SessionPtr session, ActionPtr action){
     return false;
 }
 
+std::string StateMachine::fingerprint(SessionPtr session) {
+    std::stringstream str;
+    str << "[" << workflow->getName()<< "]" << session->getOriginalRequest()->logRequest() << " ";
+    return str.str();
+}
+
 bool StateMachine::firstCall(SessionPtr session)  {
     // this is a first call, mark all actions as unplanned to begin with.
     for(const auto & kv: actions)
@@ -161,9 +167,8 @@ bool StateMachine::firstCall(SessionPtr session)  {
     
     for(const auto & input: starters) {
         if(actions.count(input.getActionId()) == 0) {
-            //! @todo add log here, not all input are ready.
-            //! @todo reply with error.
-            //! @todo maybe this isn't the place to check validity of the workflow .... it should be checked upon insertion in controller ... :)
+            
+            BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Aborting due to invalid workflow layout. Input requested doesn't exists.";
             return false;
         }
         auto act = actions.at(input.getActionId());
@@ -227,10 +232,10 @@ bool StateMachine::replyReceived(SessionPtr session, RequestPtr request) {
             actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
             return true;
         } else {
-            //! @todo add log, action doesn't expect reply.
+            BOOST_LOG_SEV(logger, Warn) << fingerprint(session) << " Ignoring this reply, as currently running action doesn't expect a reply.";
         }
     } else {
-        //! @todo add log, unknown action requested.
+         BOOST_LOG_SEV(logger, Warn) << fingerprint(session) << " Ignoring this reply, as currently running workflow doesn't expect a reply.";
     }
     return false;
 }
@@ -241,6 +246,8 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
     
     if(action_id != -1) {
         //! @todo add log, no action found.
+        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " No action to execute provided ... checking for promoted pending. ";
+
         
         int32_t next = getNext(session);
         ErrorReport er;
@@ -249,16 +256,16 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
             return executeAction(session, next);
         }
         
+        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " No action to execute provided ... checking ability to execute finish earlier ";
+
         if(canExecuteFinish(session)) {
             addToNext(session, (int32_t)Step::Finish);
-            
-            //! @todo add log Forcefully executing finish
             return executeAction(session, getNext(session));
         }
         
-        //! @todo add log: Nothing to execute ...
+        BOOST_LOG_SEV(logger, Warn) << fingerprint(session) << " Truly nothing to execute, aborting execution.";
+        
         addToNext(session, (int32_t) Step::Error);
-        // might be nice to add an error here ...
         er = ErrorReport(session->getOriginalRequest()->getTarget(),
                          "statemachine.unexpected.noend", "No end of workflow available ... aborting");
         session->getLastRequest()->setErrorReport(ErrorReportPtr(new ErrorReport(er)));
@@ -287,8 +294,14 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
         
         if(actions.count(action_id) >0) {
             
-            actionExecuted(session, actions[action_id]->perform(session));
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " About to execute ...";
             
+            auto result = actions[action_id]->perform(session);
+            
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Executed " << result.type;
+            
+            actionExecuted(session, result);
+
             return true;
         } else {
             //! @todo add log: well that's an unknown action you want to execute.
@@ -304,8 +317,8 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
     ErrorReport er;
     if(not action->checkOutputs(session, er)) {
         // move to error.
-        
-        //! @todo add log: Action didn't respect it's contracted outputs.
+        BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->actionLog() << " Failed its contracted outputs.";
+
         er = ErrorReport(session->getOriginalRequest()->getTarget(),
                          "action.contract.output", "Action failed it's outputs contract. Aborting");
         session->getLastRequest()->setErrorReport(ErrorReportPtr(new ErrorReport(er)));
@@ -314,29 +327,31 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
     
     
     switch(result.type) {
-        case Result::Done:
+        case EType::Done:
             bindResults(session, result.action_id);
             session->setStatus(result.action_id, EExecutionStatus::Done),
             executeAction(session, getNext(session));
             break;
-        case Result::Async:
+        case EType::Async:
             session->setStatus(result.action_id, EExecutionStatus::Async);
             break;
-        case Result::Finish:
+        case EType::Finish:
             bindResults(session, result.action_id);
             session->setStatus(result.action_id, EExecutionStatus::Done);
             executeAction(session, (int32_t) Step::Finish);
             break;
-        case Result::Wait:
+        case EType::Wait:
             session->setStatus(result.action_id, EExecutionStatus::Waiting);
             break;
-        case Result::Error:
+        case EType::Error:
             session->getLastRequest()->setErrorReport(result.error);
             bindResults(session, result.action_id);
             session->setStatus(result.action_id, EExecutionStatus::Done);
             executeAction(session, (int32_t) Step::Error);
             break;
         default:
+            BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->actionLog() << " Unexpected result";
+
             session->getLastRequest()->setErrorReport(ErrorReportPtr(new
                                                       ErrorReport(session->getOriginalRequest()->getTarget(),
                                                                   "action.unknown.result", "Unexpected Action result. Aborting")));
@@ -364,6 +379,8 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
                     removeFromPending(session, to_aid);
                     session->setStatus(to_aid, EExecutionStatus::Skipped);
                     //! todo add log skipped action.
+                    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[to_aid]->actionLog() << " Skipped";
+
                     isSkipped = true;
                     break;
                 }
@@ -387,6 +404,8 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
             
             
         } else {
+            BOOST_LOG_SEV(logger, Warn) << fingerprint(session) << " Unexpected absence of next action " << to_aid;
+
             //! @todo add log here: unexpected absence of next.
             // this again is a validation issue, should be handled elsewhere.
         }
@@ -418,7 +437,8 @@ int32_t StateMachine::getNext(SessionPtr session) {
             if(pending >= 0) {
                 // pending to promote :)
                 
-                //! @todo add log promotion !
+                BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[pending]->actionLog() << " Promoting action to Planned !";
+
                 removeFromPending(session, pending);
                 session->setStatus(pending, EExecutionStatus::Planned);
                 return pending;
@@ -464,11 +484,15 @@ int32_t StateMachine::getNextPending(SessionPtr session) {
 void StateMachine::addToNext(SessionPtr session, int32_t action_id) {
     session->getNexts().insert(action_id);
     session->setStatus(action_id, EExecutionStatus::Planned);
+    
+    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Planned";
 }
 
 void StateMachine::addToPending(SessionPtr session, int32_t action_id) {
     session->getPendings().insert(action_id);
     session->setStatus(action_id, EExecutionStatus::Pending);
+    
+    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Pending";
 }
 
 void StateMachine::removeFromNext(SessionPtr session, int32_t action_id) {

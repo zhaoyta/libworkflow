@@ -6,6 +6,8 @@
 #include <boost/log/core.hpp>
 #include <boost/log/trivial.hpp>
 #include <boost/log/attributes.hpp>
+namespace logging = boost::log;
+namespace expr = boost::log::expressions;
 
 
 BEGIN_WEAK_ENUM_DECL(LogSeverity) {

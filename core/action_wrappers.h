@@ -27,6 +27,9 @@ public:
     bool canHandleError(SessionPtr) const override;
     void setActionId(int32_t action_id) override;
     int32_t getActionId() const override;
+    const std::string & getName() const override;
+    void setName(const std::string &) override;
+    PropertySetPtr properties() override;
     
 protected:
     //! This get called whenever a perform is requested.

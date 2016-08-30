@@ -13,15 +13,23 @@
 #include <iomanip>
 #include <boost/log/expressions.hpp>
 #include <boost/log/support/date_time.hpp>
+#include <boost/log/utility/manipulators/add_value.hpp>
+#include <boost/log/attributes.hpp>
+#include <boost/log/utility/value_ref.hpp>
+#include <boost/log/attributes/scoped_attribute.hpp>
+#include <boost/log/trivial.hpp>
+
+
+
+namespace logging = boost::log;
+namespace expr = boost::log::expressions;
 
 
 Logged::Configuration Logged::configuration;
 
-namespace logging = boost::log;
 namespace src = boost::log::sources;
 namespace sinks = boost::log::sinks;
 namespace keywords = boost::log::keywords;
-namespace expr = boost::log::expressions;
 
 typedef sinks::synchronous_sink< sinks::text_ostream_backend > sink_t;
 

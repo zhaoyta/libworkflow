@@ -9,6 +9,7 @@
 #include <tools/type_checker.h>
 #include <core/result.h>
 #include <core/workflow.h>
+#include <iomanip>
 
 
 Action::Action(const std::string & name):
@@ -136,28 +137,28 @@ StateMachinePtr Action::getStateMachine() const {
 Result Action::done() const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Done;
+    r.type = EType::Done;
     return r;
 }
 
 Result Action::wait() const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Wait;
+    r.type = EType::Wait;
     return r;
 }
 
 Result Action::async() const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Async;
+    r.type = EType::Async;
     return r;
 }
 
 Result Action::error(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Error;
+    r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
     return r;
 }
@@ -165,7 +166,7 @@ Result Action::error(SessionPtr session, const std::string & err_key, const std:
 void Action::asyncDone(SessionPtr session) const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Done;
+    r.type = EType::Done;
     
     getStateMachine()->actionAsyncFinished(session, r);
 }
@@ -173,7 +174,7 @@ void Action::asyncDone(SessionPtr session) const {
 void Action::asyncWait(SessionPtr session) const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Wait;
+    r.type = EType::Wait;
     
     getStateMachine()->actionAsyncFinished(session, r);
 }
@@ -181,7 +182,7 @@ void Action::asyncWait(SessionPtr session) const {
 void Action::asyncError(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
     Result r;
     r.action_id = getActionId();
-    r.type = Result::Error;
+    r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
 
     getStateMachine()->actionAsyncFinished(session, r);
@@ -329,6 +330,11 @@ bool Action::canHandleError(SessionPtr) const {
     return false;
 }
 
+std::string Action::actionLog() const {
+    std::stringstream str;
+    str << "[" << std::setw(2) << std::setfill(' ') << getActionId() << " " << getName() << "]";
+    return str.str();
+}
 
 void Action::save(boost::property_tree::ptree & root) const {
     
@@ -336,6 +342,11 @@ void Action::save(boost::property_tree::ptree & root) const {
 
 void Action::load(const boost::property_tree::ptree & root) {
     
+}
+
+OSTREAM_HELPER_IMPL(Action, obj) {
+    out << "[Action] name: " << obj.getName() << ", id: " << obj.getActionId() << " ";
+    return out;
 }
 
 DefaultNextAction::DefaultNextAction() : Action("Next") {

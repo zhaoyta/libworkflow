@@ -53,6 +53,19 @@ int32_t ActionWrapper::getActionId() const {
     return wrapped->getActionId();
 }
 
+
+const std::string & ActionWrapper::getName() const {
+    return wrapped->getName();
+}
+
+void ActionWrapper::setName(const std::string & n) {
+    wrapped->setName(n);
+}
+
+PropertySetPtr ActionWrapper::properties() {
+    return wrapped->properties();
+}
+
 void ActionWrapper::wrapPerform(SessionPtr) const{
     
 }

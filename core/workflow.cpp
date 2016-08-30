@@ -52,7 +52,13 @@ const RunningSession & Workflow::getRunningSession(boost::uuids::uuid & id) cons
 }
 
 bool Workflow::perform(RequestPtr request) {
+    if(not request) {
+        BOOST_LOG_SEV(logger, Error) << "[" << getName() << "]"  << "Ignored null request";
+        return false;
+    }
+    
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+    BOOST_LOG_SEV(logger, Debug) << "[" << getName() <<"]"  << request->logRequest() << " Received request to process ...";
 
     if(canExecuteRequest(request)) {
         auto & rsession = sessions[request->getId()];
@@ -66,10 +72,12 @@ bool Workflow::perform(RequestPtr request) {
             rsession.timed->setIOService(controller->getIOService());
             rsession.timed->setDuration(timeout * 1000);
             rsession.timed->setTimeoutFunction(boost::bind<void>(&Workflow::requestTimedOut, this, request->getId()));
+            BOOST_LOG_SEV(logger, Info) << "[" << getName() << "]"  << request->logRequest() << " Creating new session ...";
         }
         
         if(shouldMakePending(request)) {
             addToPending(request);
+            BOOST_LOG_SEV(logger, Debug) << "[" << getName() << "]"  << request->logRequest() << " Made pending ...";
             return true;
         }
         
@@ -78,12 +86,14 @@ bool Workflow::perform(RequestPtr request) {
         rsession.active = false;
 
         if(stateMachine->finished(rsession.session)) {
+            BOOST_LOG_SEV(logger, Info) << "[" << getName() << "]"  << request->logRequest() << " Closing session ...";
             //! @todo add log clear session
             sessions.erase(request->getId());
         }
         
         return res;
     } else {
+        BOOST_LOG_SEV(logger, Warn) << "[" << getName() << "]"  << request->logRequest() << " Unable to execute request.";
         errorReply(request, new ErrorReport(request->getTarget(), "unable.to.execute", "Can't execute request"));
         return false;
     }
@@ -138,7 +148,11 @@ bool Workflow::canExecuteRequest(RequestPtr request) {
     if(sessions.count(request->getId()) == 0 and type == ETargetAction::Status)
         return true;
     
-    //! @todo add log here as to why request has been rejected.
+    if(sessions.count(request->getId()) == 1)
+        BOOST_LOG_SEV(logger, Debug) << "[" << getName() << "]" << request->logRequest() << " Request targeted a running session without an appropriate Target";
+    else
+        BOOST_LOG_SEV(logger, Debug) << "[" << getName() << "]" << request->logRequest() << " Request targeted a new session without an appropriate Target";
+    BOOST_LOG_SEV(logger, Debug) << "[" << getName() << "]" << request->getTarget();
     return false;
 }
 
@@ -148,11 +162,13 @@ void Workflow::requestTimedOut(boost::uuids::uuid id) {
     if(sessions.count(id) != 0) {
         auto session = sessions.at(id);
         auto target = Target(session.session->getOriginalRequest()->getTarget());
+        BOOST_LOG_SEV(logger, Info) << getName() << session.session->getOriginalRequest()->logRequest() << " Request Timed out ... interrupting ...";
+
         target.target = ETargetAction::Interrupt;
         auto req = RequestPtr(new Request(target));
         perform(req);
     } else {
-        //! @todo add log as to timeout failed to find a target.
+        BOOST_LOG_SEV(logger, Debug) << getName() << " A time out fired, but no request with this id found ...";
     }
 }
 
