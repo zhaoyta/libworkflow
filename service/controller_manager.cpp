@@ -23,6 +23,8 @@ ControllerManagerPtr ControllerManager::getInstance() {
 
 
 ControllerPtr ControllerManager::getController(const std::string & ctrl) {
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
     if(controllers.count(ctrl) > 0)
         return controllers[ctrl];
     //! @todo add log failed to find controller ... 
@@ -31,6 +33,8 @@ ControllerPtr ControllerManager::getController(const std::string & ctrl) {
 
 void ControllerManager::perform(RequestPtr req) {
     getIOService()->dispatch(boost::bind<void>([&](RequestPtr req) {
+        boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
         if(req->getTarget().target == ETargetAction::NoReply) {
             //! @todo log nothing to do :)
             return;
@@ -56,6 +60,8 @@ void ControllerManager::started() {
 }
 
 void ControllerManager::registerController(ControllerPtr controller) {
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
     BOOST_LOG_SEV(logger, Info) << "Setting new controller " << controller;
     controllers[controller->getName()] = controller;
 }

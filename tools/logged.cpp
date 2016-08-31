@@ -62,7 +62,10 @@ void Logged::Configuration::load(const boost::property_tree::ptree & root) {
 
 Logged::Logged(const std::string & ns): attr(ns) {
     logger.add_attribute("Namespace", attr);
-    setNamespace(ns);
+}
+
+Logged::Logged(): attr("global") {
+    logger.add_attribute("Namespace", attr);
 }
 
 Logged::~Logged() {

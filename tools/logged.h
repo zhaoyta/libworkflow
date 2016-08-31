@@ -36,6 +36,8 @@ END_ENUM_DECL(LogSeverity, Info, "Info");
  BOOST_LOG_SEV(logger, Info) << "A regular message";
  BOOST_LOG_SEV(logger, Warn) << "Something bad is going on but I can handle it";
  BOOST_LOG_SEV(logger, Critical) << "Everything crumbles, shoot me now!";
+ 
+ Dont forget to set your namespace, it can help when you want to filter logs.
  */
 class Logged {
     boost::log::attributes::mutable_constant< std::string > attr;
@@ -54,6 +56,7 @@ class Logged {
         void load(const boost::property_tree::ptree & root) override;
     } configuration;
 public:
+    Logged();
     Logged(const std::string & ns);
     virtual ~Logged();
     

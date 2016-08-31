@@ -7,6 +7,9 @@
 #include <boost/bind.hpp>
 #include <boost/function.hpp>
 #include <tools/logged.h>
+#include <boost/thread/recursive_mutex.hpp>
+#include <boost/interprocess/sync/scoped_lock.hpp>
+
 
 
 #pragma GCC visibility push(default)
@@ -27,12 +30,11 @@ namespace boost {
  Thus, expect started() to be called from the thread once it's well started.
  stopped() will be called on this thread as well just before it's closure.
  */
-class ActiveObject : public boost::enable_shared_from_this<ActiveObject>, public Logged {
+class ActiveObject : public boost::enable_shared_from_this<ActiveObject>, virtual public Logged {
     const std::string name;
     IOServicePtr service;
     std::vector< boost::shared_ptr<boost::thread> > threads;
     boost::shared_ptr<boost::asio::io_service::work> worker;
-    boost::shared_ptr<boost::recursive_mutex> mutex;
     
     boost::function<void(ActiveObjectPtr)> start_function;
     boost::function<void(ActiveObjectPtr)> stop_function;
@@ -64,6 +66,8 @@ public:
 protected:
     virtual void started();
     virtual void stopped();
+
+    boost::shared_ptr<boost::recursive_mutex> mutex;
 
 private:
     void run();
