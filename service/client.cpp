@@ -3,6 +3,8 @@
 #include <core/request.h>
 #include <service/controller_manager.h>
 #include <tools/error_report.h>
+#include <boost/uuid/uuid_generators.hpp>
+
 
 BEGIN_ENUM_IMPL(ClientStatus) {
     {"Connected",(uint32_t)EClientStatus::Connected},
@@ -11,7 +13,9 @@ BEGIN_ENUM_IMPL(ClientStatus) {
 };
 END_ENUM_IMPL(ClientStatus);
 
-Client::Client() : Logged("clt"), status(EClientStatus::Disconnected) {
+Client::Client() : Logged("clt"),
+    status(EClientStatus::Disconnected),
+    client_id(boost::uuids::random_generator()()){
     
 }
 Client::~Client() {
@@ -150,7 +154,9 @@ bool Client::doSendRequest(RequestPtr ) {
 
 bool Client::doReceiveRequest(RequestPtr req) {
     req->getReply().client_id = getId();
-    req->getReply().target = ETargetAction::Reply;
+    if( req->getReply().target != ETargetAction::NoReply)
+        req->getReply().target = ETargetAction::Reply;
+    BOOST_LOG_SEV(logger, Info) << logClient() << " Pushing new request " << req->getTarget() << " calling back : " << req->getReply();
     ControllerManager::getInstance()->perform(req);
     return true;
 }

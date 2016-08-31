@@ -205,8 +205,7 @@ std::string Action::fingerprint(SessionPtr session) const {
     std::stringstream str;
     str << "[" << getStateMachine()->getWorkflow()->getName()
        << "][" << getName()
-       << "][" << session->getOriginalRequest()->shortRequestId()
-       << "][" << shortId(session->getOriginalRequest()->getId()) << "]";
+    << "]" << session->getOriginalRequest()->logRequest();
     return str.str();
 }
 

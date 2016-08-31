@@ -39,6 +39,8 @@ public:
 protected:
     
     void started() override {
+        connect();
+        BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
         WorkflowPtr workflow(new Workflow("test-workflow-a"));
         auto sm = workflow->getStateMachine();
         sm->addAction(0, new TestActionA(), {
@@ -49,7 +51,7 @@ protected:
         // registering it.
         ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
         
-        RequestPtr request(new Request(Target("test-workflow-a")));
+        RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
         request->getTarget().workflow = "test-workflow-a";
         
         publishRequest(request);

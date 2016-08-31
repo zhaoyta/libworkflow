@@ -175,7 +175,7 @@ std::string StateMachine::fingerprint(SessionPtr session) {
 
 bool StateMachine::firstCall(SessionPtr session)  {
     // this is a first call, mark all actions as unplanned to begin with.
-    BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " First call !";
+    BOOST_LOG_SEV(logger,Info) << fingerprint(session) << " First call from " << session->getOriginalRequest()->getReply() ;
     for(const auto & kv: actions)
         session->setStatus(kv.first, EExecutionStatus::Unplanned);
     

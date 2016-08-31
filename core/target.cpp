@@ -58,6 +58,7 @@ OSTREAM_HELPER_IMPL(Target, obj) {
         << ", workflow:" << obj.workflow
         << ", id: " << obj.shortId()
         << ", target: " << obj.target
+        << ", client: " << shortId(obj.client_id)
         << " }";
     return out;
 }
