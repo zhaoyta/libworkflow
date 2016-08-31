@@ -21,16 +21,6 @@ RequestPtr Request::createReply(RequestPtr request) {
     if(request) {
         auto rep = RequestPtr(new Request(request->getReply(), request->getTarget()));
         rep->setRequestId(request->getRequestId());
-        rep->setClientId(request->getClientId());
-        // thats the basics.
-        
-        // now the fun part :)
-        
-        if(rep->getClientId() != boost::uuids::nil_uuid()) {
-            // ha ah ! it was sent from another client. we must reroute appropriately.
-            
-            //! @todo add a new Request to Workflow ToClient, prepare a nice SendCtx with this request as child.
-        }
         return rep;
     }
     return RequestPtr();
@@ -40,10 +30,6 @@ Request::~Request() {
     
 }
 
-
-boost::uuids::uuid Request::getClientId() const {
-    return client_id;
-}
 
 boost::uuids::uuid Request::getRequestId() const {
     return request_id;
@@ -63,10 +49,6 @@ void Request::setId(const boost::uuids::uuid & id) {
 
 void Request::setRequestId(const boost::uuids::uuid & id) {
     request_id = id;
-}
-
-void Request::setClientId(const boost::uuids::uuid & id) {
-    client_id = id;
 }
 
 PropertySetPtr Request::getBypass() {

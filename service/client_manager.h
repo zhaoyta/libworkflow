@@ -10,6 +10,7 @@
 SHARED_PTR(Client);
 SHARED_PTR(ClientManager);
 SHARED_PTR(Timed);
+SHARED_PTR(Request);
 
 /**
     ClientManager is a simple storage, that is responsible for periodic check of client availability. 
@@ -28,12 +29,14 @@ public:
     //! Singleton :)
     static ClientManagerPtr getInstance();
     
+    //! this request must be targeted to a specific client, try to find it and send him.
+    bool perform(RequestPtr);
+    
     //! Grab a client by it's ID.
     ClientPtr getClient(const boost::uuids::uuid & cid);
     //! Add a client to the stack.
     void addClient(ClientPtr);
-    
-    
+    //! call a check client.
     void checkClients();
     
 protected:

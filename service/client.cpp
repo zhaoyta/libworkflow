@@ -144,10 +144,18 @@ bool Client::canSendRequest(RequestPtr, ErrorReport & er) {
     return false;
 }
 
-void Client::doSendRequest(RequestPtr ) {
-    
+bool Client::doSendRequest(RequestPtr ) {
+    return false;
 }
 
-void Client::doReceiveRequest(RequestPtr req) {
+bool Client::doReceiveRequest(RequestPtr req) {
+    req->getReply().client_id = getId();
+    req->getReply().target = ETargetAction::Reply;
     ControllerManager::getInstance()->perform(req);
+    return true;
+}
+
+OSTREAM_HELPER_IMPL(Client, obj) {
+    out << "[Client] id: " << shortId(obj.getId());
+    return out;
 }

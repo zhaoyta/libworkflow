@@ -1,6 +1,9 @@
 #include <service/controller_manager.h>
 #include <core/controller.h>
 #include <core/request.h>
+#include <core/target.h>
+#include <service/client_manager.h>
+#include <boost/uuid/uuid_generators.hpp>
 
 static ControllerManagerPtr instance;
 
@@ -37,7 +40,12 @@ void ControllerManager::perform(RequestPtr req) {
 
         if(req->getTarget().target == ETargetAction::NoReply) {
             //! @todo log nothing to do :)
+            BOOST_LOG_SEV(logger, Debug) << this << req->logRequest() << " Well it's a NoReply thus aborting it.";
             return;
+        }
+        
+        if(req->getTarget().client_id != boost::uuids::nil_uuid()) {
+            ClientManager::getInstance()->perform(req);
         }
         
         bool able = false;
@@ -48,7 +56,7 @@ void ControllerManager::perform(RequestPtr req) {
         }
         
         if(not able) {
-            //! @todo add log stating impossibility to find an apt controller.
+            BOOST_LOG_SEV(logger, Warn) << this << req->logRequest() << " Can't process this request, no apt controller found.";
         }
     } , req));
 }

@@ -3,18 +3,17 @@
 #include <core/action.h>
 #include <core/state_machine.h>
 #include <core/bindings.h>
+#include <tests/common/test_client.h>
+#include <service/actor.h>
 #include <service/controller_manager.h>
 #include <core/controller.h>
-#include <tools/timed.h>
-#include <tools/logged.h>
+
 
 /**
     This should be the simplest of test.
     Create a new workflow with one Action. 
     Execute it and that's it.
  */
-
-
 class TestActionA: public Action {
 public:
     TestActionA() : Action("TestActionA") {}
@@ -25,68 +24,52 @@ public:
     }
     
 };
-        
-boost::shared_ptr<boost::asio::io_service::work> work;
-boost::shared_ptr<boost::asio::io_service> service;
-TimedPtr t;
-        
-void terminate(const boost::system::error_code & ec ) {
-    if(not ec) {
-    GLOB_LOGGER("general");
-    BOOST_LOG_SEV(logger, Info) << " Shutting down !";
-    ControllerManager::getInstance()->terminate();
-    work.reset();
-    } else {
-        GLOB_LOGGER("general");
-        BOOST_LOG_SEV(logger, Info) << " Unexpected call Oo ! " << ec.message();
+
+
+
+SHARED_PTR(TestClient);
+
+class TestClient: public Actor {
+public:
+    TestClient(): Actor("TestClient") {
+        setNamespace("test.log");
     }
-}
+    virtual ~TestClient(){}
+    
+protected:
+    
+    void started() override {
+        WorkflowPtr workflow(new Workflow("test-workflow-a"));
+        auto sm = workflow->getStateMachine();
+        sm->addAction(0, new TestActionA(), {
+            OutputBinding(0, "", (int32_t)Step::Finish, "")
+        });
+        sm->addInput(InputBinding("", 0, ""));
         
+        // registering it.
+        ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
         
-void delayed(ActiveObjectPtr) {
+        RequestPtr request(new Request(Target("test-workflow-a")));
+        request->getTarget().workflow = "test-workflow-a";
+        
+        publishRequest(request);
+    }
     
-    GLOB_LOGGER("general");
-    BOOST_LOG_SEV(logger, Info) << " Setting up Tests workflow !";
-    
-    // timeout execution.
-    t.reset(new Timed());
-    t->setIOService(service);
-    t->setDuration(5000);
-    t->setTimeoutFunction(&terminate);
-    t->start();
-    
-    // Workflow creation
-    // It's a pretty simple workflow that does absolutely nothing :)
-    // Aside printing hello
-    WorkflowPtr workflow(new Workflow("test-workflow-a"));
-    auto sm = workflow->getStateMachine();
-    sm->addAction(0, new TestActionA(), {
-        OutputBinding(0, "", (int32_t)Step::Finish, "")
-    });
-    sm->addInput(InputBinding("", 0, ""));
-    
-    // registering it.
-    ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
-    
-    RequestPtr request(new Request(Target("test-workflow-a")));
-    request->getTarget().workflow = "test-workflow-a";
-    ControllerManager::getInstance()->perform(request);
+    void newRequestReceived() override {
+        
+    }
+};
+
+TestClientPtr test_client;
+
+
+void test_main() {
+    test_client.reset(new TestClient());
 }
 
-        
-int main(int argc, const char * argv[]) {
-    // maybe we should wait for controller to have started ...
-    service.reset(new boost::asio::io_service());
-    Logged::loadConfiguration("");
-    GLOB_LOGGER("general");
-    BOOST_LOG_SEV(logger, Info) << " Test Starting !";
-    ControllerManager::getInstance()->setStartedFunction(&delayed);
-    ControllerManager::getInstance()->start();
-    
-    
-    // keep alive.
-    work.reset(new boost::asio::io_service::work(*service));
-    service->run();
-    
-    return 0;
-}
+/*
+ // Workflow creation
+ // It's a pretty simple workflow that does absolutely nothing :)
+ // Aside printing hello
+ 
+*/

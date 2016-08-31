@@ -25,7 +25,7 @@ END_ENUM_DECL(ClientStatus, Disconnected, "Disconnected");
  They get to know what request they emitted outside and which request they sent processing here.
  When a client get disconnected, it automagically interrupt all requests.
  */
-class Client : public Logged {
+class Client : virtual public Logged {
     EClientStatus status;
     boost::uuids::uuid client_id;
     std::map<boost::uuids::uuid, RequestPtr> receivedRequests;
@@ -99,9 +99,9 @@ protected:
     
     //! do the actual operation of receiving
     //! This will actually transfert the request to ControllerManager.
-    virtual void doReceiveRequest(RequestPtr);
+    virtual bool doReceiveRequest(RequestPtr);
     //! do the actual sending. Does nothing by default
-    virtual void doSendRequest(RequestPtr);
+    virtual bool doSendRequest(RequestPtr);
     
 private:
     //! this does internal magick ...

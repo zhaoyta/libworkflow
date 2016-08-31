@@ -32,7 +32,10 @@ public:
     std::string workflow;
     //! This is the unique id by which this instance will be called.
     boost::uuids::uuid identifier;
-    
+
+    //! To which the request should be sent .
+    boost::uuids::uuid client_id;
+
     //! This is mostly usefull for reply, it's checked when the reply gets registered.
     //! if this is different than what's stored in session, this request gets ignored.
     //! note, if set to 0, it'll be accepted nonetheless (default level is 1)

@@ -22,6 +22,7 @@ Target::Target( const std::string & workflow) : Jsonable(),
 controller("default"),
 workflow(workflow),
 identifier(boost::uuids::random_generator()()),
+client_id(boost::uuids::nil_generator()()),
 target(ETargetAction::DefaultAction),
 action(-1){}
 
