@@ -6,8 +6,7 @@
 #include <iostream>
 
 Controller::Controller(const std::string & name, uint32_t pool) :
-    ActiveObject(name, pool){
-        setNamespace("ctrl");
+    ActiveObject(name, pool), Logged("ctrl"){
     }
 Controller::~Controller() {}
 

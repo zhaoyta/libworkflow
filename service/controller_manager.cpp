@@ -46,6 +46,7 @@ void ControllerManager::perform(RequestPtr req) {
         
         if(req->getTarget().client_id != boost::uuids::nil_uuid()) {
             ClientManager::getInstance()->perform(req);
+            return;
         }
         
         bool able = false;
@@ -62,6 +63,7 @@ void ControllerManager::perform(RequestPtr req) {
 }
 
 void ControllerManager::started() {
+    ClientManager::getInstance();
     auto controller = ControllerPtr(new Controller("default", default_pool));
     
     registerController(controller);

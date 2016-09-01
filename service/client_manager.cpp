@@ -10,8 +10,8 @@ static ClientManagerPtr instance;
 
 ClientManager::ClientManager() :
     ActiveObject("ClientManager"),
-    timer(new Timed()) {
-    setNamespace("clt.mgr");
+    Logged("clt.mgr"),
+    timer(new Timed()){
     
 }
 

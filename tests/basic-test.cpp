@@ -5,6 +5,7 @@
 #include <core/bindings.h>
 #include <tests/common/test_client.h>
 #include <service/actor.h>
+#include <service/client_manager.h>
 #include <service/controller_manager.h>
 #include <core/controller.h>
 
@@ -31,13 +32,12 @@ SHARED_PTR(TestClient);
 
 class TestClient: public Actor {
 public:
-    TestClient(): Actor("TestClient") {
+    TestClient(): Actor("TestClient"), Logged("test.log") {
         setNamespace("test.log");
     }
     virtual ~TestClient(){}
     
 protected:
-    
     void started() override {
         connect();
         BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
@@ -54,11 +54,21 @@ protected:
         RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
         request->getTarget().workflow = "test-workflow-a";
         
+        BOOST_LOG_SEV(logger, Info) << logActor() << request->logRequest() << "Publishing request";
+
         publishRequest(request);
     }
     
     void newRequestReceived() override {
-        
+        auto req = dequeuePendingRequest();
+        if(req) {
+            BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Received request";
+            if(req->getTarget().target == ETargetAction::Reply){
+                BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Request succeeded";
+            } else {
+                BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Request Failed";
+            }
+        }
     }
 };
 
@@ -67,6 +77,7 @@ TestClientPtr test_client;
 
 void test_main() {
     test_client.reset(new TestClient());
+    ClientManager::getInstance()->addClient(test_client);
 }
 
 /*
