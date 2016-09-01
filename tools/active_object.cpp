@@ -70,7 +70,11 @@ void ActiveObject::setStartedFunction(boost::function<void(ActiveObjectPtr)> fn)
 void ActiveObject::run() {
     BOOST_LOG_SEV(logger, Info) << getName()  <<" Starting active object ... Run called";
     service.reset( new boost::asio::io_service());
+    BOOST_LOG_SEV(logger, Trace) << getName()  <<" Starting active object ... calling started";
+    
     started();
+    BOOST_LOG_SEV(logger, Trace) << getName()  <<" Starting active object ... start called";
+    
     if(start_function) {
         BOOST_LOG_SEV(logger, Debug) << getName() <<" Starting active object ... calling start_function";
         start_function(shared_from_this());
