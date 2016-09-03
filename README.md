@@ -28,7 +28,7 @@ I intend to use C++ 11, with boost 1.55 do manage this. I won’t provide a data
 
 Tests will be handled using google test framework. It might not be exhaustive testing, nor TDD ready, but should cover the lib enough, at least to begin with. 
 
-The lib and test executables will be compiled and tested under Mac OS X 10, and probably some debian as well, Jessy or another, not yet quite decided. 
+The lib and test executables will be compiled and tested under Mac OS X 10, and probably some debian as well, Jessie or another, not yet quite decided. 
 
 When ?
 ----------
