@@ -5,7 +5,6 @@
 #include <core/bindings.h>
 #include <tests/common/test_client.h>
 #include <service/actor.h>
-#include <service/client_manager.h>
 #include <service/controller_manager.h>
 #include <core/controller.h>
 
@@ -26,59 +25,27 @@ public:
     
 };
 
-
-
-SHARED_PTR(TestClient);
-
-class TestClient: public Actor {
-public:
-    TestClient(): Actor("TestClient"), Logged("test.log") {
-        setNamespace("test.log");
-    }
-    virtual ~TestClient(){}
+void TestClient::prepareTest() {
+    BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
+    WorkflowPtr workflow(new Workflow("test-workflow-a"));
+    auto sm = workflow->getStateMachine();
+    sm->addAction(0, new TestActionA(), {
+        OutputBinding(0, "", (int32_t)Step::Finish, "")
+    });
+    sm->addInput(InputBinding("", 0, ""));
     
-protected:
-    void started() override {
-        connect();
-        BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
-        WorkflowPtr workflow(new Workflow("test-workflow-a"));
-        auto sm = workflow->getStateMachine();
-        sm->addAction(0, new TestActionA(), {
-            OutputBinding(0, "", (int32_t)Step::Finish, "")
-        });
-        sm->addInput(InputBinding("", 0, ""));
-        
-        // registering it.
-        ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
-        
-        RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
-        request->getTarget().workflow = "test-workflow-a";
-        
-        BOOST_LOG_SEV(logger, Info) << logActor() << request->logRequest() << "Publishing request";
-
-        publishRequest(request);
-    }
+    // registering it.
+    ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
-    void newRequestReceived() override {
-        auto req = dequeuePendingRequest();
-        if(req) {
-            BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Received request";
-            if(req->getTarget().target == ETargetAction::Reply){
-                BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Request succeeded";
-            } else {
-                BOOST_LOG_SEV(logger, Info) << logActor() << req->logRequest() << "Request Failed";
-            }
-        }
-    }
-};
-
-TestClientPtr test_client;
-
-
-void test_main() {
-    test_client.reset(new TestClient());
-    ClientManager::getInstance()->addClient(test_client);
+    RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
+    request->getTarget().workflow = "test-workflow-a";
+    
+    BOOST_LOG_SEV(logger, Info) << logActor() << request->logRequest() << "Publishing request";
+    
+    expect(request, ETestResult::Success);
+    publishRequest(request);
 }
+
 
 /*
  // Workflow creation

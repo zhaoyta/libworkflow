@@ -65,7 +65,7 @@ public:
     //! seek provided @a filename to load log configuration
     static void loadConfiguration(const std::string & filename);
   
-
+    boost::log::sources::severity_logger<ELogSeverity> & getLogger();
 protected:
     
     mutable boost::log::sources::severity_logger<ELogSeverity> logger;

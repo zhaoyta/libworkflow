@@ -7,6 +7,11 @@ Actor::Actor(const std::string & name) : Client(), ActiveObject(name), Logged("a
 }
 
 Actor::~Actor() {}
+
+ActorPtr Actor::shared_from_this() {
+    return boost::dynamic_pointer_cast<Actor>(ActiveObject::shared_from_this());
+}
+
 void Actor::publishRequest(RequestPtr req) {
     ErrorReport er;
     if(not receiveNewRequest(req, er)) {
@@ -28,10 +33,15 @@ void Actor::replyError(RequestPtr req, const ErrorReport & er) {
 }
 
 bool Actor::hasPendingRequest() const {
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
     return pending_requests.size() > 0 ;
 }
 
 RequestPtr Actor::dequeuePendingRequest() {
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
+    
     if(pending_requests.size() > 0) {
     auto res = pending_requests.front();
     pending_requests.pop();
@@ -46,6 +56,8 @@ void Actor::newRequestReceived() {
 
 
 RequestPtr Actor::peekNextRequest() {
+    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
+
     if(pending_requests.size() > 0)
     return pending_requests.front();
     return RequestPtr();
