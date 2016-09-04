@@ -55,7 +55,7 @@ class Workflow : public Jsonable, public boost::enable_shared_from_this<Workflow
     
     
     StateMachinePtr stateMachine;
-    ControllerPtr controller;
+    ControllerWPtr controller;
     boost::shared_ptr<boost::recursive_mutex> mutex;
 
     std::string name;
@@ -69,7 +69,7 @@ public:
     virtual ~Workflow();
     
     //! bind thiw workflow to the controller;
-    void setController(ControllerPtr);
+    void setController(ControllerWPtr);
     
     const RunningSession & getRunningSession(boost::uuids::uuid & id) const;
     

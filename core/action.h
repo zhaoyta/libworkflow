@@ -35,7 +35,7 @@ class TypeChecker;
  
  */
 class Action : public Logged, public Jsonable {
-    StateMachinePtr state_machine;
+    StateMachineWPtr state_machine;
     int32_t action_id;
     std::string name;
     
@@ -77,11 +77,11 @@ public:
     
     virtual PropertySetPtr properties();
     
-    std::string actionLog() const;
+    std::string logAction() const;
     
     
-    void setStateMachine(StateMachinePtr);
-    StateMachinePtr getStateMachine() const;
+    void setStateMachine(StateMachineWPtr);
+    StateMachineWPtr getStateMachine() const;
     
 protected:
     

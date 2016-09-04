@@ -69,6 +69,12 @@ void ControllerManager::started() {
     registerController(controller);
 }
 
+void ControllerManager::stopped() {
+    for(const auto & kv: controllers)
+        kv.second->terminate();
+    controllers.clear();
+}
+
 void ControllerManager::registerController(ControllerPtr controller) {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
 

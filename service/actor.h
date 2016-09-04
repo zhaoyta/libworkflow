@@ -25,6 +25,12 @@ public:
     //! This is for logging :)
     std::string logActor() const;
     
+    //! kill the actors thread and set it to disconnected.
+    void disconnect() override;
+    
+    //! attempt to restart actor :)
+    void connect() override;
+    
     
     //! Tell whether there is a request awaiting your attention.
     bool hasPendingRequest() const;

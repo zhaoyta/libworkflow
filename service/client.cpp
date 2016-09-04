@@ -62,10 +62,12 @@ bool Client::shouldDeleteClient() {
 }
 
 void Client::connect() {
+    BOOST_LOG_SEV(logger, Debug) << logClient() << " Connecting ...";
     setStatus(EClientStatus::Connected);
 }
 
 void Client::disconnect() {
+    BOOST_LOG_SEV(logger, Debug) << logClient() << " Disconnecting ...";
     setStatus(EClientStatus::Disconnected);
 }
 

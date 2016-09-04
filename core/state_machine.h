@@ -28,12 +28,13 @@ class ErrorReport;
  StateMachine define how actions are interlinked, and define which action is running and what actions are expected to run.
  */
 class StateMachine : public Jsonable , public Logged, public boost::enable_shared_from_this<StateMachine> {
-    WorkflowPtr workflow;
+    WorkflowWPtr workflow;
     
     std::map<int32_t, ActionPtr> actions;
     std::map<int32_t, std::vector<OutputBinding> > outputs;
     std::map<int32_t, std::set<int32_t> > inputs_map;
     std::vector<InputBinding> starters;
+    std::string workflow_name;
 public:
     StateMachine();
     virtual ~StateMachine();
@@ -62,8 +63,12 @@ public:
     void actionAsyncFinished(SessionPtr, const Result &);
     
     //! retrieve the workflow
-    WorkflowPtr getWorkflow();
-    void setWorkflow(WorkflowPtr);
+    WorkflowWPtr getWorkflow();
+    void setWorkflow(WorkflowWPtr);
+    
+    
+    //! for logging purpose
+    std::string fingerprint(SessionPtr);
     
 protected:
     
@@ -117,9 +122,6 @@ protected:
     //! Check if we're able to promote a pending to Execution.
     //! @return true if one has been found.
     bool tryPromotePending(SessionPtr);
-    
-    //! for logging purpose
-    std::string fingerprint(SessionPtr);
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

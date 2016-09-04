@@ -54,6 +54,15 @@ void Actor::newRequestReceived() {
     BOOST_LOG_SEV(logger, Error) << logActor() << " A request has been received and there is noone to take it";
 }
 
+void Actor::disconnect() {
+    terminate();
+    Client::disconnect();
+}
+
+void Actor::connect() {
+    start();
+    Client::connect();
+}
 
 RequestPtr Actor::peekNextRequest() {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);

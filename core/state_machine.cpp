@@ -18,7 +18,7 @@ StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm"), boost::enable_share
 }
 
 StateMachine::~StateMachine() {
-    
+    actions.clear();
 }
 
 void StateMachine::init() {
@@ -36,11 +36,12 @@ void StateMachine::init() {
     });
 }
 
-WorkflowPtr StateMachine::getWorkflow() {
+WorkflowWPtr StateMachine::getWorkflow() {
     return workflow;
 }
 
-void StateMachine::setWorkflow(WorkflowPtr wk) {
+void StateMachine::setWorkflow(WorkflowWPtr wk) {
+    workflow_name = wk.lock()->getName();
     workflow = wk;
 }
 
@@ -73,7 +74,7 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
         action = ActionWrapperPtr(new CleanupWrapper(action));
     } else if(action_id < 0) {
         // reject negative id without reason.
-        BOOST_LOG_SEV(logger, Error) << workflow->getName() << action->actionLog() << " Failed to be added, due to invalid action_id on setup " << action_id;
+        BOOST_LOG_SEV(logger, Error) << workflow_name << action->logAction() << " Failed to be added, due to invalid action_id on setup " << action_id;
         return;
     }
     
@@ -126,13 +127,13 @@ bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
         return replyReceived(session, request);
     
     // this call wasn't expected.
-    BOOST_LOG_SEV(logger, Error) << workflow->getName() << request->logRequest() << " Wasn't expecting this request now. This is totally unexpected. Ignoring it.";
+    BOOST_LOG_SEV(logger, Error) << workflow_name << request->logRequest() << " Wasn't expecting this request now. This is totally unexpected. Ignoring it.";
     
     return false;
 }
 
 bool StateMachine::canExecuteAction(SessionPtr session, ActionPtr action, ErrorReport & er) {
-    BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Checking ability to be executed now.";
+    BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->logAction() << " Checking ability to be executed now.";
 
     if(action->checkInputs(session, er)) {
         // guess it's okay ...
@@ -142,17 +143,17 @@ bool StateMachine::canExecuteAction(SessionPtr session, ActionPtr action, ErrorR
                 for(const auto & input: inputs_map.at(action->getActionId())) {
                     if(session->getStatus(input) != EExecutionStatus::Done) {
                         
-                        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't execute action right now. " << actions[input]->actionLog() << " Not done.";
+                        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->logAction() << " Can't execute action right now. " << actions[input]->logAction() << " Not done.";
                         return false;
                     }
                 }
             }
             return true;
         } else {
-            BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Action refuses execution.";
+            BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->logAction() << " Action refuses execution.";
         }
     } else {
-        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't execute action right now.";
+        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->logAction() << " Can't execute action right now.";
     }
     return false;
 }
@@ -162,14 +163,14 @@ bool StateMachine::canPendAction(SessionPtr session, ActionPtr action){
     if(action->checkInputs(session, er)) {
         return true;
     } else {
-        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->actionLog() << " Can't make action pending right now.";
+        BOOST_LOG_SEV(logger,Trace) << fingerprint(session) << action->logAction() << " Can't make action pending right now.";
     }
     return false;
 }
 
 std::string StateMachine::fingerprint(SessionPtr session) {
     std::stringstream str;
-    str << "[" << workflow->getName()<< "]" << session->getOriginalRequest()->logRequest() << " ";
+    str << "[" << workflow_name << "]" << session->getOriginalRequest()->logRequest() << " ";
     return str.str();
 }
 
@@ -227,7 +228,7 @@ bool StateMachine::errorReceived(SessionPtr session, RequestPtr request)  {
         if(session->getStatus(request->getTarget().action) == EExecutionStatus::Waiting) {
             if(actions[request->getTarget().action]->canHandleError(session)) {
                 
-                BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->actionLog() << " Error Received ! but caught by action" ;
+                BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->logAction() << " Error Received ! but caught by action" ;
                 actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
                 return true;
             }
@@ -261,7 +262,7 @@ bool StateMachine::replyReceived(SessionPtr session, RequestPtr request) {
     
     if(actions.count(request->getTarget().action) > 0 ) {
         if(session->getStatus(request->getTarget().action) == EExecutionStatus::Waiting) {
-            BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->actionLog() << " Reply Received !";
+            BOOST_LOG_SEV(logger,Info) << fingerprint(session) << actions[request->getTarget().action]->logAction() << " Reply Received !";
             actionExecuted(session, actions[request->getTarget().action]->replyReceived(session, request));
             return true;
         } else {
@@ -327,11 +328,11 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
         
         if(actions.count(action_id) >0) {
             
-            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " About to execute ...";
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->logAction() << " About to execute ...";
             
             auto result = actions[action_id]->perform(session);
             
-            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Executed: " << result.type;
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->logAction() << " Executed: " << result.type;
             
             actionExecuted(session, result);
 
@@ -351,7 +352,7 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
     ErrorReport er;
     if(not action->checkOutputs(session, er)) {
         // move to error.
-        BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->actionLog() << " Failed its contracted outputs.";
+        BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->logAction() << " Failed its contracted outputs.";
 
         er = ErrorReport(session->getOriginalRequest()->getTarget(),
                          "action.contract.output", "Action failed it's outputs contract. Aborting");
@@ -385,7 +386,7 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
             executeAction(session, (int32_t) Step::Error);
             break;
         default:
-            BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->actionLog() << " Unexpected result";
+            BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->logAction() << " Unexpected result";
 
             session->getLastRequest()->setErrorReport(ErrorReportPtr(new
                                                       ErrorReport(session->getOriginalRequest()->getTarget(),
@@ -401,7 +402,7 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
     for(const auto & binding: bindings) {
         auto to_aid = binding.getToActionId();
         if(actions.count(to_aid) > 0) {
-            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Checking binding from: " << actions[action_id]->actionLog() << " to " << actions[to_aid]->actionLog() << " ?";
+            BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Checking binding from: " << actions[action_id]->logAction() << " to " << actions[to_aid]->logAction() << " ?";
 
             session->setInput(to_aid, binding.getToActionInput(),
                               session->getOutput(action_id, binding.getFromActionOutput()));
@@ -416,7 +417,7 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
                     removeFromPending(session, to_aid);
                     session->setStatus(to_aid, EExecutionStatus::Skipped);
                     //! todo add log skipped action.
-                    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[to_aid]->actionLog() << " Skipped";
+                    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[to_aid]->logAction() << " Skipped";
 
                     isSkipped = true;
                     break;
@@ -459,7 +460,7 @@ bool StateMachine::tryPromotePending(SessionPtr session) {
     if(pending != -1) {
         // pending to promote :)
         
-        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[pending]->actionLog() << " Promoting action to Planned !";
+        BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[pending]->logAction() << " Promoting action to Planned !";
         
         removeFromPending(session, pending);
         addToNext(session, pending);
@@ -533,7 +534,7 @@ void StateMachine::addToNext(SessionPtr session, int32_t action_id) {
     session->setStatus(action_id, EExecutionStatus::Planned);
     
     if(action_id != (int32_t)Step::Die)
-    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Planned";
+    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->logAction() << " Planned";
     else
         BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Planned end of Workflow";
         
@@ -543,7 +544,7 @@ void StateMachine::addToPending(SessionPtr session, int32_t action_id) {
     session->getPendings().insert(action_id);
     session->setStatus(action_id, EExecutionStatus::Pending);
     
-    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->actionLog() << " Pending";
+    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << actions[action_id]->logAction() << " Pending";
 }
 
 void StateMachine::removeFromNext(SessionPtr session, int32_t action_id) {

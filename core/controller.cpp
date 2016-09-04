@@ -8,7 +8,10 @@
 Controller::Controller(const std::string & name, uint32_t pool) :
     ActiveObject(name, pool), Logged("ctrl"){
     }
-Controller::~Controller() {}
+
+Controller::~Controller() {
+    workflows.clear();
+}
 
 bool Controller::perform(RequestPtr request) {
     if(workflows.count(request->getTarget().workflow) > 0 ) {

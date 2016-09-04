@@ -21,7 +21,10 @@ Session::Session(): current_execution_level(1), finished(false) {
 }
 
 Session::~Session() {
-    
+    inputs.clear();
+    outputs.clear();
+    bypass.reset();
+    action_bypasses.clear();
 }
 
 PropertySetPtr Session::getBypass() {

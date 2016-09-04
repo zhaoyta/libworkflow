@@ -105,12 +105,12 @@ bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
 
 Result Action::perform(SessionPtr session) const {
     
-    BOOST_LOG_SEV(logger, Error) << "Can't execute this action as Perform function wasn't implemented.";
+    BOOST_LOG_SEV(logger, Error) << logAction() << "Can't execute this action as Perform function wasn't implemented.";
     return error(session, "action.perform.unimplemented","Can't execute this action as Perform function wasn't implemented.");
 }
 
 Result Action::replyReceived(SessionPtr session, RequestPtr) const {
-    BOOST_LOG_SEV(logger, Error) << "Didn't expect a reply to this action.";
+    BOOST_LOG_SEV(logger, Error) << logAction() <<  "Didn't expect a reply to this action.";
     return error(session, "action.reply.unimplemented","Didn't expect a reply to this action.");
 }
 
@@ -138,11 +138,11 @@ PropertySetPtr Action::properties() {
     return propertyset;
 }
 
-StateMachinePtr Action::getStateMachine() const {
+StateMachineWPtr Action::getStateMachine() const {
     return state_machine;
 }
 
-void Action::setStateMachine(StateMachinePtr sm) {
+void Action::setStateMachine(StateMachineWPtr sm) {
     state_machine = sm;
 }
 
@@ -180,7 +180,7 @@ void Action::asyncDone(SessionPtr session) const {
     r.action_id = getActionId();
     r.type = EType::Done;
     
-    getStateMachine()->actionAsyncFinished(session, r);
+    getStateMachine().lock()->actionAsyncFinished(session, r);
 }
 
 void Action::asyncWait(SessionPtr session) const {
@@ -188,7 +188,7 @@ void Action::asyncWait(SessionPtr session) const {
     r.action_id = getActionId();
     r.type = EType::Wait;
     
-    getStateMachine()->actionAsyncFinished(session, r);
+    getStateMachine().lock()->actionAsyncFinished(session, r);
 }
 
 void Action::asyncError(SessionPtr session, const std::string & err_key, const std::string & error_message) const {
@@ -197,15 +197,14 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
     r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
 
-    getStateMachine()->actionAsyncFinished(session, r);
+    getStateMachine().lock()->actionAsyncFinished(session, r);
 }
 
 
 std::string Action::fingerprint(SessionPtr session) const {
     std::stringstream str;
-    str << "[" << getStateMachine()->getWorkflow()->getName()
-       << "][" << getName()
-    << "]" << session->getOriginalRequest()->logRequest();
+    auto sm = getStateMachine().lock();
+    str << sm->fingerprint(session) << logAction() ;
     return str.str();
 }
 
@@ -341,7 +340,7 @@ bool Action::canHandleError(SessionPtr) const {
     return false;
 }
 
-std::string Action::actionLog() const {
+std::string Action::logAction() const {
     
     std::stringstream str;
     str << "[" << std::setw(2) << std::setfill(' ');

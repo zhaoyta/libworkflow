@@ -2,6 +2,7 @@
 #define __SHARED_PTR_H_
 
 #include <boost/shared_ptr.hpp>
+#include <boost/weak_ptr.hpp>
 #include <boost/enable_shared_from_this.hpp>
 #include <ostream>
 #include <string>
@@ -17,7 +18,8 @@ std::string shortId(const boost::uuids::uuid & uid, int length = 8);
 //! Helper to declare a Boost Shared Pointer, named as KlassPtr
 #define SHARED_PTR(Klass) \
 class Klass; \
-typedef boost::shared_ptr<Klass> __CAT(Klass,Ptr)
+typedef boost::shared_ptr<Klass> __CAT(Klass,Ptr); \
+typedef boost::weak_ptr<Klass> __CAT(Klass,WPtr)
 
 //! Helper to declare an ostream operator for provided class.
 //! This will handle pointer, shared_ptr and const Klass &.

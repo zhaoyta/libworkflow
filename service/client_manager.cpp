@@ -16,6 +16,7 @@ ClientManager::ClientManager() :
 }
 
 ClientManager::~ClientManager() {
+    clients.clear();
 }
 
 ClientManagerPtr ClientManager::getInstance() {
@@ -47,6 +48,13 @@ void ClientManager::started() {
     timer->setDuration(15000);
     timer->setTimeoutFunction((boost::bind(&ClientManager::checkClients, this)));
     timer->start();
+}
+
+void ClientManager::stopped() {
+    for(const auto & kv: clients) {
+        kv.second->disconnect();
+    }
+    clients.clear();
 }
 
 bool ClientManager::perform(RequestPtr request) {

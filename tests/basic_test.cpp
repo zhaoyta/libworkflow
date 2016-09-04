@@ -8,6 +8,14 @@
 #include <service/controller_manager.h>
 #include <core/controller.h>
 
+/**
+ @file This test simply ensure that the basic stack is up and running. It means that if THIS test fails, all other will as well. 
+    More to the point, it ensure a Workflow can be added, a request can be issued and replied to, a workflow can be reached and executed, and basic test components works
+ 
+ As a note, you should be made aware that a TestClient has been prepared in commons/ directory.
+ Later some commons Actions will be added but also some workflow json files as well.
+ */
+
 
 /**
     This should be the simplest of test.
@@ -39,9 +47,7 @@ void TestClient::prepareTest() {
     
     RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
     request->getTarget().workflow = "test-workflow-a";
-    
-    BOOST_LOG_SEV(logger, Info) << logActor() << request->logRequest() << "Publishing request";
-    
+        
     expect(request, ETestResult::Success);
     publishRequest(request);
 }

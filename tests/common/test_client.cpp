@@ -108,7 +108,7 @@ void TestClient::newRequestReceived() {
             BOOST_LOG_SEV(logger, Error) << " Test Failed !";
         }
         
-        terminateTest();
+        ::service->post(&terminateTest);
     }
 }
 
@@ -190,9 +190,9 @@ void terminateTest() {
     
     GLOB_LOGGER("general");
     BOOST_LOG_SEV(logger, Info) << " Shutting down !";
-    ControllerManager::getInstance()->stop();
-    ClientManager::getInstance()->stop();
-    test_client->stop();
+    ControllerManager::getInstance()->terminate();
+    ClientManager::getInstance()->terminate();
+    
     
     t.reset(new Timed());
     t->setIOService(service);

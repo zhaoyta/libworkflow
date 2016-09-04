@@ -48,6 +48,7 @@ protected:
 
 protected:
     void started();
+    void stopped();
     
 };
 

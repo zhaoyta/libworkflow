@@ -39,15 +39,22 @@ void ActiveObject::start() {
 }
 
 void ActiveObject::stop() {
+    BOOST_LOG_SEV(logger, Info) << getName() << " Stopping active object ...";
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     worker.reset();
+    service->stop();
+    service->reset();
 }
 
 void ActiveObject::terminate() {
-    boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     stop();
-    for(auto thread: threads)
+    for(auto thread: threads) {
+        BOOST_LOG_SEV(logger, Trace) << getName() << " Joining thread ...";
         thread->join();
+        BOOST_LOG_SEV(logger, Trace) << getName() << " Thread joined ...";
+        
+    }
+    BOOST_LOG_SEV(logger, Debug) << getName() << " All Thread joined ...";
 }
 
 void ActiveObject::started() {
@@ -78,11 +85,11 @@ void ActiveObject::run() {
     worker.reset(new boost::asio::io_service::work(*service));
     service->post(boost::bind(&ActiveObject::startPool, this));
     service->run();
+    BOOST_LOG_SEV(logger, Debug) << getName() <<" Service closing";
+
     if(stop_function)
         stop_function(shared_from_this());
     stopped();
-    for(auto thread: threads)
-        thread->interrupt();
 }
 
 void ActiveObject::startPool() {

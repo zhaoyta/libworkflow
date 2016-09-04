@@ -29,6 +29,7 @@ public:
 protected:
     
     void started() override;
+    void stopped() override;
 };
 
 OSTREAM_HELPER_DECL(ControllerManager);

@@ -24,10 +24,12 @@ Workflow::Workflow(const std::string & name) :
 }
 
 Workflow::~Workflow() {
-    
+    stateMachine.reset();
+    controller.reset();
+    sessions.clear();
 }
 
-void Workflow::setController(ControllerPtr ctr) {
+void Workflow::setController(ControllerWPtr ctr) {
     controller = ctr;
 }
 
@@ -71,7 +73,8 @@ bool Workflow::perform(RequestPtr request) {
             //! initiate session.
             rsession.original = request;
             rsession.session->pushRequest(request);
-            rsession.timed->setIOService(controller->getIOService());
+            auto tmp_ctrl = controller.lock();
+            rsession.timed->setIOService(tmp_ctrl->getIOService());
             rsession.timed->setDuration(timeout * 1000);
             rsession.timed->setTimeoutFunction(boost::bind<void>(&Workflow::requestTimedOut, this, request->getId()));
             BOOST_LOG_SEV(logger, Info) << "[" << getName() << "]"  << request->logRequest() << " Creating new session ...";
