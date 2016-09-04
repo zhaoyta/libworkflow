@@ -5,6 +5,8 @@
 #include <core/action.h>
 #include <core/result.h>
 #include <service/controller_manager.h>
+#include <core/state_machine.h>
+#include <core/context.h>
 
 ActionWrapper::ActionWrapper( ActionPtr wrapped) : Action(wrapped->getName()),
 wrapped(wrapped) {
@@ -105,6 +107,15 @@ void FinishWrapper::wrapPerform(SessionPtr session) const {
     
     // find contexts ...
     // bind them with result.
+    
+    auto ctx = GroupedCtxPtr( new GroupedCtx());
+    
+    for(const auto & output: getStateMachine().lock()->getExpectedOutput()) {
+        ctx->setContext(output, getInput(session, output));
+    }
+    
+    reply->setContext(ctx);
+    
     
     BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Replying to " << reply->getTarget();
     

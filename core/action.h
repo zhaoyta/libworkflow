@@ -104,12 +104,12 @@ protected:
     void asyncError(SessionPtr, const std::string & err_key, const std::string & err_message) const;
     
     //! send request to be executed.
-    Result executeSyncRequest(SessionPtr, RequestPtr);
+    Result executeSyncRequest(SessionPtr, RequestPtr) const;
     //! ensure the request knows how to come back here.
     //! If none is provided, will simply create a new one.
-    RequestPtr prepareSyncRequest(SessionPtr, RequestPtr = RequestPtr());
+    RequestPtr prepareSyncRequest(SessionPtr, RequestPtr = RequestPtr()) const;
     //! will execute this request and dont expect it to reply anytime.
-    void executeAsyncRequest(RequestPtr);
+    void executeAsyncRequest(RequestPtr) const;
     
     //! For loggin, provide informations on which Workflow is running, and what request is being executed
     std::string fingerprint(SessionPtr) const;
@@ -144,13 +144,13 @@ protected:
     
     //! Input / Output accessor
     
-    ContextPtr getInput(SessionPtr, const std::string & name);
+    ContextPtr getInput(SessionPtr, const std::string & name) const;
     template<class T>
-    boost::shared_ptr<T> getCastedInput(SessionPtr session, const std::string & key) {
+    boost::shared_ptr<T> getCastedInput(SessionPtr session, const std::string & key)  const{
         return boost::dynamic_pointer_cast<T>(getInput(session, key));
     }
     
-    void setOutput(SessionPtr, const std::string & name, ContextPtr);
+    void setOutput(SessionPtr, const std::string & name, ContextPtr) const;
     
     const std::set<PutDefinition> & getInputs() const;
     const std::set<PutDefinition> & getOutputs() const;

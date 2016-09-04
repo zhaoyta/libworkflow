@@ -2,6 +2,7 @@
 #include <boost/uuid/nil_generator.hpp>
 #include <boost/uuid/uuid_io.hpp>
 #include <tools/property_set.h>
+#include <core/context.h>
 #include <iomanip>
 
 Request::Request(): Jsonable() {
@@ -51,7 +52,7 @@ void Request::setRequestId(const boost::uuids::uuid & id) {
     request_id = id;
 }
 
-PropertySetPtr Request::getBypass() {
+PropertySetPtr Request::getBypass() const {
     return bypass;
 }
 
@@ -59,8 +60,16 @@ std::map<int32_t, PropertySetPtr> & Request::getActionBypasses() {
     return action_bypasses;
 }
 
-ContextPtr Request::getContext() {
+ContextPtr Request::getContext() const {
     return context;
+}
+
+void Request::setContext(Context* ptr) {
+    setContext(ContextPtr(ptr));
+}
+
+void Request::setContext(ContextPtr ctx) {
+    context = ctx;
 }
 
 const Target & Request::getTarget() const {
@@ -84,7 +93,7 @@ void Request::setErrorReport(ErrorReportPtr er) {
     report = er;
 }
 
-ErrorReportPtr Request::getErrorReport() {
+ErrorReportPtr Request::getErrorReport() const {
     return report;
 }
 
@@ -96,7 +105,7 @@ void Request::load(const boost::property_tree::ptree & root) {
     
 }
 
-ControllerSpawnPtr Request::getControllerSpawn() {
+ControllerSpawnPtr Request::getControllerSpawn() const {
     return spawn;
 }
 

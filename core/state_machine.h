@@ -67,6 +67,8 @@ public:
     void setWorkflow(WorkflowWPtr);
     
     
+    std::vector<std::string> getExpectedOutput() const;
+    
     //! for logging purpose
     std::string fingerprint(SessionPtr);
     

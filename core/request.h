@@ -60,18 +60,20 @@ public:
     void setRequestId(const boost::uuids::uuid & id);
     
     void setErrorReport(ErrorReportPtr);
-    ErrorReportPtr getErrorReport();
+    ErrorReportPtr getErrorReport() const ;
     
-    PropertySetPtr getBypass();
+    PropertySetPtr getBypass() const;
     std::map<int32_t, PropertySetPtr> & getActionBypasses();
     
-    ContextPtr getContext();
+    ContextPtr getContext() const;
     template<class T>
-    boost::shared_ptr<T> getCastedContext() {
+    boost::shared_ptr<T> getCastedContext() const {
         return boost::dynamic_pointer_cast<T>(getContext());
     }
+    void setContext(ContextPtr);
+    void setContext(Context *);
     
-    ControllerSpawnPtr getControllerSpawn();
+    ControllerSpawnPtr getControllerSpawn() const ;
     void setControllerSpawn(ControllerSpawnPtr);
     
     void setTarget(const Target & );

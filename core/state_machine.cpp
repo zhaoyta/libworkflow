@@ -45,6 +45,19 @@ void StateMachine::setWorkflow(WorkflowWPtr wk) {
     workflow = wk;
 }
 
+std::vector<std::string> StateMachine::getExpectedOutput() const {
+    std::vector<std::string> res;
+    for(const auto & kv: outputs) {
+        for(const auto & output: kv.second) {
+            if(output.getToActionId() == (int32_t)Step::Finish) {
+                res.push_back((output.getToActionInput()));
+            }
+        }
+    }
+    
+    return res;
+}
+
 void StateMachine::addAction(Step action_id, Action* action, const std::vector<OutputBinding> & bindings) {
     addAction((int32_t)action_id, ActionPtr(action), bindings);
 }

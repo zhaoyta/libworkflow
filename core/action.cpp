@@ -298,11 +298,11 @@ void Action::defineOutput(const PutDefinition & d) {
     outputs.insert(d);
 }
 
-ContextPtr Action::getInput(SessionPtr session, const std::string & name) {
+ContextPtr Action::getInput(SessionPtr session, const std::string & name) const {
     return session->getInput(getActionId(), name);
 }
 
-void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr ctx) {
+void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr ctx) const {
     session->setOutput(getActionId(), name, ctx);
 }
 
@@ -315,13 +315,13 @@ const std::set<PutDefinition> & Action::getOutputs() const {
     return outputs;
 }
 
-Result Action::executeSyncRequest(SessionPtr session, RequestPtr req) {
+Result Action::executeSyncRequest(SessionPtr session, RequestPtr req) const{
     req = prepareSyncRequest(session, req);
     ControllerManager::getInstance()->perform(req);
     return wait();
 }
 
-RequestPtr Action::prepareSyncRequest(SessionPtr session, RequestPtr req) {
+RequestPtr Action::prepareSyncRequest(SessionPtr session, RequestPtr req) const{
     if(not req)
         req.reset(new Request());
     req->setReply(session->getOriginalRequest()->getTarget());
@@ -332,7 +332,7 @@ RequestPtr Action::prepareSyncRequest(SessionPtr session, RequestPtr req) {
     return req;
 }
 
-void Action::executeAsyncRequest(RequestPtr req) {
+void Action::executeAsyncRequest(RequestPtr req) const{
     ControllerManager::getInstance()->perform(req);
 }
 
