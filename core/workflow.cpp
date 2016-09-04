@@ -65,10 +65,11 @@ bool Workflow::perform(RequestPtr request) {
     BOOST_LOG_SEV(logger, Debug) << "[" << getName() <<"]"  << request->logRequest() << " Received request to process ...";
 
     if(canExecuteRequest(request)) {
-        auto & rsession = sessions[request->getId()];
+
         
         if(sessions.count(request->getId()) ==0 ){
             // No session found ! create a new one.
+            auto & rsession = sessions[request->getId()];
             rsession.session.reset(new Session());
             //! initiate session.
             rsession.original = request;
@@ -79,6 +80,8 @@ bool Workflow::perform(RequestPtr request) {
             rsession.timed->setTimeoutFunction(boost::bind<void>(&Workflow::requestTimedOut, this, request->getId()));
             BOOST_LOG_SEV(logger, Info) << "[" << getName() << "]"  << request->logRequest() << " Creating new session ...";
         }
+        
+        auto & rsession = sessions[request->getId()];
         
         if(shouldMakePending(request)) {
             addToPending(request);

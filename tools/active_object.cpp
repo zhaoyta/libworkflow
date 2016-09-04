@@ -43,7 +43,6 @@ void ActiveObject::stop() {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);
     worker.reset();
     service->stop();
-    service->reset();
 }
 
 void ActiveObject::terminate() {
@@ -77,7 +76,7 @@ void ActiveObject::setStartedFunction(boost::function<void(ActiveObjectPtr)> fn)
 void ActiveObject::run() {
     BOOST_LOG_SEV(logger, Info) << getName()  <<" Starting active object ... Run called";
     service.reset( new boost::asio::io_service());
-    service->post(boost::bind(&ActiveObject::started, this));
+    started();
     if(start_function) {
         BOOST_LOG_SEV(logger, Debug) << getName() <<" Starting active object ... calling start_function";
         start_function(shared_from_this());
@@ -90,6 +89,7 @@ void ActiveObject::run() {
     if(stop_function)
         stop_function(shared_from_this());
     stopped();
+    service->reset();
 }
 
 void ActiveObject::startPool() {

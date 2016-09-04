@@ -55,8 +55,8 @@ void Actor::newRequestReceived() {
 }
 
 void Actor::disconnect() {
-    terminate();
     Client::disconnect();
+    terminate();
 }
 
 void Actor::connect() {
