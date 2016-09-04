@@ -51,6 +51,9 @@ void ClientManager::started() {
 }
 
 void ClientManager::stopped() {
+    if(timer)
+        timer->stop();
+    
     for(const auto & kv: clients) {
         kv.second->disconnect();
     }
