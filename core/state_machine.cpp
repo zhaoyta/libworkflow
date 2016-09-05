@@ -96,9 +96,16 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
     
     actions[action_id] = action;
     outputs[action_id] = bindings;
+    
+    
     // ensure that we know what actions are necessary for execution of another one.
-    for(auto & output: bindings) {
-        inputs_map[output.getToActionId()].insert(action_id);
+    // entirely rebuild input map structure (as one may replace an action by another.
+    // furthermore this is one time job.
+    inputs_map.clear();
+    for(const auto & kv: outputs) {
+        for(auto output: kv.second) {
+            inputs_map[output.getToActionId()].insert(output.getFromActionId());
+        }
     }
 }
 
@@ -594,6 +601,7 @@ bool StateMachine::canExecuteFinish(SessionPtr session) {
     if(inputs_map.count((int32_t)Step::Finish) > 0) {
         // at least some do go to finish.
         for(auto input: inputs_map.at((int32_t) Step::Finish)) {
+            BOOST_LOG_SEV(logger, Trace) << fingerprint(session) << " Finish expects some inputs from " << input << " : " << session->getStatus(input);
             if(session->getStatus(input) == EExecutionStatus::Done)
                 return true;
         }
