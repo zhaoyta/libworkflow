@@ -32,6 +32,8 @@ PropertySetPtr Session::getBypass() {
 }
 
 PropertySetPtr Session::getBypass(int32_t action_id) {
+    if(action_bypasses.count(action_id) == 0)
+        action_bypasses[action_id].reset(new PropertySet());
     return action_bypasses[action_id];
 }
 

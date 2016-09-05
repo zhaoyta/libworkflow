@@ -56,6 +56,13 @@ PropertySetPtr Request::getBypass() const {
     return bypass;
 }
 
+
+PropertySetPtr Request::getActionBypasses(int action_id) {
+    if(action_bypasses.count(action_id) == 0)
+        action_bypasses[action_id].reset(new PropertySet());
+    return action_bypasses[action_id];
+}
+
 std::map<int32_t, PropertySetPtr> & Request::getActionBypasses() {
     return action_bypasses;
 }
