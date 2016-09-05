@@ -371,6 +371,7 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
                          "action.contract.output", "Action failed it's outputs contract. Aborting");
         session->getLastRequest()->setErrorReport(ErrorReportPtr(new ErrorReport(er)));
         executeAction(session, (int32_t) Step::Error);
+        return;
     }
     
     
@@ -416,6 +417,9 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
 
 void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
     auto bindings = outputs[action_id];
+    BOOST_LOG_SEV(logger, Debug) << fingerprint(session) << " Checking outputs of action: " << action_id;
+
+    
     for(const auto & binding: bindings) {
         auto to_aid = binding.getToActionId();
         if(actions.count(to_aid) > 0) {

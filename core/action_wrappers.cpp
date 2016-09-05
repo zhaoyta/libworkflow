@@ -130,6 +130,11 @@ void ErrorWrapper::wrapPerform(SessionPtr session)const  {
     auto reply = Request::createReply(session->getOriginalRequest());
     reply->setErrorReport(ErrorReportPtr(new ErrorReport(session->getOriginalRequest()->getTarget(), er)));
     reply->getTarget().target = ETargetAction::Error;
+    
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Error-ing to " << reply->getTarget();
+
+    
     ControllerManager::getInstance()->perform(reply);
 }
 

@@ -65,11 +65,3 @@ void TestClient::prepareTest() {
     expect(request, ETestResult::Success);
     publishRequest(request);
 }
-
-
-/*
- // Workflow creation
- // It's a pretty simple workflow that does absolutely nothing :)
- // Aside printing hello
- 
-*/
