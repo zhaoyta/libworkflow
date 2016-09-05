@@ -4,6 +4,7 @@
 #include <core/state_machine.h>
 #include <core/bindings.h>
 #include <tests/common/test_client.h>
+#include <tests/common/actions/do_next.h>
 #include <service/actor.h>
 #include <service/controller_manager.h>
 #include <core/controller.h>
@@ -22,22 +23,13 @@
     Create a new workflow with one Action. 
     Execute it and that's it.
  */
-class TestActionA: public Action {
-public:
-    TestActionA() : Action("TestActionA") {}
-    
-    Result perform(SessionPtr session) const override{
-        BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Hello from Action Test A";
-        return done();
-    }
-    
-};
+
 
 void TestClient::prepareTest() {
     BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
-    WorkflowPtr workflow(new Workflow("test-workflow-a"));
+    WorkflowPtr workflow(new Workflow("test-1"));
     auto sm = workflow->getStateMachine();
-    sm->addAction(0, new TestActionA(), {
+    sm->addAction(0, new DoNext(), {
         OutputBinding(0, "", (int32_t)Step::Finish, "")
     });
     sm->addInput(InputBinding("", 0, ""));
@@ -45,8 +37,8 @@ void TestClient::prepareTest() {
     // registering it.
     ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
-    RequestPtr request(new Request(Target("test-workflow-a"), Target("test_result")));
-    request->getTarget().workflow = "test-workflow-a";
+    RequestPtr request(new Request(Target("test-1"), Target("test_result")));
+    request->getTarget().workflow = "test-1";
         
     expect(request, ETestResult::Success);
     publishRequest(request);
