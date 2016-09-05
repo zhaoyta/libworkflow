@@ -6,6 +6,6 @@ PrintLog::PrintLog() : Action("PrintLog") {
 }
 
 Result PrintLog::perform(SessionPtr session) const{
-    BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " " << stringValue(session, "log") ;
+    BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " " << stringProperty(session, "log") ;
     return done();
 }

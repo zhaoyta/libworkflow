@@ -208,7 +208,7 @@ std::string Action::fingerprint(SessionPtr session) const {
     return str.str();
 }
 
-double Action::doubleValue(SessionPtr session, const std::string & key, double def) const {
+double Action::doubleProperty(SessionPtr session, const std::string & key, double def) const {
     // well def config is Session(byAction) > Session > Action
     
     if(session->getBypass(getActionId())->hasProperty(key))
@@ -221,7 +221,7 @@ double Action::doubleValue(SessionPtr session, const std::string & key, double d
     return def;
 }
 
-bool Action::boolValue(SessionPtr session, const std::string & key, bool def) const {
+bool Action::boolProperty(SessionPtr session, const std::string & key, bool def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getBoolProperty(key, def);
@@ -233,7 +233,7 @@ bool Action::boolValue(SessionPtr session, const std::string & key, bool def) co
        return def;
 }
 
-std::string Action::stringValue(SessionPtr session, const std::string & key, const std::string & def ) const {
+std::string Action::stringProperty(SessionPtr session, const std::string & key, const std::string & def ) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getStringProperty(key, def);
@@ -245,7 +245,7 @@ std::string Action::stringValue(SessionPtr session, const std::string & key, con
        return def;
 }
 
-uint32_t Action::uintValue(SessionPtr session, const std::string & key, uint32_t def) const {
+uint32_t Action::uintProperty(SessionPtr session, const std::string & key, uint32_t def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getUintProperty(key, def);
@@ -257,7 +257,7 @@ uint32_t Action::uintValue(SessionPtr session, const std::string & key, uint32_t
        return def;
 }
 
-ContextPtr Action::customValue(SessionPtr session, const std::string & key, ContextPtr def) const {
+ContextPtr Action::customProperty(SessionPtr session, const std::string & key, ContextPtr def) const {
     
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getCustomProperty(key, def);
