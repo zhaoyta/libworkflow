@@ -13,6 +13,7 @@
 #include <core/result.h>
 #include <tools/logged.h>
 #include <tools/property_set.h>
+#include <tools/type_checker.h>
 
 #pragma GCC visibility push(default)
 

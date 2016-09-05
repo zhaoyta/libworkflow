@@ -53,7 +53,7 @@ public:
     
 };
 
-#define CHECKER(Klass) TypeCheckerPtr(new ContextTypeChecker<Klass>())
+#define CHECKER(Klass) new ContextTypeChecker<Klass>()
 
 
 #pragma GCC visibility pop
