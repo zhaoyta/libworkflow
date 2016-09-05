@@ -118,7 +118,8 @@ const std::vector<RequestPtr> & Session::getRequests() const {
 RequestPtr Session::getLastRequest() const {
     if(requests.size() == 0)
         return RequestPtr();
-    return * requests.end();
+    auto it = requests.rbegin();
+    return * it;
 }
 
 ControllerSpawnPtr Session::getControllerSpawn() {

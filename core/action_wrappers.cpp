@@ -129,6 +129,7 @@ void ErrorWrapper::wrapPerform(SessionPtr session)const  {
     auto er = session->getLastRequest()->getErrorReport();
     auto reply = Request::createReply(session->getOriginalRequest());
     reply->setErrorReport(ErrorReportPtr(new ErrorReport(session->getOriginalRequest()->getTarget(), er)));
+    reply->getTarget().target = ETargetAction::Error;
     ControllerManager::getInstance()->perform(reply);
 }
 

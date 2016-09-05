@@ -392,12 +392,16 @@ void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
         case EType::Wait:
             session->setStatus(result.action_id, EExecutionStatus::Waiting);
             break;
-        case EType::Error:
-            session->getLastRequest()->setErrorReport(result.error);
+        case EType::Error: {
+            auto last = session->getLastRequest();
+            if(not last)
+                BOOST_LOG_SEV(logger, Error) << fingerprint(session) <<actions[result.action_id]->logAction() << "Failed to find last request Oo";
+            else
+                last->setErrorReport(result.error);
             session->setStatus(result.action_id, EExecutionStatus::Done);
-            bindResults(session, result.action_id);
             executeAction(session, (int32_t) Step::Error);
             break;
+        }
         default:
             BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->logAction() << " Unexpected result";
 
