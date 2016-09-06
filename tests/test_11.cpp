@@ -12,7 +12,7 @@
 #include <core/controller.h>
 
 /**
- Test 10 is a Workflow input Test. This is a simple A workflow, where A allows a context input. We provide another context context.
+ Test 11 is a Workflow input Test. This is a simple A workflow, where A allows a context input. We provide another context context.
  */
 
 

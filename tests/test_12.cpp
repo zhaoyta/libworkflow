@@ -12,7 +12,7 @@
 #include <core/controller.h>
 
 /**
- Test 6 is a simple A->B workflow where B expect some context but doens't get it.
+ Test 12 is a test of workflow output. A produces some_data, we check we get it fair and square.
  */
 
 
