@@ -67,6 +67,14 @@ OutputBinding::OutputBinding(int32_t from_action_id, const std::string & from_ac
     
 }
 
+
+OutputBinding::OutputBinding(int32_t from_action_id, const std::string & from_action_output,
+                             Step to_action_id, const std::string & to_action_input) :
+from_action_id(from_action_id), from_action_output(from_action_output),
+to_action_id((int32_t)to_action_id), to_action_input(to_action_input) {
+    
+}
+
 OutputBinding::~OutputBinding() {
     
 }

@@ -43,6 +43,8 @@ public:
     OutputBinding();
     OutputBinding(int32_t from_action_id, const std::string & from_action_output,
                   int32_t to_action_id, const std::string & to_action_input);
+    OutputBinding(int32_t from_action_id, const std::string & from_action_output,
+                  Step to_action_id, const std::string & to_action_input);
     OutputBinding(Step from_action_id, const std::string & from_action_output,
                   Step to_action_id, const std::string & to_action_input);
     OutputBinding(const std::string & from_action_output,

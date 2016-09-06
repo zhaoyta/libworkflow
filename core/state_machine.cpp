@@ -95,7 +95,11 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
     action->setActionId(action_id);
     
     actions[action_id] = action;
-    outputs[action_id] = bindings;
+    
+    for(OutputBinding ob: bindings) {
+        ob.setFromActionId(action_id);
+        outputs[action_id].push_back(ob);
+    }
     
     
     // ensure that we know what actions are necessary for execution of another one.
@@ -201,7 +205,7 @@ bool StateMachine::firstCall(SessionPtr session)  {
         session->setStatus(kv.first, EExecutionStatus::Unplanned);
     
     // now map contexts.
-    auto grouped_ctx = session->getOriginalRequest()->getCastedContext<GroupedCtx>();
+    auto grouped_ctx = session->getOriginalRequest()->getContext();
     for(const auto & input: starters) {
         // empty (action/workflow) input means a "simple" next.
         // basically it's just ordering for execution plan.

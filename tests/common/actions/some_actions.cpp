@@ -24,3 +24,19 @@ Result SomeConsummer::perform(SessionPtr session) const {
     BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Found target number: " << input->some_value;
     return done();
 }
+
+
+SomeAllowed::SomeAllowed(): Action("SomeAllowed") {
+    defineInput("some_data", CHECKER(SomeContext), true);
+}
+
+Result SomeAllowed::perform(SessionPtr session) const {
+    // note: we don't need to check for existence, as it's a mandatory input.
+    auto input = getCastedInput<SomeContext>(session, "some_data");
+    if(input) {
+    BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Found Optionnal target number: " << input->some_value;
+    } else {
+        BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " No data provided continuing." ;
+    }
+    return done();
+}

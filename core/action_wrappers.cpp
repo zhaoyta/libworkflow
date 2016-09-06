@@ -108,14 +108,9 @@ void FinishWrapper::wrapPerform(SessionPtr session) const {
     // find contexts ...
     // bind them with result.
     
-    auto ctx = GroupedCtxPtr( new GroupedCtx());
-    
     for(const auto & output: getStateMachine().lock()->getExpectedOutput()) {
-        ctx->setContext(output, getInput(session, output));
+        reply->setContext(output, getInput(session, output));
     }
-    
-    reply->setContext(ctx);
-    
     
     BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Replying to " << reply->getTarget();
     

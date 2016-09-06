@@ -22,4 +22,15 @@ public:
 };
 
 
+/**
+ This action allows an input on some_data with SomeContext.
+ */
+class SomeAllowed: public Action {
+public:
+    SomeAllowed();
+    Result perform(SessionPtr session) const override;
+};
+
+
+
 #endif // __SOME_ACTIONS_H_

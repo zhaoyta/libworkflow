@@ -9,11 +9,12 @@
 #include <tools/error_report.h>
 
 
-#pragma GCC visibility push(default)
-SHARED_PTR(Request);
 SHARED_PTR(Context);
+SHARED_PTR(GroupedCtx);
 SHARED_PTR(ControllerSpawn);
 SHARED_PTR(PropertySet);
+#pragma GCC visibility push(default)
+SHARED_PTR(Request);
 
 
 /**
@@ -31,7 +32,7 @@ class Request: public Jsonable {
     //! This might differe from target id as target id might refer to a sub request id. Means, this request_id is the one the client set. It's the reference for logs and such. 
     boost::uuids::uuid request_id;
     //! this is initial (or callbacked) informations to be pushed to the workflow.
-    ContextPtr context;
+    GroupedCtxPtr context;
     //! This is a global bypass, it's less specific than action_bypasses, but then has a wider range of action.
     PropertySetPtr bypass;
     //! This is a local bypass, it allows to override properties of actions by their ID. 
@@ -66,13 +67,14 @@ public:
     PropertySetPtr getActionBypasses(int action_id);
     std::map<int32_t, PropertySetPtr> & getActionBypasses();
     
-    ContextPtr getContext() const;
+    GroupedCtxPtr getContext() const;
+    ContextPtr getContext(const std::string &) const;
     template<class T>
-    boost::shared_ptr<T> getCastedContext() const {
-        return boost::dynamic_pointer_cast<T>(getContext());
+    boost::shared_ptr<T> getCastedContext(const std::string & key) const {
+        return boost::dynamic_pointer_cast<T>(getContext(key));
     }
-    void setContext(ContextPtr);
-    void setContext(Context *);
+    void setContext(const std::string &, ContextPtr);
+    void setContext(const std::string &, Context *);
     
     ControllerSpawnPtr getControllerSpawn() const ;
     void setControllerSpawn(ControllerSpawnPtr);

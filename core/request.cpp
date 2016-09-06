@@ -5,16 +5,21 @@
 #include <core/context.h>
 #include <iomanip>
 
-Request::Request(): Jsonable() {
+Request::Request(): Jsonable(), context( new GroupedCtx()){
     reply.target = ETargetAction::NoReply;
     target.target = ETargetAction::NoReply;
 }
 
-Request::Request(const Target & target): Jsonable(), target(target), request_id(target.identifier) , bypass(new PropertySet()){
+Request::Request(const Target & target): Jsonable(), target(target)
+    , context( new GroupedCtx()), request_id(target.identifier)
+    , bypass(new PropertySet()){
     reply.target = ETargetAction::NoReply;
 }
 
-Request::Request(const Target & target, const Target & reply): Jsonable(), target(target), reply(reply), request_id(target.identifier)  , bypass(new PropertySet()){
+Request::Request(const Target & target, const Target & reply): Jsonable()
+    , target(target), reply(reply)
+    , request_id(target.identifier), context( new GroupedCtx())
+    , bypass(new PropertySet()){
     
 }
 
@@ -67,16 +72,20 @@ std::map<int32_t, PropertySetPtr> & Request::getActionBypasses() {
     return action_bypasses;
 }
 
-ContextPtr Request::getContext() const {
+GroupedCtxPtr Request::getContext() const {
     return context;
 }
 
-void Request::setContext(Context* ptr) {
-    setContext(ContextPtr(ptr));
+ContextPtr Request::getContext(const std::string & key) const {
+    return context->getContext(key);
 }
 
-void Request::setContext(ContextPtr ctx) {
-    context = ctx;
+void Request::setContext(const std::string & key, Context* ptr) {
+    setContext(key, ContextPtr(ptr));
+}
+
+void Request::setContext(const std::string & key, ContextPtr ctx) {
+    context->setContext(key,ctx);
 }
 
 const Target & Request::getTarget() const {

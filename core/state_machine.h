@@ -47,7 +47,7 @@ public:
     
     //! this is a configuration method, will store action in this state machine, and connect it to other actions.
     void addAction(Step step, Action *, const std::vector<OutputBinding> & );
-    virtual void addAction(Step step, ActionPtr, const std::vector<OutputBinding> & );
+    void addAction(Step step, ActionPtr, const std::vector<OutputBinding> & );
     void addAction(int32_t action_id, Action *, const std::vector<OutputBinding> & );
     virtual void addAction(int32_t action_id, ActionPtr, const std::vector<OutputBinding> & );
     //! set initial actions of this state machine.
