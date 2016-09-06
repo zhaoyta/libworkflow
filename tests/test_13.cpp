@@ -15,45 +15,27 @@
 #include <core/put_definition.h>
 
 /**
- Test 13 Condition workflow: 
+ Test 13 Split executiong workflow:
             A
            / \
-          B ? C
+          B   C
  
-    This workflow will execute B over C.
+    This workflow will execute both B and C from A.
  */
-
-class ConditionTestAction: public Action {
-public:
-    ConditionTestAction(): Action("ConditionTestAction") {
-        defineOutput("Yes", CHECKER(Context));
-        PutDefinition p;
-        p.put_name = "No";
-        p.allowSkip = true;
-        p.checker.reset(CHECKER(Context));
-        defineOutput(p);
-    }
-    
-    Result perform(SessionPtr session) const override {
-        setOutput(session, "Yes", new Context());
-        setOutput(session, "No", new SkipCtx()); // this ensure that whatever is connected to this output never gets executed.
-        return done();
-    }
-};
 
 void TestClient::prepareTest() {
     BOOST_LOG_SEV(logger, Info) << logActor() << "Adding workflow";
     WorkflowPtr workflow(new Workflow("test-13"));
     auto sm = workflow->getStateMachine();
-    sm->addAction(0, new ConditionTestAction(), {
-        OutputBinding(0,"Yes", 1, ""),
-        OutputBinding(0,"No", 2, "")
+    sm->addAction(0, new DoNext, {
+        OutputBinding(0,"", 1, ""),
+        OutputBinding(0,"", 2, "")
     });
     sm->addAction(1, new PrintLog(), {
-        OutputBinding(1, "", Step::Finish, "")
+        OutputBinding("", Step::Finish, "")
     });
-    sm->addAction(2, new ErrorAction(), {
-        OutputBinding(2, "", Step::Finish, "")
+    sm->addAction(2, new PrintLog(), {
+        OutputBinding("", Step::Finish, "")
     });
     sm->addInput(InputBinding("", 0, ""));
     
