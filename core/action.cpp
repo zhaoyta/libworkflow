@@ -306,6 +306,9 @@ void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr 
     session->setOutput(getActionId(), name, ctx);
 }
 
+void Action::setOutput(SessionPtr session, const std::string & name, Context* ctx) const {
+    setOutput(session, name, ContextPtr(ctx));
+}
 
 const std::set<PutDefinition> & Action::getInputs() const {
     return inputs;

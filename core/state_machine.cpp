@@ -95,7 +95,7 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
     action->setActionId(action_id);
     
     actions[action_id] = action;
-    
+    outputs[action_id].clear();
     for(OutputBinding ob: bindings) {
         ob.setFromActionId(action_id);
         outputs[action_id].push_back(ob);
@@ -443,7 +443,7 @@ void StateMachine::bindResults(SessionPtr session, int32_t action_id) {
             
             bool isSkipped = false;
             // has it been skipped ?
-            for(const auto & kv : session->getInputs()[action_id]) {
+            for(const auto & kv : session->getInputs()[to_aid]) {
                 if(boost::dynamic_pointer_cast<SkipCtx>(kv.second)) {
                     removeFromNext(session, to_aid);
                     removeFromPending(session, to_aid);
