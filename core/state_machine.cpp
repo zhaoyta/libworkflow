@@ -615,11 +615,71 @@ bool StateMachine::canExecuteFinish(SessionPtr session) {
 }
 
 void StateMachine::save(boost::property_tree::ptree & root) const {
+    boost::property_tree::ptree pactions;
+    for(const auto & kv: actions) {
+        boost::property_tree::ptree pitem;
+        kv.second->save(pitem);
+        pactions.add_child(std::to_string(kv.first), pitem);
+    }
+    root.add_child("actions", pactions);
     
+    boost::property_tree::ptree poutputs;
+    for(const auto & kv: outputs) {
+        boost::property_tree::ptree plist;
+        for(const auto & item: kv.second) {
+            boost::property_tree::ptree pitem;
+            item.save(pitem);
+            plist.push_back(std::make_pair("", pitem));
+        }
+        poutputs.add_child(std::to_string(kv.first), plist);
+    }
+    root.add_child("outputs", poutputs);
+    
+    boost::property_tree::ptree pinputs;
+    for(const auto & input: starters) {
+        boost::property_tree::ptree pitem;
+        input.save(pitem);
+        pinputs.push_back(std::make_pair("", pitem));
+    }
+    root.add_child("inputs", pinputs);
 }
 
 void StateMachine::load(const boost::property_tree::ptree & root) {
+    auto cactions = root.get_child_optional("actions");
+    if(cactions) {
+        for(const auto & kv: *cactions) {
+            std::string type;
+            GET_OPT(kv.second, type, std::string, "name");
+            // generate a new Action.
+            ActionPtr act;
+            act->load(kv.second);
+            actions[act->getActionId()] = act;
+        }
+    }
     
+    auto coutputs = root.get_child_optional("outputs");
+    if(coutputs) {
+        for(const auto & kv : *coutputs) {
+            int32_t cid;
+            std::stringstream str(kv.first.data());
+            str >> cid;
+            
+            for(const auto & kvout: kv.second) {
+                OutputBinding ob;
+                ob.load(kvout.second);
+                outputs[cid].push_back(ob);
+            }
+        }
+    }
+    
+    auto cinputs = root.get_child_optional("inputs");
+    if(cinputs) {
+        for(const auto & kv: *cinputs) {
+            InputBinding ib;
+            ib.load(kv.second);
+            starters.push_back(ib);
+        }
+    }
 }
 
 bool StateMachine::finished(SessionPtr session) {

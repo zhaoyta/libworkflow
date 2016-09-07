@@ -285,11 +285,43 @@ bool PropertySet::setCustomProperty(const std::string & key, const ContextPtr & 
 }
 
 
+#define SAVE_PROPERTIES(store) \
+{ \
+    boost::property_tree::ptree sub; \
+    for(const auto & kv: store) { \
+        boost::property_tree::ptree item; \
+        kv.second.save(item); \
+        sub.add_child(kv.first, item); \
+    } \
+    root.add_child(#store, sub); \
+}
 
 void PropertySet::save(boost::property_tree::ptree & root) const {
-    
+    root.put("guarded", guarded);
+    SAVE_PROPERTIES(uint_values);
+    SAVE_PROPERTIES(double_values);
+    SAVE_PROPERTIES(string_values);
+    SAVE_PROPERTIES(bool_values);
+    SAVE_PROPERTIES(custom_values);
+}
+
+#define LOAD_PROPERTIES(store, type) \
+{ \
+  auto cmap = root.get_child_optional(#store); \
+  if(cmap) { \
+    for(const auto & kv: *cmap) { \
+        Property<type> p; \
+        p.load(kv.second); \
+        store[kv.first.data()] = p; \
+    } \
+  } \
 }
 
 void PropertySet::load(const boost::property_tree::ptree & root) {
-    
+    GET_OPT(root, guarded, bool, "guarded");
+    LOAD_PROPERTIES(uint_values, uint32_t);
+    LOAD_PROPERTIES(double_values, double);
+    LOAD_PROPERTIES(string_values, std::string);
+    LOAD_PROPERTIES(bool_values, bool);
+    LOAD_PROPERTIES(custom_values, ContextPtr);
 }

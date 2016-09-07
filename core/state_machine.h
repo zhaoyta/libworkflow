@@ -72,6 +72,10 @@ public:
     //! for logging purpose
     std::string fingerprint(SessionPtr);
     
+    
+    void save(boost::property_tree::ptree & root) const override;
+    void load(const boost::property_tree::ptree & root) override;
+    
 protected:
     
     //! first call  :) start everything.
@@ -125,8 +129,6 @@ protected:
     //! @return true if one has been found.
     bool tryPromotePending(SessionPtr);
     
-    void save(boost::property_tree::ptree & root) const override;
-    void load(const boost::property_tree::ptree & root) override;
     
 };
 

@@ -1,6 +1,7 @@
 #ifndef __JSONABLE_H_
 #define __JSONABLE_H_
 #include <boost/property_tree/ptree.hpp>
+#include <tools/defines.h>
 
 #pragma GCC visibility push(default)
 /**
@@ -25,6 +26,26 @@ public:
     virtual void load(const boost::property_tree::ptree & root) =0;
     
 };
+
+#define GET_OPT(tree, member, type, key) \
+{ \
+    auto __CAT(o,member) = tree.get_optional<type>(key); \
+    if(__CAT(o,member)) member = * __CAT(o,member); \
+}
+
+#define PUT_CHILD(tree, member, key) \
+{ \
+    boost::property_tree::ptree cmember;\
+    (member).save(cmember); \
+    tree.add_child(key, cmember);\
+}
+
+#define GET_CHILD(tree, member, key) \
+{ \
+    auto popt = tree.get_child_optional(key); \
+    if(popt) \
+        (member).load(*popt); \
+}
 
 #pragma GCC visibility pop
 

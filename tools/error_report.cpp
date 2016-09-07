@@ -59,9 +59,23 @@ const std::vector<ErrorReportPtr> ErrorReport::getAncestry() {
 
 
 void ErrorReport::save(boost::property_tree::ptree & root) const {
-    
+    PUT_CHILD(root, target, "target");
+    root.put("message", error_message);
+    root.put("key", error_key);
+    PUT_CHILD(root, *parent, "parent");
 }
 
 void ErrorReport::load(const boost::property_tree::ptree & root) {
+    GET_OPT(root, error_message, std::string, "message");
+    GET_OPT(root, error_key, std::string, "key");
     
+    auto otarget = root.get_child_optional("target");
+    if(otarget)
+        target.load(*otarget);
+    
+    auto oparent = root.get_child_optional("parent");
+    if(oparent) {
+        parent.reset(new ErrorReport());
+        parent->load(*oparent);
+    }
 }

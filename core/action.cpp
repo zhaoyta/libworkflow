@@ -374,11 +374,52 @@ std::string Action::logAction() const {
 }
 
 void Action::save(boost::property_tree::ptree & root) const {
+    // action only store few informations ... :
+    // it's name ( serves as types for Factory )
+    // it's property set
+    // it's input and outputs.
+    // and last but not least it's ID
+    
+    // Note that most thing may be ignored in load, but save should store everything.
+    
+    root.put("name", name);
+    root.put("action_id", action_id);
+    boost::property_tree::ptree pprop;
+    propertyset->save(pprop);
+    root.add_child("properties", pprop);
+    
+    boost::property_tree::ptree pinputs;
+    
+    // store inputs and outputs, solely for informative purpose.
+    for(const auto & input: inputs) {
+        boost::property_tree::ptree cinput;
+        input.save(cinput);
+        pinputs.push_back(std::make_pair("",cinput));
+    }
+    root.add_child("inputs", pinputs);
+    
+    
+    boost::property_tree::ptree poutputs;
+    
+    for(const auto & output: outputs) {
+        boost::property_tree::ptree coutput;
+        output.save(coutput);
+        poutputs.push_back(std::make_pair("",coutput));
+    }
+    root.add_child("outputs", poutputs);
     
 }
 
 void Action::load(const boost::property_tree::ptree & root) {
+    // don't expect actions to load bindings. It would be totally irresponsisble.
+    // read only action_id and properties.
     
+    GET_OPT(root, name, std::string, "name");
+    GET_OPT(root, action_id, int32_t, "action_id");
+    auto oprop = root.get_child_optional("properties");
+    if(oprop) {
+        properties()->load(*oprop);
+    }
 }
 
 

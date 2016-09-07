@@ -192,11 +192,15 @@ std::string Workflow::getName() const {
 
 
 void Workflow::save(boost::property_tree::ptree & root) const {
-    
+    root.put("name", name);
+    root.put("timeout", timeout);
+    stateMachine->save(root);
 }
 
 void Workflow::load(const boost::property_tree::ptree & root) {
-    
+    GET_OPT(root, name, std::string, "name");
+    GET_OPT(root, timeout, double, "timeout");
+    stateMachine->load(root);
 }
 
 OSTREAM_HELPER_IMPL(Workflow, obj) {

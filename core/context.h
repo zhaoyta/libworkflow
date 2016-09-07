@@ -90,6 +90,9 @@ public:
     std::map<std::string, ContextPtr> & getContexts();
     
     
+    void save(boost::property_tree::ptree & root) const override;
+    void load(const boost::property_tree::ptree & root) override;
+    
     
 };
 

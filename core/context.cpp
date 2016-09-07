@@ -1,5 +1,6 @@
 #include <core/context.h>
-
+#include <tools/context_factory.h>
+#include <tools/logged.h>
 
 Context::Context(): Jsonable(), type("Context") {}
 Context::Context(const std::string & type) : Jsonable(),
@@ -17,11 +18,11 @@ const std::string & Context::getType() const {
 
 
 void Context::save(boost::property_tree::ptree & root) const {
-    
+    root.put("type", type);
 }
 
 void Context::load(const boost::property_tree::ptree & root) {
-    
+    //! type shoudln't be loaded ...
 }
 
 
@@ -47,11 +48,32 @@ void ListCtx::clear() {
 }
 
 void ListCtx::save(boost::property_tree::ptree & root) const {
-    
+    Context::save(root);
+    boost::property_tree::ptree plist;
+    for(const auto & ctx: contexts) {
+        boost::property_tree::ptree citem;
+        ctx->save(citem);
+        plist.push_back(std::make_pair("", citem));
+    }
+    root.add_child("items", plist);
 }
 
 void ListCtx::load(const boost::property_tree::ptree & root) {
-    
+    auto olist = root.get_child_optional("items");
+    if(olist) {
+        for(const auto & kv: *olist) {
+            const auto & citem = kv.second;
+            std::string type = citem.get<std::string>("type");
+            ContextPtr ctx = ContextFactory::create(type);
+            if(ctx) {
+                ctx->load(citem);
+                contexts.push_back(ctx);
+            } else {
+                GLOB_LOGGER("json.ctx");
+                BOOST_LOG_SEV(logger, Error) << " Failed to find an appropriate factory for context type: " << type;
+            }
+        }
+    }
 }
 
 SkipCtx::SkipCtx() : Context("SkipCtx") {}
@@ -77,5 +99,28 @@ void GroupedCtx::setContext(const std::string & ctx_name, ContextPtr ctx) {
 
 std::map<std::string, ContextPtr> & GroupedCtx::getContexts() {
     return contexts;
+}
+
+
+void GroupedCtx::save(boost::property_tree::ptree & root) const {
+    Context::save(root);
+}
+
+void GroupedCtx::load(const boost::property_tree::ptree & root) {
+    auto olist = root.get_child_optional("items");
+    if(olist) {
+        for(const auto & kv: *olist) {
+            const auto & citem = kv.second;
+            std::string type = citem.get<std::string>("type");
+            ContextPtr ctx = ContextFactory::create(type);
+            if(ctx) {
+                ctx->load(citem);
+                setContext(kv.first.data() , ctx);
+            } else {
+                GLOB_LOGGER("json.ctx");
+                BOOST_LOG_SEV(logger, Error) << " Failed to find an appropriate factory for context type: " << type;
+            }
+        }
+    }
 }
 

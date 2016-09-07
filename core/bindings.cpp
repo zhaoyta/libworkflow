@@ -25,11 +25,15 @@ const std::string & InputBinding::getWorkflowInput() const {
 }
 
 void InputBinding::save(boost::property_tree::ptree & root) const {
-    
+    root.put("workflow_input", workflow_input);
+    root.put("action_id", action_id);
+    root.put("action_input", action_input);
 }
 
 void InputBinding::load(const boost::property_tree::ptree & root) {
-    
+    GET_OPT(root, workflow_input, std::string, "workflow_input");
+    GET_OPT(root, action_input, std::string, "action_input");
+    GET_OPT(root, action_id, int32_t, "action_id");
 }
 
 
@@ -105,9 +109,15 @@ const std::string & OutputBinding::getToActionInput() const {
 }
 
 void OutputBinding::save(boost::property_tree::ptree & root) const {
-    
+    root.put("from_action_id", from_action_id);
+    root.put("from_action_output", from_action_output);
+    root.put("to_action_id", to_action_id);
+    root.put("to_action_input", to_action_input);
 }
 
 void OutputBinding::load(const boost::property_tree::ptree & root) {
-    
+    GET_OPT(root, from_action_id, int32_t, "from_action_id");
+    GET_OPT(root, from_action_output, std::string, "from_action_output");
+    GET_OPT(root, to_action_id, int32_t, "to_action_id");
+    GET_OPT(root, to_action_input, std::string, "to_action_input");
 }

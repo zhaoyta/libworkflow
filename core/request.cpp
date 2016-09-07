@@ -4,6 +4,7 @@
 #include <tools/property_set.h>
 #include <core/context.h>
 #include <iomanip>
+#include <boost/uuid/string_generator.hpp>
 
 Request::Request(): Jsonable(), context( new GroupedCtx()){
     reply.target = ETargetAction::NoReply;
@@ -114,10 +115,58 @@ ErrorReportPtr Request::getErrorReport() const {
 }
 
 void Request::save(boost::property_tree::ptree & root) const {
+    PUT_CHILD(root, target, "target");
+    PUT_CHILD(root, reply, "reply");
+    root.put("request_id", to_string(request_id));
+    PUT_CHILD(root, (*context), "context");
+    PUT_CHILD(root, (*bypass), "bypass");
     
+    boost::property_tree::ptree cmap;
+    for(const auto & kv: action_bypasses) {
+        boost::property_tree::ptree citem;
+        kv.second->save(citem);
+        std::stringstream str;
+        str << kv.first;
+        cmap.add_child(str.str(), citem);
+    }
+    
+    root.add_child("action_bypasses", cmap);
+    
+    PUT_CHILD(root, (*report), "error_report");
+    // ignore controller spawn, that's set by controller upon execution.
 }
 
 void Request::load(const boost::property_tree::ptree & root) {
+    GET_CHILD(root, target, "target");
+    GET_CHILD(root, reply, "reply");
+    
+    boost::uuids::string_generator gen;
+    std::string rid;
+    GET_OPT(root, rid, std::string, "request_id");
+    
+    request_id = gen(rid);
+    
+    GET_CHILD(root, (*context), "context");
+    GET_CHILD(root, (*bypass), "bypass");
+    
+    auto cmap = root.get_child_optional("action_bypasses");
+    if(cmap) {
+        for(const auto & kv: *cmap) {
+            std::stringstream str(kv.first.data());
+            int32_t action_id;
+            str >> action_id;
+            auto pset = PropertySetPtr(new PropertySet());
+            pset->load(kv.second);
+            action_bypasses[action_id] = pset;
+        }
+    }
+    
+    auto creport = root.get_child_optional("report");
+    if(creport) {
+        // isn't set by default.
+        report.reset(new ErrorReport);
+        GET_CHILD(root, (*report), "report");
+    }
     
 }
 
