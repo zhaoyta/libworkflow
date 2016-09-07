@@ -24,6 +24,12 @@ void ErrorReport::setError(const std::string & errk, const std::string & errm) {
     error_key = errk;
 }
 
+bool ErrorReport::isSet() const {
+    if(not parent and error_key.empty())
+        return false;
+    return true;
+}
+
 const std::string & ErrorReport::getErrorMessage()  {
     if(not parent)
         return error_message;

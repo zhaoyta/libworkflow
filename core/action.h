@@ -15,7 +15,6 @@
 #include <tools/property_set.h>
 #include <tools/type_checker.h>
 
-#pragma GCC visibility push(default)
 
 SHARED_PTR(StateMachine);
 SHARED_PTR(Session);
@@ -27,6 +26,9 @@ class PutDefinition;
 class Result;
 class ErrorReport;
 class TypeChecker;
+
+#pragma GCC visibility push(default)
+
 
 /**
  Action is where the business code go. 

@@ -30,7 +30,7 @@ public:
     ControllerSpawnPtr spawnForRequest(RequestPtr);
     
     //! register a workflow in this controller
-    void addWorkflow(WorkflowPtr);
+    bool addWorkflow(WorkflowPtr);
 };
 
 OSTREAM_HELPER_DECL(Controller);
