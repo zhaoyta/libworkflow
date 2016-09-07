@@ -36,6 +36,14 @@ void InputBinding::load(const boost::property_tree::ptree & root) {
     GET_OPT(root, action_id, int32_t, "action_id");
 }
 
+OSTREAM_HELPER_IMPL(InputBinding, obj) {
+    out << "[Input] { "
+        << ", workflow_input: " << obj.getWorkflowInput()
+        << ", action_id: " << obj.getActionId()
+        << ", input: " << obj.getActionInput()
+        << " }";
+    return out;
+}
 
 OutputBinding::OutputBinding() {
     
@@ -121,3 +129,15 @@ void OutputBinding::load(const boost::property_tree::ptree & root) {
     GET_OPT(root, to_action_id, int32_t, "to_action_id");
     GET_OPT(root, to_action_input, std::string, "to_action_input");
 }
+
+
+OSTREAM_HELPER_IMPL(OutputBinding, obj) {
+    out << "[Output] { "
+    << ", from_action_id: " << obj.getFromActionId()
+    << ", from_action_output: " << obj.getFromActionOutput()
+    << ", to_action_id: " << obj.getToActionId()
+    << ", to_action_input: " << obj.getToActionInput()
+    << " }";
+    return out;
+}
+

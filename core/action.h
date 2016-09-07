@@ -86,6 +86,11 @@ public:
     void setStateMachine(StateMachineWPtr);
     StateMachineWPtr getStateMachine() const;
     
+    
+    const std::set<PutDefinition> & getInputs() const;
+    const std::set<PutDefinition> & getOutputs() const;
+
+    
 protected:
     
 
@@ -155,9 +160,6 @@ protected:
     
     void setOutput(SessionPtr, const std::string & name, ContextPtr) const;
     void setOutput(SessionPtr, const std::string & name, Context*) const;
-    
-    const std::set<PutDefinition> & getInputs() const;
-    const std::set<PutDefinition> & getOutputs() const;
     
     void clearInputs();
     void clearOutputs();

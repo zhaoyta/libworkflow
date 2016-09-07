@@ -28,6 +28,7 @@ public:
     void load(const boost::property_tree::ptree & root) override;
 };
 
+OSTREAM_HELPER_DECL(InputBinding);
 
 /**
  Meta information as to how actions are connected to next actions.
@@ -66,6 +67,7 @@ public:
     void load(const boost::property_tree::ptree & root) override;
 };
 
+OSTREAM_HELPER_DECL(OutputBinding);
 
 #pragma GCC visibility pop
 

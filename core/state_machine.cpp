@@ -9,6 +9,8 @@
 #include <core/workflow.h>
 #include <core/steps.h>
 #include <core/action.h>
+#include <core/put_definition.h>
+#include <tools/action_factory.h>
 
 
 StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm"), boost::enable_shared_from_this<StateMachine>() {
@@ -651,9 +653,13 @@ void StateMachine::load(const boost::property_tree::ptree & root) {
             std::string type;
             GET_OPT(kv.second, type, std::string, "name");
             // generate a new Action.
-            ActionPtr act;
-            act->load(kv.second);
-            actions[act->getActionId()] = act;
+            ActionPtr act = ActionFactory::create(type);
+            if(act) {
+                act->load(kv.second);
+                actions[act->getActionId()] = act;
+            } else {
+                BOOST_LOG_SEV(logger, Error) << " Failed to find appropriate Action for type: " << type;
+            }
         }
     }
     
@@ -684,4 +690,67 @@ void StateMachine::load(const boost::property_tree::ptree & root) {
 
 bool StateMachine::finished(SessionPtr session) {
     return session->hasFinished();
+}
+
+ErrorReport StateMachine::validate() const {
+    ErrorReport er;
+    std::stringstream str;
+    
+    std::set<int32_t> unused_actions;
+    for(const auto & kv: actions)
+        unused_actions.insert(kv.first);
+    
+    // starters and outputs should link from and to known actions.
+    // actions should at least have an a binding.
+    
+    for(const auto & input: starters) {
+        unused_actions.erase(input.getActionId());
+        if(actions.count(input.getActionId()) == 0) {
+            str << input << " is invalid, targeted action doesn't exist" << std::endl;
+        }
+    }
+    
+    
+    for(const auto & kv: outputs) {
+        for(const auto & output: kv.second) {
+            if(actions.count(output.getFromActionId()) == 0) {
+                str << output << " is invalid, origin action doesn't exist" << std::endl;
+            } else if (actions.count(output.getToActionId()) == 0) {
+                str << output << " is invalid, targeted action doesn't exist" << std::endl;
+            } else {
+                auto outputs = actions.at(output.getFromActionId())->getOutputs();
+                bool found = false;
+                for(const auto & put: outputs) {
+                    if(put.put_name == output.getFromActionOutput()) {
+                        found = true;
+                        break;
+                    }
+                }
+                if(not found)
+                    str << output << " is invalid, origin output doesn't exist" << std::endl;
+                else {
+                    auto inputs = actions.at(output.getToActionId())->getInputs();
+                    bool found = false;
+                    for(const auto & put: inputs) {
+                        if(put.put_name == output.getToActionInput()) {
+                            found = true;
+                            break;
+                        }
+                    }
+                    if(not found)
+                        str << output << " is invalid, targeted input doesn't exist" << std::endl;
+                    else {
+                        unused_actions.erase(output.getToActionId());
+                        unused_actions.erase(output.getFromActionId());
+                    }
+                }
+            }
+        }
+    }
+    
+    if(str.str().empty())
+        return er;
+    
+    er.setError("workflow.structure.invalid", str.str());
+    return er;
 }

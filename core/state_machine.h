@@ -72,6 +72,8 @@ public:
     //! for logging purpose
     std::string fingerprint(SessionPtr);
     
+    //! Validate this state machine. Ensure that all action and binding are sound.
+    ErrorReport validate() const;
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;
