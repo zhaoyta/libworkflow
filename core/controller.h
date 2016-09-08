@@ -29,6 +29,9 @@ public:
     //! Note, default add only data to DefaultAction kind of request.
     ControllerSpawnPtr spawnForRequest(RequestPtr);
     
+    //! Well retrieve requested workflow.
+    WorkflowPtr getWorkflow(const std::string &) const;
+    
     //! register a workflow in this controller
     bool addWorkflow(WorkflowPtr);
 };

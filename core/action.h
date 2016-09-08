@@ -46,8 +46,8 @@ class Action : public Logged, public Jsonable {
     
     PropertySetPtr propertyset;
     
-    std::set<PutDefinition> inputs;
-    std::set<PutDefinition> outputs;
+    std::map<std::string, PutDefinition> inputs;
+    std::map<std::string, PutDefinition> outputs;
     
 
 public:
@@ -89,9 +89,12 @@ public:
     StateMachineWPtr getStateMachine() const;
     
     
-    const std::set<PutDefinition> & getInputs() const;
-    const std::set<PutDefinition> & getOutputs() const;
+    const std::map<std::string,PutDefinition> & getInputs() const;
+    const std::map<std::string,PutDefinition> & getOutputs() const;
 
+    
+    std::map<std::string,PutDefinition> & getInputs() ;
+    std::map<std::string,PutDefinition> & getOutputs() ;
     
 protected:
     

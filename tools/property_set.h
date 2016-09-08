@@ -1,7 +1,7 @@
 #ifndef __PROPERTY_SET_H_
 #define __PROPERTY_SET_H_
 #include <map>
-#include <tools/jsonable.h>
+#include <core/context.h>
 #include <tools/defines.h>
 
 
@@ -23,6 +23,10 @@ template<typename T> class Property;
  
  //! @return false if the propertyset is guarded and value hasn't been defined.
  bool setTypeProperty(const std::string & key, const type & value);
+ //! brutal add :)
+ bool setTypeProperty(const Property<type> &);
+ //! return all values for a given type.
+ const std::map<std::string, Property<type> > getTypeProperties() const;
  
  */
 #define DECLARE_PROPERTY_FUNCTIONS(Name,type) \
@@ -32,12 +36,14 @@ type __CAT(__CAT(get,Name),Property)(const std::string & key, const type & defau
 \
 void __CAT(__CAT(define,Name),Property)(const std::string & key, const type & value, const std::string & description, bool exposed = false); \
 \
-bool __CAT(__CAT(set,Name),Property)(const std::string & key, const type & value);
+bool __CAT(__CAT(set,Name),Property)(const std::string & key, const type & value); \
+void __CAT(__CAT(set,Name),Property)(const Property<type> &); \
+const std::map<std::string,Property<type> > & __CAT(__CAT(get,Name),Properties)() const;
 
 /**
  Stores various kind of data, accessible by string keys. 
  */
-class PropertySet : public Jsonable {
+class PropertySet : public Context {
     //! This ensure that set values check that these values have been defined before hand. That's a safeguard for Action properties.
     bool guarded;
     
@@ -69,6 +75,7 @@ public:
         return boost::dynamic_pointer_cast<T>(getCustomValue(key, default_value));
     }
     
+    void clear();
     
     void save(boost::property_tree::ptree & root) const override;
     void load(const boost::property_tree::ptree & root) override;

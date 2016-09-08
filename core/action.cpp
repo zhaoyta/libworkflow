@@ -26,7 +26,8 @@ Action::~Action() {
 }
 
 bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
-    for(const auto & id: getInputs()) {
+    for(const auto & kv: getInputs()) {
+        auto id = kv.second;
         auto ctx = session->getInput(getActionId(), id.put_name);
         
         if(not ctx) {
@@ -69,7 +70,8 @@ bool Action::checkInputs(SessionPtr session, ErrorReport & er) const {
 }
 
 bool Action::checkOutputs(SessionPtr session, ErrorReport & er) const {
-    for(const auto & id: getOutputs()) {
+    for(const auto & kv: getOutputs()) {
+        auto id = kv.second;
         auto ctx = session->getOutput(getActionId(), id.put_name);
         
         if(not ctx) {
@@ -278,10 +280,8 @@ void Action::defineInput(const std::string & name, TypeChecker* checker , bool m
     defineInput(d);
 }
 
-void Action::defineInput(const PutDefinition & d) {
-    //! @todo check that there aren't twice the same put name defined.
-    
-    inputs.insert(d);
+void Action::defineInput(const PutDefinition & d) {    
+    inputs[d.put_name] = (d);
 }
 
 void Action::defineOutput(const std::string & name, TypeChecker * checker, bool mandatory) {
@@ -294,8 +294,7 @@ void Action::defineOutput(const std::string & name, TypeChecker * checker, bool 
 }
 
 void Action::defineOutput(const PutDefinition & d) {
-    //! @todo check that there aren't twice the same put name defined.
-    outputs.insert(d);
+    outputs[d.put_name] = (d);
 }
 
 ContextPtr Action::getInput(SessionPtr session, const std::string & name) const {
@@ -310,13 +309,22 @@ void Action::setOutput(SessionPtr session, const std::string & name, Context* ct
     setOutput(session, name, ContextPtr(ctx));
 }
 
-const std::set<PutDefinition> & Action::getInputs() const {
+const std::map<std::string, PutDefinition> & Action::getInputs() const {
     return inputs;
 }
 
-const std::set<PutDefinition> & Action::getOutputs() const {
+const std::map<std::string, PutDefinition> & Action::getOutputs() const {
     return outputs;
 }
+
+std::map<std::string, PutDefinition> & Action::getInputs() {
+    return inputs;
+}
+
+std::map<std::string, PutDefinition> & Action::getOutputs() {
+    return outputs;
+}
+
 
 Result Action::executeSyncRequest(SessionPtr session, RequestPtr req) const{
     req = prepareSyncRequest(session, req);
@@ -391,7 +399,8 @@ void Action::save(boost::property_tree::ptree & root) const {
     boost::property_tree::ptree pinputs;
     
     // store inputs and outputs, solely for informative purpose.
-    for(const auto & input: inputs) {
+    for(const auto & kv: inputs) {
+        auto input = kv.second;
         boost::property_tree::ptree cinput;
         input.save(cinput);
         pinputs.push_back(std::make_pair("",cinput));
@@ -401,7 +410,8 @@ void Action::save(boost::property_tree::ptree & root) const {
     
     boost::property_tree::ptree poutputs;
     
-    for(const auto & output: outputs) {
+    for(const auto & kv: outputs) {
+        auto output = kv.second;
         boost::property_tree::ptree coutput;
         output.save(coutput);
         poutputs.push_back(std::make_pair("",coutput));

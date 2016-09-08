@@ -2,7 +2,7 @@
 #include <tools/property.h>
 #include <core/context.h>
 
-PropertySet::PropertySet() : Jsonable(), guarded(false) {
+PropertySet::PropertySet() : Context("PropertySet"), guarded(false) {
     setGuarded(false);
 }
 
@@ -59,6 +59,14 @@ std::string PropertySet::getDescription(const std::string & key) const {
     return "";
 }
 
+void PropertySet::clear() {
+    custom_values.clear();
+    bool_values.clear();
+    double_values.clear();
+    uint_values.clear();
+    string_values.clear();
+}
+
 // #########################
 // ##### BOOL PROPERTIES ###
 // #########################
@@ -101,6 +109,15 @@ bool PropertySet::setBoolProperty(const std::string & key, const bool & value) {
         // Log: unable to set value of a guarded and undefined property.
         return false;
     }
+}
+
+const std::map<std::string, Property<bool> > & PropertySet::getBoolProperties() const {
+    return bool_values;
+}
+
+
+void PropertySet::setBoolProperty(const Property<bool> & p) {
+    bool_values[p.key] = p;
 }
 
 
@@ -149,6 +166,14 @@ bool PropertySet::setDoubleProperty(const std::string & key, const double & valu
 }
 
 
+void PropertySet::setDoubleProperty(const Property<double> & p) {
+    double_values[p.key] = p;
+}
+
+const std::map<std::string, Property<double> > & PropertySet::getDoubleProperties() const {
+    return double_values;
+}
+
 // ###########################
 // ##### UINT PROPERTIES #####
 // ###########################
@@ -194,6 +219,13 @@ bool PropertySet::setUintProperty(const std::string & key, const uint32_t & valu
 }
 
 
+void PropertySet::setUintProperty(const Property<uint32_t> & p) {
+    uint_values[p.key] = p;
+}
+
+const std::map<std::string, Property<uint32_t> > & PropertySet::getUintProperties() const {
+    return uint_values;
+}
 
 // #############################
 // ##### STRING PROPERTIES #####
@@ -237,6 +269,15 @@ bool PropertySet::setStringProperty(const std::string & key, const std::string &
         // Log: unable to set value of a guarded and undefined property.
         return false;
     }
+}
+
+
+void PropertySet::setStringProperty(const Property<std::string> & p) {
+    string_values[p.key] = p;
+}
+
+const std::map<std::string, Property<std::string> > & PropertySet::getStringProperties() const {
+    return string_values;
 }
 
 
@@ -284,6 +325,13 @@ bool PropertySet::setCustomProperty(const std::string & key, const ContextPtr & 
     }
 }
 
+void PropertySet::setCustomProperty(const Property<ContextPtr> & p) {
+    custom_values[p.key] = p;
+}
+
+const std::map<std::string, Property<ContextPtr> > & PropertySet::getCustomProperties() const {
+    return custom_values;
+}
 
 #define SAVE_PROPERTIES(store) \
 { \

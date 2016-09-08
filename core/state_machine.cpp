@@ -119,10 +119,25 @@ void StateMachine::addInput(const InputBinding & input) {
     starters.push_back(input);
 }
 
-const std::map<int32_t, ActionPtr> StateMachine::getActions() const {
+const std::map<int32_t, ActionPtr> & StateMachine::getActions() const {
     return actions;
 }
 
+const std::vector<InputBinding> & StateMachine::getStarters() const {
+    return starters;
+}
+
+std::vector<OutputBinding> StateMachine::getEnders() const {
+    std::vector<OutputBinding> res;
+    for(const auto & kv: outputs) {
+        for(const auto & output: kv.second) {
+            if(output.getToActionId() == (int32_t)Step::Finish) {
+                res.push_back(output);
+            }
+        }
+    }
+    return res;
+}
 
 bool StateMachine::execute(SessionPtr session, RequestPtr request)  {
     session->pushRequest(request);
@@ -719,24 +734,13 @@ ErrorReport StateMachine::validate() const {
                 str << output << " is invalid, targeted action doesn't exist" << std::endl;
             } else {
                 auto outputs = actions.at(output.getFromActionId())->getOutputs();
-                bool found = false;
-                for(const auto & put: outputs) {
-                    if(put.put_name == output.getFromActionOutput()) {
-                        found = true;
-                        break;
-                    }
-                }
+                bool found = outputs.count(output.getFromActionOutput()) > 0;
+                
                 if(not found)
                     str << output << " is invalid, origin output doesn't exist" << std::endl;
                 else {
                     auto inputs = actions.at(output.getToActionId())->getInputs();
-                    bool found = false;
-                    for(const auto & put: inputs) {
-                        if(put.put_name == output.getToActionInput()) {
-                            found = true;
-                            break;
-                        }
-                    }
+                    bool found = inputs.count(output.getToActionInput()) > 0;
                     if(not found)
                         str << output << " is invalid, targeted input doesn't exist" << std::endl;
                     else {

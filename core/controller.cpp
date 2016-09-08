@@ -46,6 +46,13 @@ bool Controller::addWorkflow(WorkflowPtr workflow) {
     return true;
 }
 
+WorkflowPtr Controller::getWorkflow(const std::string & name) const {
+    if(workflows.count(name) > 0 ) {
+        return workflows.at(name);
+    }
+    return WorkflowPtr();
+}
+
 
 OSTREAM_HELPER_IMPL(Controller, obj) {
     out << "[Controller] name: " << obj.getName() << ", pool: " << obj.getPoolSize();

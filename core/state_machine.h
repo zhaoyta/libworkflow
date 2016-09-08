@@ -54,7 +54,9 @@ public:
     virtual void addInput(const InputBinding & );
     
     //! thats all actions.
-    const std::map<int32_t, ActionPtr> getActions() const;
+    const std::map<int32_t, ActionPtr> & getActions() const;
+    const std::vector<InputBinding> & getStarters() const;
+    std::vector<OutputBinding> getEnders() const;
     
     //! tell whether this session has finished it's job.
     bool finished(SessionPtr);
