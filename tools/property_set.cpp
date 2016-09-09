@@ -115,6 +115,11 @@ const std::map<std::string, Property<bool> > & PropertySet::getBoolProperties() 
     return bool_values;
 }
 
+Property<bool> PropertySet::getBoolSProperty(const std::string & key) const {
+    if(bool_values.count(key) > 0 )
+        return bool_values.at(key);
+    return Property<bool>();
+}
 
 void PropertySet::setBoolProperty(const Property<bool> & p) {
     bool_values[p.key] = p;
@@ -165,9 +170,14 @@ bool PropertySet::setDoubleProperty(const std::string & key, const double & valu
     }
 }
 
-
 void PropertySet::setDoubleProperty(const Property<double> & p) {
     double_values[p.key] = p;
+}
+
+Property<double> PropertySet::getDoubleSProperty(const std::string & key) const {
+    if(double_values.count(key) > 0 )
+        return double_values.at(key);
+    return Property<double>();
 }
 
 const std::map<std::string, Property<double> > & PropertySet::getDoubleProperties() const {
@@ -218,6 +228,11 @@ bool PropertySet::setUintProperty(const std::string & key, const uint32_t & valu
     }
 }
 
+Property<uint32_t> PropertySet::getUintSProperty(const std::string & key) const {
+    if(uint_values.count(key) > 0 )
+        return uint_values.at(key);
+    return Property<uint32_t>();
+}
 
 void PropertySet::setUintProperty(const Property<uint32_t> & p) {
     uint_values[p.key] = p;
@@ -271,6 +286,11 @@ bool PropertySet::setStringProperty(const std::string & key, const std::string &
     }
 }
 
+Property<std::string> PropertySet::getStringSProperty(const std::string & key) const  {
+    if(string_values.count(key) > 0 )
+        return string_values.at(key);
+    return Property<std::string>();
+}
 
 void PropertySet::setStringProperty(const Property<std::string> & p) {
     string_values[p.key] = p;
@@ -323,6 +343,12 @@ bool PropertySet::setCustomProperty(const std::string & key, const ContextPtr & 
         // Log: unable to set value of a guarded and undefined property.
         return false;
     }
+}
+
+Property<ContextPtr> PropertySet::getCustomSProperty(const std::string & key) const {
+    if(custom_values.count(key) > 0 )
+        return custom_values.at(key);
+    return Property<ContextPtr>();
 }
 
 void PropertySet::setCustomProperty(const Property<ContextPtr> & p) {

@@ -11,6 +11,7 @@
 #include <core/action.h>
 #include <core/put_definition.h>
 #include <tools/action_factory.h>
+#include <tools/property.h>
 
 
 StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm"), boost::enable_shared_from_this<StateMachine>() {
@@ -113,11 +114,60 @@ void StateMachine::addAction(int32_t action_id, ActionPtr action, const std::vec
             inputs_map[output.getToActionId()].insert(output.getFromActionId());
         }
     }
+    
+    // seek all exposed properties of this action ... and register it.
+    auto props = action->properties();
+    for(const auto & kv: props->getBoolProperties()) {
+        if(kv.second.exposed) {
+            expose(action_id, kv.first);
+        }
+    }
+    for(const auto & kv: props->getDoubleProperties()) {
+        if(kv.second.exposed) {
+            expose(action_id, kv.first);
+        }
+    }
+    for(const auto & kv: props->getUintProperties()) {
+        if(kv.second.exposed) {
+            expose(action_id, kv.first);
+        }
+    }
+    for(const auto & kv: props->getStringProperties()) {
+        if(kv.second.exposed) {
+            expose(action_id, kv.first);
+        }
+    }
+    for(const auto & kv: props->getCustomProperties()) {
+        if(kv.second.exposed) {
+            expose(action_id, kv.first);
+        }
+    }
 }
 
 void StateMachine::addInput(const InputBinding & input) {
     starters.push_back(input);
 }
+
+void StateMachine::unexpose(int32_t action) {
+    exposed_properties.erase(action);
+}
+
+void StateMachine::unexpose(int32_t action, const std::string & alias) {
+    exposed_properties[action].erase(alias);
+}
+
+void StateMachine::expose(int32_t action, const std::string & key, const std::string & alias) {
+    exposed_properties[action][alias] = key;
+}
+
+void StateMachine::expose(int32_t action, const std::string & key) {
+    exposed_properties[action][key] = key;
+}
+
+const std::map<int32_t, std::map<std::string, std::string> > & StateMachine::getExposedProperties() const {
+    return exposed_properties;
+}
+
 
 const std::map<int32_t, ActionPtr> & StateMachine::getActions() const {
     return actions;
@@ -659,9 +709,24 @@ void StateMachine::save(boost::property_tree::ptree & root) const {
         pinputs.push_back(std::make_pair("", pitem));
     }
     root.add_child("inputs", pinputs);
+    
+    boost::property_tree::ptree pexposed;
+    for(const auto & kv: exposed_properties) {
+        boost::property_tree::ptree paction;
+        for(const auto & ka: kv.second) {
+            paction.put(ka.first, ka.second);
+        }
+        pexposed.add_child(std::to_string(kv.first), paction);
+    }
+    root.add_child("exposed", pexposed);
 }
 
 void StateMachine::load(const boost::property_tree::ptree & root) {
+    actions.clear();
+    outputs.clear();
+    starters.clear();
+    exposed_properties.clear();
+    
     auto cactions = root.get_child_optional("actions");
     if(cactions) {
         for(const auto & kv: *cactions) {
@@ -699,6 +764,18 @@ void StateMachine::load(const boost::property_tree::ptree & root) {
             InputBinding ib;
             ib.load(kv.second);
             starters.push_back(ib);
+        }
+    }
+    
+    auto cexposed = root.get_child_optional("exposed");
+    if(cexposed) {
+        for(const auto & kv: *cexposed) {
+            std::stringstream str(kv.first.data());
+            int32_t action_id;
+            str >> action_id;
+            for(const auto & ka: kv.second) {
+                exposed_properties[action_id][ka.first.data()] = ka.second.data();
+            }
         }
     }
 }

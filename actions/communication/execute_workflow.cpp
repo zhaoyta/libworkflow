@@ -5,6 +5,8 @@
 #include <core/state_machine.h>
 #include <core/bindings.h>
 #include <core/put_definition.h>
+#include <tools/property.h>
+#include <tools/property_set.h>
 
 
 ExecuteWorkflow::ExecuteWorkflow() : Action("ExecuteWorkflow") {
@@ -98,6 +100,7 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
     auto actions = sm->getActions();
     auto starters = sm->getStarters();
     auto enders = sm->getEnders();
+    auto exposed = sm->getExposedProperties();
     
     
     for(const auto & start: starters) {
@@ -140,8 +143,39 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
     }
     
     // State machine should hold what is exposed or not. ask it for a nice list and set it here.
-    
     properties()->clear();
+    
+    for(const auto & kv : exposed) {
+        auto aid = kv.first;
+        auto prop = actions[aid]->properties();
+        for(const auto & ka: kv.second) {
+            auto property = ka.second;
+            if(prop->getBoolProperties().count(property)> 0) {
+                properties()->setBoolProperty(prop->getBoolSProperty(property));
+                continue;
+            }
+            
+            if(prop->getDoubleProperties().count(property)> 0) {
+                properties()->setDoubleProperty(prop->getDoubleSProperty(property));
+                continue;
+            }
+            
+            if(prop->getStringProperties().count(property)> 0) {
+                properties()->setStringProperty(prop->getStringSProperty(property));
+                continue;
+            }
+            
+            if(prop->getUintProperties().count(property)> 0) {
+                properties()->setUintProperty(prop->getUintSProperty(property));
+                continue;
+            }
+            
+            if(prop->getCustomProperties().count(property)> 0) {
+                properties()->setCustomProperty(prop->getCustomSProperty(property));
+                continue;
+            }
+        }
+    }
     
     session->getBypass(getActionId())->setStringProperty("__local_workflow",workflow);
     session->getBypass(getActionId())->setStringProperty("__local_controller",controller);

@@ -33,6 +33,8 @@ class StateMachine : public Jsonable , public Logged, public boost::enable_share
     std::map<int32_t, ActionPtr> actions;
     std::map<int32_t, std::vector<OutputBinding> > outputs;
     std::map<int32_t, std::set<int32_t> > inputs_map;
+    //! map action_id to property alias to property key.
+    std::map<int32_t, std::map<std::string, std::string> > exposed_properties;
     std::vector<InputBinding> starters;
     std::string workflow_name;
 public:
@@ -50,6 +52,7 @@ public:
     void addAction(Step step, ActionPtr, const std::vector<OutputBinding> & );
     void addAction(int32_t action_id, Action *, const std::vector<OutputBinding> & );
     virtual void addAction(int32_t action_id, ActionPtr, const std::vector<OutputBinding> & );
+    
     //! set initial actions of this state machine.
     virtual void addInput(const InputBinding & );
     
@@ -57,6 +60,19 @@ public:
     const std::map<int32_t, ActionPtr> & getActions() const;
     const std::vector<InputBinding> & getStarters() const;
     std::vector<OutputBinding> getEnders() const;
+    
+    //! remove all exposed keys of @a action.
+    void unexpose(int32_t action);
+    
+    //! remove exposed @a key of @a action
+    void unexpose(int32_t action, const std::string & alias);
+    
+    //! expose @a action 's property @a key and gives it @a alias.
+    void expose(int32_t action, const std::string & key, const std::string & alias);
+    void expose(int32_t action, const std::string & key);
+    
+    //! recover all exposed properties.
+    const std::map<int32_t, std::map<std::string, std::string> > & getExposedProperties() const;
     
     //! tell whether this session has finished it's job.
     bool finished(SessionPtr);

@@ -25,6 +25,8 @@ template<typename T> class Property;
  bool setTypeProperty(const std::string & key, const type & value);
  //! brutal add :)
  bool setTypeProperty(const Property<type> &);
+ //! Return property struct for @a key
+ Property<type> getTypeSProperty(const std::string & key) const;
  //! return all values for a given type.
  const std::map<std::string, Property<type> > getTypeProperties() const;
  
@@ -38,6 +40,7 @@ void __CAT(__CAT(define,Name),Property)(const std::string & key, const type & va
 \
 bool __CAT(__CAT(set,Name),Property)(const std::string & key, const type & value); \
 void __CAT(__CAT(set,Name),Property)(const Property<type> &); \
+Property<type> __CAT(__CAT(get,Name),SProperty)(const std::string & key) const; \
 const std::map<std::string,Property<type> > & __CAT(__CAT(get,Name),Properties)() const;
 
 /**
