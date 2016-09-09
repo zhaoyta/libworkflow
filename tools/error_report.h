@@ -26,6 +26,7 @@ class ErrorReport: public Jsonable, public boost::enable_shared_from_this<ErrorR
     ErrorReportPtr parent;
 public:
     ErrorReport();
+    ErrorReport(const ErrorReport & );
     //! Create an error report.
     ErrorReport(const Target & target, const std::string & error_key, const std::string & error_msg);
     //! This is rethrow version, add provided error report to the stack.

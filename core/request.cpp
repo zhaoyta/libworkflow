@@ -134,6 +134,8 @@ void Request::save(boost::property_tree::ptree & root) const {
     
     PUT_CHILD(root, (*report), "error_report");
     // ignore controller spawn, that's set by controller upon execution.
+    
+    root.put("workflow_json", workflow_json);
 }
 
 void Request::load(const boost::property_tree::ptree & root) {
@@ -168,6 +170,7 @@ void Request::load(const boost::property_tree::ptree & root) {
         GET_CHILD(root, (*report), "report");
     }
     
+    GET_OPT(root, workflow_json, std::string, "workflow_json");
 }
 
 ControllerSpawnPtr Request::getControllerSpawn() const {
@@ -178,6 +181,13 @@ void Request::setControllerSpawn(ControllerSpawnPtr sp) {
     spawn = sp;
 }
 
+const std::string & Request::getWorkflowJson() const {
+    return workflow_json;
+}
+
+void Request::setWorkflowJson(const std::string & json) {
+    workflow_json = json;
+}
 
 void Request::setTarget(const Target & t) {
     target = t;

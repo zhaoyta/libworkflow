@@ -84,6 +84,7 @@ public:
     //! default to 60 s.
     void setTimeout(double = 60);
     
+    void setName(const std::string & name);
     std::string getName() const;
 
 protected:

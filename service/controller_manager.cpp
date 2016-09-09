@@ -50,6 +50,11 @@ void ControllerManager::perform(RequestPtr req) {
         }
         
         bool able = false;
+        if(not req->getWorkflowJson().empty()) {
+            able = controllers["temporary"]->perform(req);
+        }
+        
+        
         if(controllers.count(req->getTarget().controller) > 0 )
             able = controllers[req->getTarget().controller]->perform(req);
         else {
@@ -65,7 +70,8 @@ void ControllerManager::perform(RequestPtr req) {
 void ControllerManager::started() {
     ClientManager::getInstance();
     auto controller = ControllerPtr(new Controller("default", default_pool));
-    
+    registerController(controller);
+    controller = ControllerPtr(new TemporaryController(default_pool));
     registerController(controller);
 }
 

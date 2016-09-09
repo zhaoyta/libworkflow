@@ -29,11 +29,30 @@ public:
     //! Note, default add only data to DefaultAction kind of request.
     ControllerSpawnPtr spawnForRequest(RequestPtr);
     
+    //! this is used for a back propagation of request execution.
+    virtual void requestFinished(RequestPtr);
+    
     //! Well retrieve requested workflow.
     WorkflowPtr getWorkflow(const std::string &) const;
     
     //! register a workflow in this controller
     bool addWorkflow(WorkflowPtr);
+    
+    //! drop @a key workflow
+    void dropWorkflow(const std::string & key);
+};
+
+SHARED_PTR(TemporaryController);
+/**
+ This kind of specific controller will simply get the workflow from the request and store it temporarily.
+ */
+class TemporaryController : public Controller {
+public:
+    TemporaryController(uint32_t pool);
+    virtual ~TemporaryController();
+    
+    bool perform(RequestPtr) override;
+    void requestFinished(RequestPtr) override;
 };
 
 OSTREAM_HELPER_DECL(Controller);

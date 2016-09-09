@@ -2,6 +2,16 @@
 
 
 ErrorReport::ErrorReport(): Jsonable(), boost::enable_shared_from_this<ErrorReport>(){}
+
+ErrorReport::ErrorReport(const ErrorReport & ref) :
+    Jsonable(),
+target(ref.target),
+error_message(ref.error_message),
+error_key(ref.error_key),
+parent(ref.parent) {
+    
+}
+
 ErrorReport::ErrorReport(const Target & target, const std::string & error_key, const std::string & error_msg):
     Jsonable(),
     boost::enable_shared_from_this<ErrorReport>(),

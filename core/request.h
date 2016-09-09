@@ -43,6 +43,9 @@ class Request: public Jsonable {
     
     //! stores controller data.
     ControllerSpawnPtr spawn;
+    
+    //! stores workflow for temporary execution.
+    std::string workflow_json;
 public:
     Request();
     Request(const Target & target);
@@ -60,8 +63,11 @@ public:
     void setId(const boost::uuids::uuid & id);
     void setRequestId(const boost::uuids::uuid & id);
     
+    const std::string & getWorkflowJson() const;
+    void setWorkflowJson(const std::string & json);
+    
     void setErrorReport(ErrorReportPtr);
-    ErrorReportPtr getErrorReport() const ;
+    ErrorReportPtr getErrorReport() const;
     
     PropertySetPtr getBypass() const;
     PropertySetPtr getActionBypasses(int action_id);
