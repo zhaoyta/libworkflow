@@ -1,6 +1,9 @@
 #include <tools/property_set.h>
 #include <tools/property.h>
+#include <tools/logged.h>
 #include <core/context.h>
+
+
 
 PropertySet::PropertySet() : Context("PropertySet"), guarded(false) {
     setGuarded(false);
@@ -106,7 +109,8 @@ bool PropertySet::setBoolProperty(const std::string & key, const bool & value) {
         bool_values[key].value = value;
         return true;
     } else {
-        // Log: unable to set value of a guarded and undefined property.
+        GLOB_LOGGER("propertyset");
+        BOOST_LOG_SEV(logger, Error) << " Unable to set this new property" << key << " in a guarded propertyset";
         return false;
     }
 }
@@ -166,6 +170,8 @@ bool PropertySet::setDoubleProperty(const std::string & key, const double & valu
         return true;
     } else {
         // Log: unable to set value of a guarded and undefined property.
+        GLOB_LOGGER("propertyset");
+        BOOST_LOG_SEV(logger, Error) << " Unable to set this new property" << key << " in a guarded propertyset";
         return false;
     }
 }
@@ -224,6 +230,8 @@ bool PropertySet::setUintProperty(const std::string & key, const uint32_t & valu
         return true;
     } else {
         // Log: unable to set value of a guarded and undefined property.
+        GLOB_LOGGER("propertyset");
+        BOOST_LOG_SEV(logger, Error) << " Unable to set this new property" << key << " in a guarded propertyset";
         return false;
     }
 }
@@ -282,6 +290,8 @@ bool PropertySet::setStringProperty(const std::string & key, const std::string &
         return true;
     } else {
         // Log: unable to set value of a guarded and undefined property.
+        GLOB_LOGGER("propertyset");
+        BOOST_LOG_SEV(logger, Error) << " Unable to set this new property" << key << " in a guarded propertyset";
         return false;
     }
 }
@@ -341,6 +351,8 @@ bool PropertySet::setCustomProperty(const std::string & key, const ContextPtr & 
         return true;
     } else {
         // Log: unable to set value of a guarded and undefined property.
+        GLOB_LOGGER("propertyset");
+        BOOST_LOG_SEV(logger, Error) << " Unable to set this new property" << key << " in a guarded propertyset";
         return false;
     }
 }

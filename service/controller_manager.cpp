@@ -24,6 +24,9 @@ ControllerManagerPtr ControllerManager::getInstance() {
     return instance;
 }
 
+const std::map<std::string, ControllerPtr> & ControllerManager::getControllers() const {
+    return controllers;
+}
 
 ControllerPtr ControllerManager::getController(const std::string & ctrl) {
     boost::interprocess::scoped_lock<boost::recursive_mutex> sl(*mutex);

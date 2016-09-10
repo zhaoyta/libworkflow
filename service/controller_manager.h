@@ -26,6 +26,8 @@ public:
     
     void registerController(ControllerPtr);
     ControllerPtr getController(const std::string & = "default");
+    const std::map<std::string, ControllerPtr> & getControllers() const;
+
 protected:
     
     void started() override;

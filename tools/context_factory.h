@@ -19,6 +19,8 @@ public:
     
     static void registerContext(_ContextBuilder * cbuild);
     static ContextPtr create(const std::string & type);
+    static std::map<std::string, _ContextBuilder * > getBuilders();
+
 };
 
 class _ContextBuilder {

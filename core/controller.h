@@ -40,6 +40,8 @@ public:
     
     //! drop @a key workflow
     void dropWorkflow(const std::string & key);
+    
+    const std::map<std::string, WorkflowPtr> & getWorkflows() const;
 };
 
 SHARED_PTR(TemporaryController);

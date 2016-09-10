@@ -17,6 +17,7 @@ public:
     
     static void registerAction(_ActionBuilder *);
     static ActionPtr create(const std::string & name);
+    static std::map<std::string, _ActionBuilder *> getBuilders();
 };
 
 class _ActionBuilder {

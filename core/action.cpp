@@ -219,7 +219,9 @@ double Action::doubleProperty(SessionPtr session, const std::string & key, doubl
        return session->getBypass()->getDoubleProperty(key,def);
     if(propertyset->hasProperty(key))
        return propertyset->getDoubleProperty(key, def);
-       
+    
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
     return def;
 }
 
@@ -228,11 +230,13 @@ bool Action::boolProperty(SessionPtr session, const std::string & key, bool def)
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getBoolProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getBoolProperty(key,def);
-       if(propertyset->hasProperty(key))
-       return propertyset->getBoolProperty(key, def);
-       
-       return def;
+        return session->getBypass()->getBoolProperty(key,def);
+    if(propertyset->hasProperty(key))
+        return propertyset->getBoolProperty(key, def);
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
+    
+    return def;
 }
 
 std::string Action::stringProperty(SessionPtr session, const std::string & key, const std::string & def ) const {
@@ -240,11 +244,13 @@ std::string Action::stringProperty(SessionPtr session, const std::string & key, 
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getStringProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getStringProperty(key,def);
-       if(propertyset->hasProperty(key))
-       return propertyset->getStringProperty(key, def);
-       
-       return def;
+        return session->getBypass()->getStringProperty(key,def);
+    if(propertyset->hasProperty(key))
+        return propertyset->getStringProperty(key, def);
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
+    
+    return def;
 }
 
 uint32_t Action::uintProperty(SessionPtr session, const std::string & key, uint32_t def) const {
@@ -252,11 +258,13 @@ uint32_t Action::uintProperty(SessionPtr session, const std::string & key, uint3
     if(session->getBypass(getActionId())->hasProperty(key))
         return session->getBypass(getActionId())->getUintProperty(key, def);
     if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getUintProperty(key,def);
-       if(propertyset->hasProperty(key))
-       return propertyset->getUintProperty(key, def);
-       
-       return def;
+        return session->getBypass()->getUintProperty(key,def);
+    if(propertyset->hasProperty(key))
+        return propertyset->getUintProperty(key, def);
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
+    
+    return def;
 }
 
 ContextPtr Action::customProperty(SessionPtr session, const std::string & key, ContextPtr def) const {
@@ -267,6 +275,8 @@ ContextPtr Action::customProperty(SessionPtr session, const std::string & key, C
         return session->getBypass()->getCustomProperty(key,def);
     if(propertyset->hasProperty(key))
         return propertyset->getCustomProperty(key, def);
+    
+    BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
     
     return def;
 }
@@ -298,11 +308,20 @@ void Action::defineOutput(const PutDefinition & d) {
 }
 
 ContextPtr Action::getInput(SessionPtr session, const std::string & name) const {
-    return session->getInput(getActionId(), name);
+    if(inputs.count(name) > 0)
+        return session->getInput(getActionId(), name);
+    else {
+        BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Failed to fetch Input as it isn't defined in contract: " << name ;
+        return ContextPtr();
+    }
 }
 
 void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr ctx) const {
-    session->setOutput(getActionId(), name, ctx);
+    if(name.empty() or outputs.count(name) > 0) {
+        session->setOutput(getActionId(), name, ctx);
+    } else {
+        BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Failed to set Output as it isn't defined in contract: " << name << " for context: " << ctx->getType();
+    }
 }
 
 void Action::setOutput(SessionPtr session, const std::string & name, Context* ctx) const {

@@ -64,6 +64,9 @@ void Controller::requestFinished(RequestPtr) {
     
 }
 
+const std::map<std::string, WorkflowPtr> & Controller::getWorkflows() const {
+    return workflows;
+}
 
 TemporaryController::TemporaryController(uint32_t pool) : Controller("temporary", pool) {}
 TemporaryController::~TemporaryController() {

@@ -17,6 +17,11 @@ ActionPtr ActionFactory::create(const std::string & name) {
     return ActionPtr();
 }
 
+std::map<std::string, _ActionBuilder *> ActionFactory::getBuilders() {
+    return builders;
+}
+
+
 ActionPtr _ActionBuilder::create() {
     return ActionPtr();
 }

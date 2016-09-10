@@ -22,6 +22,10 @@ void ContextFactory::registerContext(_ContextBuilder * cbuild) {
 }
 
 
+std::map<std::string, _ContextBuilder * > ContextFactory::getBuilders() {
+    return builders;
+}
+
 ContextPtr ContextFactory::create(const std::string & type) {
     if(builders.count(type) > 0) {
         return builders[type]->create();
