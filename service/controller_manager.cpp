@@ -7,8 +7,8 @@
 
 static ControllerManagerPtr instance;
 
-ControllerManager::ControllerManager(uint32_t default_pool) :
-    ActiveObject("ControllerManager",3, true),
+ControllerManager::ControllerManager(uint32_t default_pool, bool delay) :
+    ActiveObject("ControllerManager",3, delay),
     default_pool(default_pool)
 {
     setNamespace("ctrl.mngr");
@@ -18,9 +18,9 @@ ControllerManager::ControllerManager(uint32_t default_pool) :
 }
 ControllerManager::~ControllerManager() {}
 
-ControllerManagerPtr ControllerManager::getInstance() {
+ControllerManagerPtr ControllerManager::getInstance(bool delay) {
     if(not instance)
-        instance.reset(new ControllerManager());
+        instance.reset(new ControllerManager(delay));
     return instance;
 }
 
@@ -71,11 +71,6 @@ void ControllerManager::perform(RequestPtr req) {
 }
 
 void ControllerManager::started() {
-    ClientManager::getInstance();
-    auto controller = ControllerPtr(new Controller("default", default_pool));
-    registerController(controller);
-    controller = ControllerPtr(new TemporaryController(default_pool));
-    registerController(controller);
 }
 
 void ControllerManager::stopped() {

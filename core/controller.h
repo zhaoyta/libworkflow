@@ -50,7 +50,7 @@ SHARED_PTR(TemporaryController);
  */
 class TemporaryController : public Controller {
 public:
-    TemporaryController(uint32_t pool);
+    TemporaryController(uint32_t pool, bool delayed_start);
     virtual ~TemporaryController();
     
     bool perform(RequestPtr) override;

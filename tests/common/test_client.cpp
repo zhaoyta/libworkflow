@@ -16,6 +16,8 @@
 
 #include <tests/common/contexts/some_context.h>
 
+#include <service/server.h>
+
 
 BEGIN_ENUM_IMPL(TestResult) {
     {"Succeed",(uint32_t)ETestResult::Success},
@@ -39,7 +41,7 @@ TestClientPtr test_client;
 
 
 TestClient::TestClient():
-    Actor("TestClient"),
+    Actor("TestClient", true) ,
 Logged("test.log"), global_result(ETestResult::None) {
     
 }
@@ -186,39 +188,31 @@ void TestClient::scheduleNextBatch() {
 
 
 
+boost::shared_ptr<Server> server;
+
 //! interrupt the service by TimeOut
 void terminateTO(const boost::system::error_code & ec);
 
-void delayedTermination(const boost::system::error_code & ec ) {
-    work.reset();
-}
-
-void terminateTest() {
+void delayedTermination(ActiveObjectPtr) {
     if(t) {
         t->stop();
         t.reset();
     }
     
-    GLOB_LOGGER("general");
-    BOOST_LOG_SEV(logger, Info) << " Shutting down !";
-    ControllerManager::getInstance()->terminate();
-    ClientManager::getInstance()->terminate();
-    
-    
-    t.reset(new Timed());
-    t->setIOService(service);
-    t->setDuration(1000);
-    t->setTimeoutFunction(&delayedTermination);
-    t->start();
+    work.reset();
+}
+
+void terminateTest() {
+    server->stopServer();
 }
 
 
 void terminateTO(const boost::system::error_code & ec ) {
     if(not ec) {
-        terminateTest();
+        server->stopServer();
     } else {
         GLOB_LOGGER("general");
-        BOOST_LOG_SEV(logger, Info) << " Unexpected call Oo ! " << ec.message();
+        BOOST_LOG_SEV(logger, Info) << " Aborting general timeout: " << ec.message();
     }
 }
 void setGlobalTimeout(double ms) {
@@ -230,12 +224,8 @@ void setGlobalTimeout(double ms) {
     t->start();
 }
 
-void delayed(ActiveObjectPtr) {
+void delayed() {
     GLOB_LOGGER("general");
-    BOOST_LOG_SEV(logger, Info) << " Setting up Tests  !";
-    
-    test_client.reset(new TestClient());
-    ClientManager::getInstance()->addClient(test_client);
     
     BOOST_LOG_SEV(logger, Info) << " Load JSON-ready Action and Contexts... ";
     ActionFactory::registerAction(new ActionBuilder<SomeProducer>());
@@ -253,9 +243,15 @@ int main(int argc, const char * argv[]) {
     Logged::loadConfiguration("");
     GLOB_LOGGER("general");
     BOOST_LOG_SEV(logger, Info) << " Test Starting !";
-    ControllerManager::getInstance()->setStartedFunction(&delayed);
-    ControllerManager::getInstance()->start();
+    setGlobalTimeout(60000);
     
+    test_client.reset(new TestClient());
+    
+    server.reset(new Server());
+    server->addActor(test_client);
+    server->setStoppedFunction(&delayedTermination);
+    server->setControllersStartedFunction(&delayed);
+    server->startServer();
     
     // keep alive.
     work.reset(new boost::asio::io_service::work(*service));

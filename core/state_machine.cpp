@@ -826,7 +826,9 @@ ErrorReport StateMachine::validate() const {
                     }
                     
                     auto inputs = actions.at(output.getToActionId())->getInputs();
-                    bool found = output.getToActionInput().empty() or inputs.count(output.getToActionInput()) > 0;
+                    bool found = output.getToActionInput().empty()
+                                 or output.getToActionId() == (int32_t) Step::Finish
+                                 or inputs.count(output.getToActionInput()) > 0;
                     if(not found)
                         str << output << " is invalid, targeted input doesn't exist" << std::endl;
                     else {

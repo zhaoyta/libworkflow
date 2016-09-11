@@ -17,10 +17,10 @@ class ControllerManager : public ActiveObject {
     std::map<std::string, ControllerPtr> controllers;
     uint32_t default_pool;
 public:
-    ControllerManager(uint32_t default_pool = 10);
+    ControllerManager(uint32_t default_pool = 10, bool delay = false);
     virtual ~ControllerManager();
     
-    static ControllerManagerPtr getInstance();
+    static ControllerManagerPtr getInstance(bool delay = false);
     
     void perform(RequestPtr);
     

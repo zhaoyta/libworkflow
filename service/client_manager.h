@@ -23,11 +23,11 @@ SHARED_PTR(Request);
 class ClientManager : public ActiveObject {
     std::map<boost::uuids::uuid, ClientPtr> clients;
     TimedPtr timer;
-    ClientManager();
+    ClientManager(bool delay = false);
 public:
     virtual ~ClientManager();
     //! Singleton :)
-    static ClientManagerPtr getInstance();
+    static ClientManagerPtr getInstance(bool delay = false);
     
     //! this request must be targeted to a specific client, try to find it and send him.
     bool perform(RequestPtr);

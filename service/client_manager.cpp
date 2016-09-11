@@ -8,8 +8,8 @@
 
 static ClientManagerPtr instance;
 
-ClientManager::ClientManager() :
-    ActiveObject("ClientManager"),
+ClientManager::ClientManager(bool delay) :
+    ActiveObject("ClientManager", 1, delay),
     Logged("clt.mgr"),
     timer(new Timed()){
     
@@ -19,9 +19,9 @@ ClientManager::~ClientManager() {
     clients.clear();
 }
 
-ClientManagerPtr ClientManager::getInstance() {
+ClientManagerPtr ClientManager::getInstance(bool delay) {
     if(not instance)
-        instance.reset(new ClientManager());
+        instance.reset(new ClientManager(delay));
     return instance;
 }
 
