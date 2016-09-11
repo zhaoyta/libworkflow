@@ -11,6 +11,8 @@
 #include <core/controller.h>
 #include <tools/property_set.h>
 
+
+
 /**
  
  Test 2 is a simple A->B->C workflow. 
@@ -38,13 +40,22 @@ void TestClient::prepareTest() {
     // registering it.
     ControllerManager::getInstance()->getController("default")->addWorkflow(workflow);
     
-    RequestPtr request(new Request(Target("test-2"), Target("test_result")));
+    RequestPtr request(new Request(Target("default", "test-2"), Target("test_result")));
     request->getTarget().workflow = "test-2";
     request->getBypass()->setStringProperty("log", "Some General Log");
     request->getActionBypasses(2)->setStringProperty("log", "Some Action Specific Log");
         
     expect(request, ETestResult::Success);
     publishRequest(request);
+    
+    std::string str;
+
+    workflow->str_save(str);
+    std::ofstream fs;
+    fs.open("test_2.json");
+    fs << str;
+    fs.flush();
+    fs.close();
 }
 
 

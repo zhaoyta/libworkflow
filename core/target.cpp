@@ -17,6 +17,7 @@ END_ENUM_IMPL(TargetAction);
 Target::Target() : Jsonable(),
     controller("default"),
     identifier(boost::uuids::random_generator()()),
+    client_id(boost::uuids::nil_generator()()),
     target(ETargetAction::DefaultAction),
     action(-1){}
 
@@ -31,7 +32,8 @@ action(-1){}
 Target::Target(const std::string & controller, const std::string & workflow) : Jsonable(),
     controller(controller),
     workflow(workflow),
-    identifier(boost::uuids::random_generator()()),
+identifier(boost::uuids::random_generator()()),
+client_id(boost::uuids::nil_generator()()),
     target(ETargetAction::DefaultAction),
     action(-1){}
 

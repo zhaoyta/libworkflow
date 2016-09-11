@@ -45,4 +45,13 @@ void TestClient::prepareTest() {
         
     expect(request, ETestResult::Failure);
     publishRequest(request);
+    
+    
+    std::string str;
+    workflow->str_save(str);
+    std::ofstream fs;
+    fs.open("test_5.json");
+    fs << str;
+    fs.flush();
+    fs.close();
 }

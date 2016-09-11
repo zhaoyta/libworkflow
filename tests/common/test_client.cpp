@@ -6,6 +6,17 @@
 #include <service/client_manager.h>
 #include <core/request.h>
 
+#include <tools/action_factory.h>
+#include <tools/context_factory.h>
+
+#include <tests/common/actions/some_actions.h>
+#include <tests/common/actions/do_next.h>
+#include <tests/common/actions/error.h>
+#include <tests/common/actions/print_log.h>
+
+#include <tests/common/contexts/some_context.h>
+
+
 BEGIN_ENUM_IMPL(TestResult) {
     {"Succeed",(uint32_t)ETestResult::Success},
     {"Failed",(uint32_t)ETestResult::Failure},
@@ -225,6 +236,15 @@ void delayed(ActiveObjectPtr) {
     
     test_client.reset(new TestClient());
     ClientManager::getInstance()->addClient(test_client);
+    
+    BOOST_LOG_SEV(logger, Info) << " Load JSON-ready Action and Contexts... ";
+    ActionFactory::registerAction(new ActionBuilder<SomeProducer>());
+    ActionFactory::registerAction(new ActionBuilder<SomeConsummer>());
+    ActionFactory::registerAction(new ActionBuilder<SomeAllowed>());
+    ActionFactory::registerAction(new ActionBuilder<ErrorAction>());
+    ActionFactory::registerAction(new ActionBuilder<DoNext>());
+    ActionFactory::registerAction(new ActionBuilder<PrintLog>());
+    ContextFactory::registerContext(new ContextBuilder<SomeContext>());
 }
 
 int main(int argc, const char * argv[]) {

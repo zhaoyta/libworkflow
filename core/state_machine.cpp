@@ -807,17 +807,26 @@ ErrorReport StateMachine::validate() const {
         for(const auto & output: kv.second) {
             if(actions.count(output.getFromActionId()) == 0) {
                 str << output << " is invalid, origin action doesn't exist" << std::endl;
-            } else if (actions.count(output.getToActionId()) == 0) {
+            } else if (actions.count(output.getToActionId()) ==  0
+                       and output.getToActionId() != (int32_t)Step::Die) {
                 str << output << " is invalid, targeted action doesn't exist" << std::endl;
             } else {
                 auto outputs = actions.at(output.getFromActionId())->getOutputs();
-                bool found = outputs.count(output.getFromActionOutput()) > 0;
+                
+                bool found = output.getFromActionOutput().empty() or outputs.count(output.getFromActionOutput()) > 0;
                 
                 if(not found)
                     str << output << " is invalid, origin output doesn't exist" << std::endl;
                 else {
+                    //! Die doesn't have any action, but that's okay :)
+                    if(output.getToActionId() == (int32_t)Step::Die) {
+                        unused_actions.erase(output.getToActionId());
+                        unused_actions.erase(output.getFromActionId());
+                        continue;
+                    }
+                    
                     auto inputs = actions.at(output.getToActionId())->getInputs();
-                    bool found = inputs.count(output.getToActionInput()) > 0;
+                    bool found = output.getToActionInput().empty() or inputs.count(output.getToActionInput()) > 0;
                     if(not found)
                         str << output << " is invalid, targeted input doesn't exist" << std::endl;
                     else {

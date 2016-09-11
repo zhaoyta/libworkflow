@@ -17,7 +17,8 @@ Workflow::Workflow(const std::string & name) :
     Logged("wkf"),
     stateMachine(new StateMachine()),
     mutex(new boost::recursive_mutex()),
-    name(name){
+    name(name),
+    timeout(60) {
     
     stateMachine->init();
     

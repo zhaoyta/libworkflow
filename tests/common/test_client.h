@@ -5,6 +5,9 @@
 #include <tools/timed.h>
 #include <tools/defines.h>
 
+#include <iostream>
+#include <fstream>
+
 BEGIN_ENUM_DECL(TestResult) {
     Success, //!< Test or Request met requirement
     Failure, //!< Test or request failed requirement
