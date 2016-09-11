@@ -3,8 +3,9 @@
 #include <service/client_manager.h>
 #include <core/controller.h>
 #include <service/actor.h>
+#include <boost/bind.hpp>
 
-Server::Server() : ActiveObject("Server", false), expected(0) {
+Server::Server() : ActiveObject("Server", 1,false), controllers_expected(0), clients_expected(0) {
     
 }
 
@@ -13,15 +14,15 @@ Server::~Server() {
 }
 
 void Server::addController(ControllerPtr ctr) {
-    expected++;
-    ctr->setStartedFunction(boost::bind(&Server::decreaseCounter, this));
+    controllers_expected++;
+    ctr->setStartedFunction(boost::bind(&Server::decreaseControllersCounter, this, _1));
     ctr->start();
     ControllerManager::getInstance()->registerController(ctr);
 }
 
 void Server::addActor(ActorPtr act) {
-    expected++;
-    act->setStartedFunction(boost::bind(&Server::decreaseCounter, this));
+    clients_expected++;
+    act->setStartedFunction(boost::bind(&Server::decreaseClientsCounter, this, _1));
     act->start();
     ClientManager::getInstance()->addClient(act);
 }
@@ -36,8 +37,12 @@ void Server::stopServer() {
     terminate();
 }
 
-void Server::setServerStartedFunction(const boost::function<void()> & fn) {
-    server_started = fn;
+void Server::setControllersStartedFunction(const boost::function<void()> & fn) {
+    controllers_started = fn;
+}
+
+void Server::setClientsStartedFunction(const boost::function<void()> & fn) {
+    clients_started = fn;
 }
 
 void Server::started() {
@@ -48,14 +53,24 @@ void Server::stopped() {
     
 }
 
-void Server::decreaseCounter(ActiveObjectPtr) {
+void Server::decreaseControllersCounter(ActiveObjectPtr) {
     getIOService()->dispatch([&]() {
-        if(expected > 0 ){
-            expected--;
-            if(expected == 0) {
-                server_started();
+        if(controllers_expected > 0 ){
+            controllers_expected--;
+            if(controllers_expected == 0) {
+                controllers_started();
             }
         }
     });
 }
 
+void Server::decreaseClientsCounter(ActiveObjectPtr) {
+    getIOService()->dispatch([&]() {
+        if(clients_expected > 0 ){
+            clients_expected--;
+            if(clients_expected == 0) {
+                clients_started();
+            }
+        }
+    });
+}

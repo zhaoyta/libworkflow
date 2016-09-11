@@ -17,8 +17,10 @@ SHARED_PTR(Actor);
  This is an helper to have things synchronized and ready. It also help to clear things up.
  */
 class Server : public ActiveObject {
-    boost::function<void()> server_started;
-    uint32_t expected;
+    boost::function<void()> controllers_started;
+    boost::function<void()> clients_started;
+    uint32_t controllers_expected;
+    uint32_t clients_expected;
 public:
     Server();
     virtual ~Server();
@@ -29,13 +31,15 @@ public:
     void startServer();
     void stopServer();
     
-    void setServerStartedFunction(const boost::function<void()> & );
+    void setControllersStartedFunction(const boost::function<void()> & );
+    void setClientsStartedFunction(const boost::function<void()> & );
     
 protected:
     void started() override;
     void stopped() override;
     
-    void decreaseCounter(ActiveObjectPtr);
+    void decreaseControllersCounter(ActiveObjectPtr);
+    void decreaseClientsCounter(ActiveObjectPtr);
 };
 
 #endif // __SERVER_H_
