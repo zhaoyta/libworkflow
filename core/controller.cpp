@@ -10,8 +10,8 @@
 #include <boost/uuid/uuid.hpp>
 #include <iostream>
 
-Controller::Controller(const std::string & name, uint32_t pool) :
-    ActiveObject(name, pool), Logged("ctrl"){
+Controller::Controller(const std::string & name, uint32_t pool, bool delay_start) :
+    ActiveObject(name, pool, delay_start), Logged("ctrl"){
     }
 
 Controller::~Controller() {

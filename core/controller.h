@@ -17,7 +17,7 @@ SHARED_PTR(Workflow);
 class Controller: public ActiveObject{
     std::map<std::string, WorkflowPtr> workflows;
 public:
-    Controller(const std::string & name, uint32_t pool);
+    Controller(const std::string & name, uint32_t pool, bool delay_start = false);
     virtual ~Controller();
     
     //! cast helper :)

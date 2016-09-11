@@ -17,7 +17,7 @@ class ErrorReport;
 class Actor: public Client, public ActiveObject {
     std::queue<RequestPtr> pending_requests;
 public:
-    Actor(const std::string & name);
+    Actor(const std::string & name, bool delay_start = false);
     virtual ~Actor();
     
     ActorPtr shared_from_this();

@@ -1,0 +1,197 @@
+{
+    "name": "test-2",
+    "timeout": "60",
+    "actions":
+    {
+        "-1020":
+        {
+            "name": "Next",
+            "action_id": "0",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values": "",
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        },
+        "-1015":
+        {
+            "name": "Next",
+            "action_id": "0",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values": "",
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        },
+        "-1010":
+        {
+            "name": "Next",
+            "action_id": "0",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values": "",
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        },
+        "0":
+        {
+            "name": "DoNext",
+            "action_id": "0",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values": "",
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        },
+        "1":
+        {
+            "name": "PrintLog",
+            "action_id": "1",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values":
+                {
+                    "log":
+                    {
+                        "key": "log",
+                        "value": "Default Message",
+                        "description": "Message to display",
+                        "exposed": "true"
+                    }
+                },
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        },
+        "2":
+        {
+            "name": "PrintLog",
+            "action_id": "2",
+            "properties":
+            {
+                "guarded": "true",
+                "uint_values": "",
+                "double_values": "",
+                "string_values":
+                {
+                    "log":
+                    {
+                        "key": "log",
+                        "value": "Default Message",
+                        "description": "Message to display",
+                        "exposed": "true"
+                    }
+                },
+                "bool_values": "",
+                "custom_values": ""
+            },
+            "inputs": "",
+            "outputs": ""
+        }
+    },
+    "outputs":
+    {
+        "-1020":
+        [
+            {
+                "from_action_id": "-1020",
+                "from_action_output": "",
+                "to_action_id": "-1666",
+                "to_action_input": ""
+            }
+        ],
+        "-1015":
+        [
+            {
+                "from_action_id": "-1015",
+                "from_action_output": "",
+                "to_action_id": "-1020",
+                "to_action_input": ""
+            }
+        ],
+        "-1010":
+        [
+            {
+                "from_action_id": "-1010",
+                "from_action_output": "",
+                "to_action_id": "-1020",
+                "to_action_input": ""
+            }
+        ],
+        "0":
+        [
+            {
+                "from_action_id": "0",
+                "from_action_output": "",
+                "to_action_id": "1",
+                "to_action_input": ""
+            }
+        ],
+        "1":
+        [
+            {
+                "from_action_id": "1",
+                "from_action_output": "",
+                "to_action_id": "2",
+                "to_action_input": ""
+            }
+        ],
+        "2":
+        [
+            {
+                "from_action_id": "2",
+                "from_action_output": "",
+                "to_action_id": "-1010",
+                "to_action_input": ""
+            }
+        ]
+    },
+    "inputs":
+    [
+        {
+            "workflow_input": "",
+            "action_id": "0",
+            "action_input": ""
+        }
+    ],
+    "exposed":
+    {
+        "1":
+        {
+            "log": "log"
+        },
+        "2":
+        {
+            "log": "log"
+        }
+    }
+}

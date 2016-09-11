@@ -3,7 +3,7 @@
 #include <core/request.h>
 #include <core/target.h>
 
-Actor::Actor(const std::string & name) : Client(), ActiveObject(name), Logged("actor"){
+Actor::Actor(const std::string & name, bool delay_start) : Client(), ActiveObject(name,1,delay_start), Logged("actor"){
 }
 
 Actor::~Actor() {}
