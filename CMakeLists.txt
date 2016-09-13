@@ -13,7 +13,7 @@ set(Boost_LIBRARY_DIR /usr/local/lib)
 FIND_PACKAGE( Boost 1.55 COMPONENTS system filesystem thread date_time timer serialization regex log iostreams chrono log_setup REQUIRED )
 INCLUDE_DIRECTORIES( ${Boost_INCLUDE_DIR} .)
 
-file(GLOB files core/*.cpp actions/*.cpp contexts/*.cpp tools/*.cpp service/*.cpp)
+file(GLOB_RECURSE files core/*.cpp actions/*.cpp contexts/*.cpp tools/*.cpp service/*.cpp)
 
 add_library(libworkflow ${files})
 TARGET_LINK_LIBRARIES(libworkflow ${Boost_LIBRARIES} )

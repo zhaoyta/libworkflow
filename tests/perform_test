@@ -1,0 +1,83 @@
+#!/usr/bin/ruby
+
+require 'erb'
+
+# This script will execute all tests
+# Gather logs and gdb output if necessary
+# And produce a nice HTML file showing all these informations. 
+# It'll also output a quick console output for test results.
+
+# per test layout.
+test = %{
+	<div style="width:200px;height:100px;float:left;">
+		<a href="#<%= @name %>"> <%= @name %> </a><br/>
+		<span> Result: <%= @result %> </span>
+	</div>
+}
+
+test_content = %{
+	<p>
+		<span id="<%= @name %>" <%= @name %> : <%= @result %> </span> <br/>
+		<pre>
+		<%= @log %>
+		</pre>
+		<br/>
+		<pre>
+		<%= @gdb_log %>
+		</pre>
+	</p>
+}
+
+# Provide complete layout.
+layout = %{
+	<html>
+		<body>
+		<h2> Test Results </h2>
+		<h3> <%= @date.strftime('%A, %d %B %Y') %> </h3>
+		<div style="width:800px" >
+			<% for @test in @tests %>
+				<%= @test.render_short() %>
+			<% end %>
+			<br style="clear: left"/>
+		</div>
+		<h2> Test Details </h2>
+			<% for @test in @tests %>
+				<%= @test.render_long() %>
+			<% end %>
+		</body>
+	</html>
+
+}
+
+class Test 
+	include ERB::Util
+  	attr_accessor :name, :result, :log, :gdb_log
+
+  	def initialize(dir,filename)  
+  		IO.popen("#{dir}/#{filename}", :err=>[:child, :out]) { |f|
+  			@log = f.read
+  		}
+
+  		@result = $?.to_i == 0 ? :success : :error
+
+  		p "Test: #{filename} #{@result}"
+  	end
+
+  	def render_shor() 
+
+  	end
+
+  	def render_long() 
+
+  	end
+end
+
+tests = []
+
+for file in Dir["test_*_test"] do
+	p "#{Dir.pwd}/#{file}: starting ..."
+	tests << Test.new(Dir.pwd,file)
+end
+
+
+
