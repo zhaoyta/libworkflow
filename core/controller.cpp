@@ -35,7 +35,7 @@ ControllerSpawnPtr Controller::spawnForRequest(RequestPtr) {
 }
 
 bool Controller::addWorkflow(WorkflowPtr workflow) {
-    BOOST_LOG_SEV(logger, Info) << getName() << " Add workflow : " << workflow << std::endl;
+    BOOST_LOG_SEV(logger, Info) << getName() << " Add workflow : " << workflow;
     // check first if workflow is "addable"
     
     auto er = workflow->getStateMachine()->validate();

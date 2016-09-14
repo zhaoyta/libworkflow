@@ -13,7 +13,7 @@ file(GLOB files *.cpp)
 
 foreach(f ${files})
 	get_filename_component(filename ${f} NAME_WE)
-	add_executable("${filename}_test" ${f} )
+	add_executable("${filename}" ${f} )
 	TARGET_LINK_LIBRARIES("${filename}_test" libworkflow)
 	TARGET_LINK_LIBRARIES("${filename}_test" test_common)
 endforeach()
