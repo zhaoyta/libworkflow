@@ -17,6 +17,8 @@ void Jsonable::str_save(std::string & str) const {
 }
 
 void Jsonable::str_load(const std::string & str) {
+    if(str.empty())
+        return;
     boost::property_tree::ptree root;
     std::stringstream ss(str);
     read_json(ss, root);

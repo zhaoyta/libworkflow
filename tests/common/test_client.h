@@ -62,6 +62,9 @@ protected:
     
     //! start request scheduler.
     void startScheduler();
+    
+    //! Abort the test :) ahah
+    void abortTest();
 private:
     //! called by timer, will perform all next scheduled requests.
     void startNextBatch();

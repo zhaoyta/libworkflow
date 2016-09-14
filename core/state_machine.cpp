@@ -721,12 +721,7 @@ void StateMachine::save(boost::property_tree::ptree & root) const {
     root.add_child("exposed", pexposed);
 }
 
-void StateMachine::load(const boost::property_tree::ptree & root) {
-    actions.clear();
-    outputs.clear();
-    starters.clear();
-    exposed_properties.clear();
-    
+void StateMachine::load(const boost::property_tree::ptree & root) {    
     auto cactions = root.get_child_optional("actions");
     if(cactions) {
         for(const auto & kv: *cactions) {

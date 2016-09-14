@@ -125,7 +125,11 @@ void TestClient::newRequestReceived() {
     }
 }
 
-
+void TestClient::abortTest() {
+    main_return_value = 1;
+    BOOST_LOG_SEV(logger, Error) << " Test Failed !";
+    ::service->post(&terminateTest);
+}
 
 void TestClient::expect(RequestPtr req, ETestResult expected_res) {
     expected_results[req->getRequestId()] = expected_res;

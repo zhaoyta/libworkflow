@@ -7,6 +7,8 @@
 #include <core/state_machine.h>
 #include <core/bindings.h>
 #include <actions/tools/fetch_refs.h>
+#include <tools/action_factory.h>
+#include <core/action.h>
 
 Server::Server() : ActiveObject("Server", 1,false), controllers_expected(0), clients_expected(0), default_pool(5), clients_done(false), controllers_done(false) {
     
@@ -124,6 +126,8 @@ void Server::defaultPostControllersActions() {
     });
     sm->addInput(InputBinding("", 0, ""));
     ControllerManager::getInstance()->getController()->addWorkflow(workflow);
+    
+    ActionFactory::registerAction(new ActionBuilder<DefaultNextAction>());
 }
 
 void Server::defaultPostClientsActions() {
