@@ -86,7 +86,7 @@ class Tests
 
 		}
 		@tests = []
-		for file in Dir["test_*"] do
+		for file in Dir["bin/test_*"] do
 			p "#{Dir.pwd}/#{file}: starting ..."
 			@tests << Test.new(Dir.pwd,file)
 		end
@@ -97,7 +97,10 @@ class Tests
   	end
 end
 
-File.open("#{Dir.pwd}/test.html",'w') { |f| 
+Dir.mkdir("jsons") unless Dir.exist?("jsons");
+Dir.mkdir("html") unless Dir.exist?("html");
+
+File.open("#{Dir.pwd}/html/test.html",'w') { |f| 
 	t = Tests.new()
 	f.write t.render
 }

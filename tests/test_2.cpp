@@ -52,7 +52,7 @@ void TestClient::prepareTest() {
 
     workflow->str_save(str);
     std::ofstream fs;
-    fs.open("test_2.json");
+    fs.open("jsons/test_2.json");
     fs << str;
     fs.flush();
     fs.close();
