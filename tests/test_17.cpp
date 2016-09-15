@@ -34,6 +34,8 @@ void TestClient::prepareTest() {
     }
     
     WorkflowPtr wkf(new Workflow("loading..."));
+
+    
     wkf->str_load(json);
     auto err = wkf->getStateMachine()->validate();
     if(err.isSet()) {

@@ -86,6 +86,8 @@ public:
     
     void setName(const std::string & name);
     std::string getName() const;
+    
+    ControllerWPtr getController() const;
 
 protected:
     //! check whether a request can be executed or not.

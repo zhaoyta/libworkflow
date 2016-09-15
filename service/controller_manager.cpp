@@ -55,6 +55,7 @@ void ControllerManager::perform(RequestPtr req) {
         bool able = false;
         if(not req->getWorkflowJson().empty()) {
             able = controllers["temporary"]->perform(req);
+            return;
         }
         
         

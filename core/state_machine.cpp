@@ -12,6 +12,7 @@
 #include <core/put_definition.h>
 #include <tools/action_factory.h>
 #include <tools/property.h>
+#include <core/controller.h>
 
 
 StateMachine::StateMachine() : Jsonable(), Logged("wkf.sm"), boost::enable_shared_from_this<StateMachine>() {
@@ -366,8 +367,12 @@ bool StateMachine::replyReceived(SessionPtr session, RequestPtr request) {
 }
 
 bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
-    if(action_id == (int32_t) Step::Die)
+    if(action_id == (int32_t) Step::Die) {
+        auto wkf = getWorkflow().lock();
+        auto ctrl = wkf->getController().lock();
+        ctrl->requestFinished(session->getOriginalRequest());
         return true;
+    }
     
     if(action_id == -1) {
         //! @todo add log, no action found.

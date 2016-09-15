@@ -18,7 +18,7 @@ public:
     //! store content of this class to a json string.
     void str_save(std::string &) const;
     //! load the content of this class from a json string
-    void str_load(const std::string &);
+    bool str_load(const std::string &);
     
     //! this does the actual class to ptree conversion
     virtual void save(boost::property_tree::ptree & root) const =0;

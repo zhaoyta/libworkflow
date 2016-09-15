@@ -6,7 +6,7 @@
 #include <iomanip>
 #include <boost/uuid/string_generator.hpp>
 
-Request::Request(): Jsonable(), context( new GroupedCtx()){
+Request::Request(): Jsonable(), context( new GroupedCtx()), bypass(new PropertySet()){
     reply.target = ETargetAction::NoReply;
     target.target = ETargetAction::NoReply;
 }
@@ -132,9 +132,10 @@ void Request::save(boost::property_tree::ptree & root) const {
     
     root.add_child("action_bypasses", cmap);
     
-    PUT_CHILD(root, (*report), "error_report");
-    // ignore controller spawn, that's set by controller upon execution.
+    if(report)
+        PUT_CHILD(root, (*report), "error_report");
     
+    // ignore controller spawn, that's set by controller upon execution.
     root.put("workflow_json", workflow_json);
 }
 

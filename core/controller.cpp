@@ -74,6 +74,12 @@ TemporaryController::~TemporaryController() {
 
 bool TemporaryController::perform(RequestPtr req) {
     if(req->getWorkflowJson().empty()) {
+        // either it's a reply, or it's an error.
+        
+        if(req->getTarget().target == ETargetAction::Reply) {
+            return Controller::perform(req);
+        }
+        
         BOOST_LOG_SEV(logger, Error) << req->logRequest() << getName() << " controller can't execute this request, as it doesn't provide a workflow.";
         
         auto reply = Request::createReply(req);
@@ -96,16 +102,22 @@ bool TemporaryController::perform(RequestPtr req) {
     
     auto wkf_prefix = shortId(boost::uuids::random_generator()(), 3);
     wkf->setName(wkf_prefix + wkf->getName());
-    req->getTarget().workflow = wkf_prefix + wkf->getName();
+    req->getTarget().workflow = wkf->getName();
+    req->getTarget().controller = "temporary";
     addWorkflow(wkf);
-    BOOST_LOG_SEV(logger, Trace) << req->logRequest() << getName() << " adding temporary workflow: " << req->getReply().workflow;
+    BOOST_LOG_SEV(logger, Trace) << req->logRequest() << getName() << " adding temporary workflow: " << wkf->getName();
     
-    return true;
+    auto res = Controller::perform(req);
+    if(not res) {
+        BOOST_LOG_SEV(logger, Warn) << req->logRequest() << getName() << " " << wkf->getName() << " Failed to perform request.";
+    }
+    
+    return res;
 }
 
 void TemporaryController::requestFinished(RequestPtr req) {
-    dropWorkflow(req->getReply().workflow);
-    BOOST_LOG_SEV(logger, Trace) << req->logRequest() << getName() << " dropping temporary workflow: " << req->getReply().workflow;
+    dropWorkflow(req->getTarget().workflow);
+    BOOST_LOG_SEV(logger, Trace) << req->logRequest() << getName() << " dropping temporary workflow: " << req->getTarget().workflow;
 }
 
 

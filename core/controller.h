@@ -27,7 +27,7 @@ public:
 
     //! by default simply add an empty struct, but can be used to add some meta data.
     //! Note, default add only data to DefaultAction kind of request.
-    ControllerSpawnPtr spawnForRequest(RequestPtr);
+    virtual ControllerSpawnPtr spawnForRequest(RequestPtr);
     
     //! this is used for a back propagation of request execution.
     virtual void requestFinished(RequestPtr);

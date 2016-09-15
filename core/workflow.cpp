@@ -194,6 +194,10 @@ std::string Workflow::getName() const {
     return name;
 }
 
+ControllerWPtr Workflow::getController() const {
+    return controller;
+}
+
 void Workflow::save(boost::property_tree::ptree & root) const {
     root.put("name", name);
     root.put("timeout", timeout);
