@@ -33,18 +33,36 @@ void TestClient::prepareTest() {
     auto ctx = new SomeContext();
     ctx->some_value = 42;
     request->setContext("some_data", ctx);
-        
+    
+    
+    std::string str;
+    
+    workflow->str_save(str);
+    {
+        std::ofstream fs;
+        fs.open("jsons/test_7.json");
+        fs << str;
+        fs.flush();
+        fs.close();
+    }
+    
+    request->setWorkflowJson(str);
+    request->str_save(str);
+    {
+        std::ofstream fs;
+        fs.open("jsons/request_7.json");
+        fs << str;
+        fs.flush();
+        fs.close();
+    }
+    request->setWorkflowJson("");
+    
     expect(request, ETestResult::Success);
     publishRequest(request);
     
     
-    std::string str;
-    workflow->str_save(str);
-    std::ofstream fs;
-    fs.open("jsons/test_7.json");
-    fs << str;
-    fs.flush();
-    fs.close();
+    
+    
 }
 
 

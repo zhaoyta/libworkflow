@@ -51,11 +51,25 @@ void TestClient::prepareTest() {
     std::string str;
 
     workflow->str_save(str);
+    {
     std::ofstream fs;
     fs.open("jsons/test_2.json");
     fs << str;
     fs.flush();
     fs.close();
+    }
+    
+    request->setWorkflowJson(str);
+    request->str_save(str);
+    {
+        std::ofstream fs;
+        fs.open("jsons/request_2.json");
+        fs << str;
+        fs.flush();
+        fs.close();
+    }
+    request->setWorkflowJson("");
+    
 }
 
 

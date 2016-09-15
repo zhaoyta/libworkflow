@@ -15,12 +15,25 @@
 #include <core/put_definition.h>
 
 /**
- Test 19
+ Test 19: Start a new Workflow, and provide a context as well, the whole from a simple request.
  */
 void TestClient::prepareTest() {
     RequestPtr request(new Request());
+    std::string json;
+    
+    {
+        std::ifstream t("jsons/request_7.json");
+        
+        t.seekg(0, std::ios::end);
+        json.reserve(t.tellg());
+        t.seekg(0, std::ios::beg);
+        
+        json.assign((std::istreambuf_iterator<char>(t)),
+                    std::istreambuf_iterator<char>());
+    }
+    
+    request->str_load(json);
     
     expect(request, ETestResult::Success);
-    publishRequest(request);
-}
+    publishRequest(request);}
 

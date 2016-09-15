@@ -104,6 +104,14 @@ std::map<std::string, ContextPtr> & GroupedCtx::getContexts() {
 
 void GroupedCtx::save(boost::property_tree::ptree & root) const {
     Context::save(root);
+    
+    boost::property_tree::ptree pitems;
+    for(const auto & kv: contexts) {
+        boost::property_tree::ptree pitem;
+        kv.second->save(pitem);
+        pitems.add_child(kv.first, pitem);
+    }
+    root.add_child("items", pitems);
 }
 
 void GroupedCtx::load(const boost::property_tree::ptree & root) {
