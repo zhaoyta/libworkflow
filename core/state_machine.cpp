@@ -721,34 +721,44 @@ void StateMachine::save(boost::property_tree::ptree & root) const {
     root.add_child("exposed", pexposed);
 }
 
-void StateMachine::load(const boost::property_tree::ptree & root) {    
-    auto cactions = root.get_child_optional("actions");
-    if(cactions) {
-        for(const auto & kv: *cactions) {
-            std::string type;
-            GET_OPT(kv.second, type, std::string, "name");
-            // generate a new Action.
-            ActionPtr act = ActionFactory::create(type);
-            if(act) {
-                act->load(kv.second);
-                actions[act->getActionId()] = act;
-            } else {
-                BOOST_LOG_SEV(logger, Error) << " Failed to find appropriate Action for type: " << type;
-            }
-        }
-    }
-    
+void StateMachine::load(const boost::property_tree::ptree & root) {
     auto coutputs = root.get_child_optional("outputs");
+    std::map<int32_t, std::vector<OutputBinding> > toutputs;
     if(coutputs) {
         for(const auto & kv : *coutputs) {
             int32_t cid;
             std::stringstream str(kv.first.data());
             str >> cid;
-            
             for(const auto & kvout: kv.second) {
                 OutputBinding ob;
                 ob.load(kvout.second);
-                outputs[cid].push_back(ob);
+                toutputs[cid].push_back(ob);
+            }
+        }
+    }
+    
+    auto cactions = root.get_child_optional("actions");
+    if(cactions) {
+        for(const auto & kv: *cactions) {
+            std::string type;
+            GET_OPT(kv.second, type, std::string, "name");
+            int32_t aid;
+            std::stringstream str(kv.first.data());
+            str >> aid;
+            
+            // generate a new Action.
+            ActionPtr act = ActionFactory::create(type);
+            
+            if(act) {
+                act->load(kv.second);
+                addAction(aid, act, toutputs[aid]);
+                std::stringstream str;
+                for(const auto & out: toutputs[aid])
+                    str << out << ", ";
+                
+                BOOST_LOG_SEV(logger, Trace) << " Built action: " << type <<", action id: " << act->getActionId() << ", action: " << act->logAction() << ": " << str.str();
+            } else {
+                BOOST_LOG_SEV(logger, Error) << " Failed to find appropriate Action for type: " << type;
             }
         }
     }
@@ -764,6 +774,7 @@ void StateMachine::load(const boost::property_tree::ptree & root) {
     
     auto cexposed = root.get_child_optional("exposed");
     if(cexposed) {
+        exposed_properties.clear();
         for(const auto & kv: *cexposed) {
             std::stringstream str(kv.first.data());
             int32_t action_id;

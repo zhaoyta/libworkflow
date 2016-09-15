@@ -33,8 +33,6 @@ void TestClient::prepareTest() {
                    std::istreambuf_iterator<char>());
     }
     
-    BOOST_LOG_SEV(logger, Trace) << " Loaded: " << json;
-    
     WorkflowPtr wkf(new Workflow("loading..."));
     wkf->str_load(json);
     auto err = wkf->getStateMachine()->validate();

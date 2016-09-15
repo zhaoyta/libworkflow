@@ -133,7 +133,7 @@ void OutputBinding::load(const boost::property_tree::ptree & root) {
 
 OSTREAM_HELPER_IMPL(OutputBinding, obj) {
     out << "[Output] { "
-    << ", from_action_id: " << obj.getFromActionId()
+    << "from_action_id: " << obj.getFromActionId()
     << ", from_action_output: " << obj.getFromActionOutput()
     << ", to_action_id: " << obj.getToActionId()
     << ", to_action_input: " << obj.getToActionInput()
