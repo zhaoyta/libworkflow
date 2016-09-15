@@ -8,6 +8,7 @@
 SHARED_PTR(Context);
 /**
  Stores data for Actions usage.
+ Note: Dont forget to call Context::save(root) when overriding save ... otherwise json load wouldn't work. 
  */
 class Context : public Jsonable {
     const std::string type;
