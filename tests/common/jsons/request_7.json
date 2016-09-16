@@ -1,0 +1,46 @@
+{
+    "target":
+    {
+        "controller": "default",
+        "workflow": "test-7",
+        "identifier": "e9ca0551-0b1b-437c-9d35-028a8724c3ea",
+        "client_id": "00000000-0000-0000-0000-000000000000",
+        "execution_level": "8411920",
+        "action_id": "-1",
+        "target": "DefaultAction"
+    },
+    "reply":
+    {
+        "controller": "default",
+        "workflow": "test_result",
+        "identifier": "139435fe-d87c-4af3-9975-a8c39d28288a",
+        "client_id": "00000000-0000-0000-0000-000000000000",
+        "execution_level": "752329",
+        "action_id": "-1",
+        "target": "DefaultAction"
+    },
+    "request_id": "e9ca0551-0b1b-437c-9d35-028a8724c3ea",
+    "context":
+    {
+        "type": "GroupedCtx",
+        "items":
+        {
+            "some_data":
+            {
+                "type": "SomeContext",
+                "some_value": "42"
+            }
+        }
+    },
+    "bypass":
+    {
+        "guarded": "false",
+        "uint_values": "",
+        "double_values": "",
+        "string_values": "",
+        "bool_values": "",
+        "custom_values": ""
+    },
+    "action_bypasses": "",
+    "workflow_json": "{\n    \"name\": \"test-7\",\n    \"timeout\": \"60\",\n    \"actions\":\n    {\n        \"-1020\":\n        {\n            \"name\": \"Next\",\n            \"action_id\": \"0\",\n            \"properties\":\n            {\n                \"guarded\": \"true\",\n                \"uint_values\": \"\",\n                \"double_values\": \"\",\n                \"string_values\": \"\",\n                \"bool_values\": \"\",\n                \"custom_values\": \"\"\n            },\n            \"inputs\": \"\",\n            \"outputs\": \"\"\n        },\n        \"-1015\":\n        {\n            \"name\": \"Next\",\n            \"action_id\": \"0\",\n            \"properties\":\n            {\n                \"guarded\": \"true\",\n                \"uint_values\": \"\",\n                \"double_values\": \"\",\n                \"string_values\": \"\",\n                \"bool_values\": \"\",\n                \"custom_values\": \"\"\n            },\n            \"inputs\": \"\",\n            \"outputs\": \"\"\n        },\n        \"-1010\":\n        {\n            \"name\": \"Next\",\n            \"action_id\": \"0\",\n            \"properties\":\n            {\n                \"guarded\": \"true\",\n                \"uint_values\": \"\",\n                \"double_values\": \"\",\n                \"string_values\": \"\",\n                \"bool_values\": \"\",\n                \"custom_values\": \"\"\n            },\n            \"inputs\": \"\",\n            \"outputs\": \"\"\n        },\n        \"0\":\n        {\n            \"name\": \"SomeConsummer\",\n            \"action_id\": \"0\",\n            \"properties\":\n            {\n                \"guarded\": \"true\",\n                \"uint_values\": \"\",\n                \"double_values\": \"\",\n                \"string_values\": \"\",\n                \"bool_values\": \"\",\n                \"custom_values\": \"\"\n            },\n            \"inputs\":\n            [\n                {\n                    \"name\": \"some_data\",\n                    \"description\": \"\",\n                    \"type\": \"SomeContext\",\n                    \"mandatory\": \"true\",\n                    \"ignoreEmpty\": \"false\",\n                    \"allowSkip\": \"false\"\n                }\n            ],\n            \"outputs\": \"\"\n        }\n    },\n    \"outputs\":\n    {\n        \"-1020\":\n        [\n            {\n                \"from_action_id\": \"-1020\",\n                \"from_action_output\": \"\",\n                \"to_action_id\": \"-1666\",\n                \"to_action_input\": \"\"\n            }\n        ],\n        \"-1015\":\n        [\n            {\n                \"from_action_id\": \"-1015\",\n                \"from_action_output\": \"\",\n                \"to_action_id\": \"-1020\",\n                \"to_action_input\": \"\"\n            }\n        ],\n        \"-1010\":\n        [\n            {\n                \"from_action_id\": \"-1010\",\n                \"from_action_output\": \"\",\n                \"to_action_id\": \"-1020\",\n                \"to_action_input\": \"\"\n            }\n        ],\n        \"0\":\n        [\n            {\n                \"from_action_id\": \"0\",\n                \"from_action_output\": \"\",\n                \"to_action_id\": \"-1010\",\n                \"to_action_input\": \"\"\n            }\n        ]\n    },\n    \"inputs\":\n    [\n        {\n            \"workflow_input\": \"some_data\",\n            \"action_id\": \"0\",\n            \"action_input\": \"some_data\"\n        }\n    ],\n    \"exposed\": \"\"\n}\n"
+}
