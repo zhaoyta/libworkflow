@@ -198,7 +198,7 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
     r.action_id = getActionId();
     r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
-
+    
     getStateMachine().lock()->actionAsyncFinished(session, r);
 }
 
@@ -206,19 +206,23 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
 std::string Action::fingerprint(SessionPtr session) const {
     std::stringstream str;
     auto sm = getStateMachine().lock();
-    str << sm->fingerprint(session) << logAction() ;
+    if(session)
+        str << sm->fingerprint(session) << logAction() ;
+    else
+        str << logAction();
     return str.str();
 }
 
 double Action::doubleProperty(SessionPtr session, const std::string & key, double def) const {
     // well def config is Session(byAction) > Session > Action
-    
-    if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getDoubleProperty(key, def);
-    if(session->getBypass()->hasProperty(key))
-       return session->getBypass()->getDoubleProperty(key,def);
+    if(session) {
+        if(session->getBypass(getActionId())->hasProperty(key))
+            return session->getBypass(getActionId())->getDoubleProperty(key, def);
+        if(session->getBypass()->hasProperty(key))
+            return session->getBypass()->getDoubleProperty(key,def);
+    }
     if(propertyset->hasProperty(key))
-       return propertyset->getDoubleProperty(key, def);
+        return propertyset->getDoubleProperty(key, def);
     
     
     BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Seeking an unknown property: " << key;
@@ -226,11 +230,12 @@ double Action::doubleProperty(SessionPtr session, const std::string & key, doubl
 }
 
 bool Action::boolProperty(SessionPtr session, const std::string & key, bool def) const {
-    
-    if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getBoolProperty(key, def);
-    if(session->getBypass()->hasProperty(key))
-        return session->getBypass()->getBoolProperty(key,def);
+    if(session) {
+        if(session->getBypass(getActionId())->hasProperty(key))
+            return session->getBypass(getActionId())->getBoolProperty(key, def);
+        if(session->getBypass()->hasProperty(key))
+            return session->getBypass()->getBoolProperty(key,def);
+    }
     if(propertyset->hasProperty(key))
         return propertyset->getBoolProperty(key, def);
     
@@ -240,11 +245,12 @@ bool Action::boolProperty(SessionPtr session, const std::string & key, bool def)
 }
 
 std::string Action::stringProperty(SessionPtr session, const std::string & key, const std::string & def ) const {
-    
-    if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getStringProperty(key, def);
-    if(session->getBypass()->hasProperty(key))
-        return session->getBypass()->getStringProperty(key,def);
+    if(session) {
+        if(session->getBypass(getActionId())->hasProperty(key))
+            return session->getBypass(getActionId())->getStringProperty(key, def);
+        if(session->getBypass()->hasProperty(key))
+            return session->getBypass()->getStringProperty(key,def);
+    }
     if(propertyset->hasProperty(key))
         return propertyset->getStringProperty(key, def);
     
@@ -254,11 +260,12 @@ std::string Action::stringProperty(SessionPtr session, const std::string & key, 
 }
 
 uint32_t Action::uintProperty(SessionPtr session, const std::string & key, uint32_t def) const {
-    
-    if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getUintProperty(key, def);
-    if(session->getBypass()->hasProperty(key))
-        return session->getBypass()->getUintProperty(key,def);
+    if(session) {
+        if(session->getBypass(getActionId())->hasProperty(key))
+            return session->getBypass(getActionId())->getUintProperty(key, def);
+        if(session->getBypass()->hasProperty(key))
+            return session->getBypass()->getUintProperty(key,def);
+    }
     if(propertyset->hasProperty(key))
         return propertyset->getUintProperty(key, def);
     
@@ -268,11 +275,12 @@ uint32_t Action::uintProperty(SessionPtr session, const std::string & key, uint3
 }
 
 ContextPtr Action::customProperty(SessionPtr session, const std::string & key, ContextPtr def) const {
-    
-    if(session->getBypass(getActionId())->hasProperty(key))
-        return session->getBypass(getActionId())->getCustomProperty(key, def);
-    if(session->getBypass()->hasProperty(key))
-        return session->getBypass()->getCustomProperty(key,def);
+    if(session) {
+        if(session->getBypass(getActionId())->hasProperty(key))
+            return session->getBypass(getActionId())->getCustomProperty(key, def);
+        if(session->getBypass()->hasProperty(key))
+            return session->getBypass()->getCustomProperty(key,def);
+    }
     if(propertyset->hasProperty(key))
         return propertyset->getCustomProperty(key, def);
     
@@ -326,6 +334,38 @@ void Action::setOutput(SessionPtr session, const std::string & name, ContextPtr 
 
 void Action::setOutput(SessionPtr session, const std::string & name, Context* ctx) const {
     setOutput(session, name, ContextPtr(ctx));
+}
+
+ErrorReport Action::expectInput(const std::string & key) const {
+    ErrorReport er;
+    if(inputs.count(key) > 0)
+        return er;
+    if(key.empty())
+        return er;
+    std::stringstream str;
+    str << key << " is invalid, targeted input doesn't exist";
+    er.setError("action.unexpected.input", str.str());
+    return er;
+}
+
+ErrorReport Action::expectOutput(const std::string & key) const {
+    ErrorReport er;
+    if(outputs.count(key) > 0)
+        return er;
+    if(key.empty())
+        return er;
+    std::stringstream str;
+    str << key << " is invalid, targeted output doesn't exist";
+    er.setError("action.unexpected.output", str.str());
+    return er;
+}
+
+void Action::clearInputs() {
+    inputs.clear();
+}
+
+void Action::clearOutputs() {
+    outputs.clear();
 }
 
 const std::map<std::string, PutDefinition> & Action::getInputs() const {

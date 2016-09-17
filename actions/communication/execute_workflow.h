@@ -29,6 +29,16 @@ public:
     bool canHandleError(SessionPtr) const override;
     
     
+    
+    //! will check whether provided input is expected or not.
+    //! This is a validation check (and not an actual on the spot check )
+    ErrorReport expectInput(const std::string &) const override;
+    
+    //! will check whether provided output is expected or not.
+    //! This is a validation check (and not an actual on the spot check )
+    ErrorReport expectOutput(const std::string &) const override;
+    
+    
     bool checkInputs(SessionPtr, ErrorReport &) const override;
     
     //! this will ensure we're expecting what is expected, due to current selection of controller and workflow.

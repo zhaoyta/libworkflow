@@ -15,7 +15,6 @@ ExecuteWorkflow::ExecuteWorkflow() : Action("ExecuteWorkflow") {
     properties()->defineStringProperty("workflow", "", "Targeted Workflow");
     PropertySetPtr ps(new PropertySet());
     properties()->defineCustomProperty("customization", ps, "Will be provided as general customization to the request");
-    
     properties()->defineBoolProperty("sync", true, " Tell whether the call should be synchroneous, or not.");
     properties()->defineBoolProperty("allow_error", false, "When set to true, if targeted sync workflow fails, this one won't fail.");
     prepared = false;
@@ -24,10 +23,9 @@ ExecuteWorkflow::ExecuteWorkflow() : Action("ExecuteWorkflow") {
 ExecuteWorkflow::ExecuteWorkflow(const std::string & controller, const std::string & workflow) : Action("ExecuteWorkflow") {
     properties()->defineBoolProperty("dynamic", false, "If set to true, will refresh inputs/outputs expectations and property transfert upon checkInputs.");
     properties()->defineStringProperty("controller", controller, "Targeted controller");
-    properties()->defineStringProperty("workflow", "", workflow);
+    properties()->defineStringProperty("workflow", workflow, "Targeted workflow");
     PropertySetPtr ps(new PropertySet());
     properties()->defineCustomProperty("customization", ps, "Will be provided as general customization to the request");
-    
     properties()->defineBoolProperty("sync", true, " Tell whether the call should be synchroneous, or not.");
     properties()->defineBoolProperty("allow_error", false, "When set to true, if targeted sync workflow fails, this one won't fail.");
     
@@ -71,7 +69,7 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
     auto controller = stringProperty(session, "controller");
     auto workflow = stringProperty(session, "workflow");
     
-    if(prepared and boolProperty(session, "dynamic")) {
+    if(prepared and session and boolProperty(session, "dynamic")) {
         prepared = session->getBypass(getActionId())->getStringProperty("__local_workflow") == workflow and
         session->getBypass(getActionId())->getStringProperty("__local_controller") == controller;
     }
@@ -106,8 +104,11 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
     for(const auto & start: starters) {
         if(getInputs().count(start.getWorkflowInput()) == 0) {
             auto act = actions.at(start.getActionId());
-            auto input = act->getInputs().at(start.getActionInput());
-            defineInput(input);
+            if(not start.getActionInput().empty()) {
+                auto input = act->getInputs().at(start.getActionInput());
+                defineInput(input);
+            }
+            
         } else {
             // we need to ensure we've got the strictess of inputs.
             auto act = actions.at(start.getActionId());
@@ -143,7 +144,6 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
     }
     
     // State machine should hold what is exposed or not. ask it for a nice list and set it here.
-    properties()->clear();
     
     for(const auto & kv : exposed) {
         auto aid = kv.first;
@@ -177,8 +177,46 @@ bool ExecuteWorkflow::prepare(SessionPtr session) {
         }
     }
     
-    session->getBypass(getActionId())->setStringProperty("__local_workflow",workflow);
-    session->getBypass(getActionId())->setStringProperty("__local_controller",controller);
+    if(session) {
+        session->getBypass(getActionId())->setStringProperty("__local_workflow",workflow);
+        session->getBypass(getActionId())->setStringProperty("__local_controller",controller);
+    }
     prepared = true;
     return true;
 }
+
+
+ErrorReport ExecuteWorkflow::expectInput(const std::string & key) const {
+    ErrorReport er;
+    if(not prepared){
+        bool res = const_cast<ExecuteWorkflow*>(this)->prepare(SessionPtr());
+        if(not res) {
+            er.setError("execute.unknown.workflow", "Can't execute this action, as requested workflow to execute is unknown");
+            return er;
+        }
+    }
+    
+    if(boolProperty(SessionPtr(),"dynamic")) {
+        return er;
+    }
+    
+    return Action::expectInput(key);
+}
+
+ErrorReport ExecuteWorkflow::expectOutput(const std::string & key) const {
+    ErrorReport er;
+    if(not prepared){
+        bool res = const_cast<ExecuteWorkflow*>(this)->prepare(SessionPtr());
+        if(not res) {
+            er.setError("execute.unknown.workflow", "Can't execute this action, as requested workflow to execute is unknown");
+            return er;
+        }
+    }
+    
+    if(boolProperty(SessionPtr(),"dynamic")) {
+        return er;
+    }
+    
+    return Action::expectOutput(key);
+}
+

@@ -96,6 +96,14 @@ public:
     std::map<std::string,PutDefinition> & getInputs() ;
     std::map<std::string,PutDefinition> & getOutputs() ;
     
+    //! will check whether provided input is expected or not.
+    //! This is a validation check (and not an actual on the spot check )
+    virtual ErrorReport expectInput(const std::string &) const;
+    
+    //! will check whether provided output is expected or not.
+    //! This is a validation check (and not an actual on the spot check )
+    virtual ErrorReport expectOutput(const std::string &) const;
+    
 protected:
     
 

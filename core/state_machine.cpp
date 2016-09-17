@@ -824,24 +824,26 @@ ErrorReport StateMachine::validate() const {
             } else {
                 auto outputs = actions.at(output.getFromActionId())->getOutputs();
                 
-                bool found = output.getFromActionOutput().empty() or outputs.count(output.getFromActionOutput()) > 0;
+                auto ier = actions.at(output.getFromActionId())->expectOutput(output.getFromActionOutput());
                 
-                if(not found)
-                    str << output << " is invalid, origin output doesn't exist" << std::endl;
+                if(ier.isSet())
+                    str << output << " " << ier.getErrorMessage()<< std::endl;
                 else {
                     //! Die doesn't have any action, but that's okay :)
-                    if(output.getToActionId() == (int32_t)Step::Die) {
+                    //! Finish must accept any inut.
+                    if(output.getToActionId() == (int32_t)Step::Die or
+                       output.getToActionId() == (int32_t)Step::Finish ) {
                         unused_actions.erase(output.getToActionId());
                         unused_actions.erase(output.getFromActionId());
                         continue;
                     }
                     
                     auto inputs = actions.at(output.getToActionId())->getInputs();
-                    bool found = output.getToActionInput().empty()
-                                 or output.getToActionId() == (int32_t) Step::Finish
-                                 or inputs.count(output.getToActionInput()) > 0;
-                    if(not found)
-                        str << output << " is invalid, targeted input doesn't exist" << std::endl;
+                    
+                    auto oer = actions.at(output.getToActionId())->expectInput(output.getToActionInput());
+                    
+                    if(oer.isSet())
+                        str << output << " " << oer.getErrorMessage()<< std::endl;
                     else {
                         unused_actions.erase(output.getToActionId());
                         unused_actions.erase(output.getFromActionId());
