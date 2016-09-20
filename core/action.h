@@ -153,7 +153,7 @@ protected:
     //! Fetch a Context
     ContextPtr customProperty(SessionPtr, const std::string & key, ContextPtr def = ContextPtr()) const;
     template<class T>
-    boost::shared_ptr<T> customCastedProperty(SessionPtr session, const std::string & key, ContextPtr def= ContextPtr()) {
+    boost::shared_ptr<T> customCastedProperty(SessionPtr session, const std::string & key, ContextPtr def= ContextPtr()) const {
         return boost::dynamic_pointer_cast<T>(customProperty(session,key,def));
     }
     

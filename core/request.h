@@ -70,6 +70,8 @@ public:
     ErrorReportPtr getErrorReport() const;
     
     PropertySetPtr getBypass() const;
+    void setBypass(PropertySetPtr);
+    
     PropertySetPtr getActionBypasses(int action_id);
     std::map<int32_t, PropertySetPtr> & getActionBypasses();
     

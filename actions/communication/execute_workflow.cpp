@@ -39,11 +39,20 @@ ExecuteWorkflow::~ExecuteWorkflow() {
 
 Result ExecuteWorkflow::perform(SessionPtr session) const {
     if(boolProperty(session, "sync")) {
-        
+        auto req = prepareSyncRequest(session);
+        req->getTarget().controller = stringProperty(session, "controller");
+        req->getTarget().workflow = stringProperty(session, "workflow");
+        req->setBypass(customCastedProperty<PropertySet>(session, "customization"));
+        return executeSyncRequest(session, req);
     } else {
+        RequestPtr req(new Request());
+        req->getTarget().controller = stringProperty(session, "controller");
+        req->getTarget().workflow = stringProperty(session, "workflow");
+        req->getReply().target = ETargetAction::NoReply; // we're async here.
+        req->setBypass(customCastedProperty<PropertySet>(session, "customization"));
         
+        return done();
     }
-    return done();
 }
 
 Result ExecuteWorkflow::replyReceived(SessionPtr session, RequestPtr reply) const {

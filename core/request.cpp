@@ -62,6 +62,10 @@ PropertySetPtr Request::getBypass() const {
     return bypass;
 }
 
+void Request::setBypass(PropertySetPtr set) {
+    bypass = set;
+}
+
 
 PropertySetPtr Request::getActionBypasses(int action_id) {
     if(action_bypasses.count(action_id) == 0)
