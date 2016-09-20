@@ -66,7 +66,7 @@ void ControllerManager::perform(RequestPtr req) {
         }
         
         if(not able) {
-            BOOST_LOG_SEV(logger, Warn) << this << req->logRequest() << " Can't process this request, no apt controller found.";
+            BOOST_LOG_SEV(logger, Warn) << this << req->logRequest() << " Can't process this request, no apt controller found." << req;
         }
     } , req));
 }

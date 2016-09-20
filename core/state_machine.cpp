@@ -446,7 +446,7 @@ bool StateMachine::executeAction(SessionPtr session, int32_t action_id)  {
 void StateMachine::actionExecuted(SessionPtr session, const Result & result)  {
     auto action = actions[result.action_id];
     ErrorReport er;
-    if(not action->checkOutputs(session, er)) {
+    if(result.type == EType::Done and not action->checkOutputs(session, er)) {
         // move to error.
         BOOST_LOG_SEV(logger, Error) << fingerprint(session) << actions[result.action_id]->logAction() << " Failed its contracted outputs.";
 

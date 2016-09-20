@@ -42,12 +42,14 @@ Result ExecuteWorkflow::perform(SessionPtr session) const {
         auto req = prepareSyncRequest(session);
         req->getTarget().controller = stringProperty(session, "controller");
         req->getTarget().workflow = stringProperty(session, "workflow");
+        req->getTarget().target = ETargetAction::DefaultAction;
         req->setBypass(customCastedProperty<PropertySet>(session, "customization"));
         return executeSyncRequest(session, req);
     } else {
         RequestPtr req(new Request());
         req->getTarget().controller = stringProperty(session, "controller");
         req->getTarget().workflow = stringProperty(session, "workflow");
+        req->getTarget().target = ETargetAction::DefaultAction;
         req->getReply().target = ETargetAction::NoReply; // we're async here.
         req->setBypass(customCastedProperty<PropertySet>(session, "customization"));
         
@@ -56,19 +58,22 @@ Result ExecuteWorkflow::perform(SessionPtr session) const {
 }
 
 Result ExecuteWorkflow::replyReceived(SessionPtr session, RequestPtr reply) const {
-    if(boolProperty(session, "sync")) {
+    if(not boolProperty(session, "sync")) {
         BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Received and un expected reply from: " << reply->getReply();
     } else {
         // Do the thing. (map provided contexts to outputs.)
-        if(reply->getErrorReport()->isSet() and boolProperty(session, "allow_error")) {
-            BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " replyReceived an Error, but it has been allowed... thus forwarding default constructed outputs...";
-            for(auto kv: getOutputs()) {
-                setOutput(session, kv.first, kv.second.checker->generate());
+        if(reply->getErrorReport() and
+           reply->getErrorReport()->isSet() ) {
+            if (boolProperty(session, "allow_error")) {
+                BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " replyReceived an Error, but it has been allowed... thus forwarding default constructed outputs...";
+                for(auto kv: getOutputs()) {
+                    setOutput(session, kv.first, kv.second.checker->generate());
+                }
+            } else {
+                BOOST_LOG_SEV(logger, Error) << fingerprint(session) << "replyReceived an unexpected error. It wasn't caught by state machine, albeit our unability to deal with it. Forwarding the error";
+                ErrorReportPtr ner(new ErrorReport(reply->getTarget(), reply->getErrorReport()));
+                return error(session, ner);
             }
-        } else if( not boolProperty(session, "allow_error")) {
-            BOOST_LOG_SEV(logger, Error) << fingerprint(session) << "replyReceived an unexpected error. It wasn't caught by state machine, albeit our unability to deal with it. Forwarding the error";
-            ErrorReportPtr ner(new ErrorReport(reply->getTarget(), reply->getErrorReport()));
-            return error(session, ner);
         } else {
             for(auto kv:reply->getContext()->getContexts())
                 setOutput(session, kv.first, kv.second);

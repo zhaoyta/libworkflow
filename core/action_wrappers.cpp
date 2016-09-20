@@ -109,7 +109,7 @@ void FinishWrapper::wrapPerform(SessionPtr session) const {
     // bind them with result.
     
     for(const auto & output: getStateMachine().lock()->getExpectedOutput()) {
-        reply->setContext(output, getInput(session, output));
+        reply->setContext(output, getInput(session, output, true));
     }
     
     BOOST_LOG_SEV(logger, Info) << fingerprint(session) << " Replying to " << reply->getTarget();

@@ -21,7 +21,8 @@ Controller::~Controller() {
 bool Controller::perform(RequestPtr request) {
     if(workflows.count(request->getTarget().workflow) > 0 ) {
         request->setControllerSpawn(spawnForRequest(request));
-        return workflows[request->getTarget().workflow]->perform(request);
+        getIOService()->post(boost::bind(&Workflow::perform, workflows[request->getTarget().workflow],request));
+        return true;
     }
     return false;
 }

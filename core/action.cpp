@@ -332,8 +332,8 @@ void Action::defineOutput(const PutDefinition & d) {
     outputs[d.put_name] = (d);
 }
 
-ContextPtr Action::getInput(SessionPtr session, const std::string & name) const {
-    if(inputs.count(name) > 0)
+ContextPtr Action::getInput(SessionPtr session, const std::string & name, bool force) const {
+    if(inputs.count(name) > 0 or force)
         return session->getInput(getActionId(), name);
     else {
         BOOST_LOG_SEV(logger, Error) << fingerprint(session) << " Failed to fetch Input as it isn't defined in contract: " << name ;

@@ -167,10 +167,11 @@ protected:
     
     //! Input / Output accessor
     
-    ContextPtr getInput(SessionPtr, const std::string & name) const;
+    //! attempt to fetch input context with provided @a name, if @a force is set to true, then it will ignore contract. 
+    ContextPtr getInput(SessionPtr, const std::string & name, bool force = false) const;
     template<class T>
-    boost::shared_ptr<T> getCastedInput(SessionPtr session, const std::string & key)  const{
-        return boost::dynamic_pointer_cast<T>(getInput(session, key));
+    boost::shared_ptr<T> getCastedInput(SessionPtr session, const std::string & key, bool force = false)  const{
+        return boost::dynamic_pointer_cast<T>(getInput(session, key, force));
     }
     
     void setOutput(SessionPtr, const std::string & name, ContextPtr) const;

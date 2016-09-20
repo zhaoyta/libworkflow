@@ -23,13 +23,10 @@ void TestClient::prepareTest() {
     WorkflowPtr workflow(new Workflow("test-6"));
     auto sm = workflow->getStateMachine();
     sm->addAction(0, new DoNext(), {
-        OutputBinding(0, "", 1, "")
+        OutputBinding("", 1, "")
     });
-    sm->addAction(1, new SomeConsummer(), {
-        OutputBinding(1, "", 2, "")
-    });
-    sm->addAction(2, new SomeProducer(), {
-        OutputBinding(2, "some_data", (int32_t)Step::Finish, "some_data")
+    sm->addAction(1, new SomeProducer(), {
+        OutputBinding("some_data", Step::Finish, "some_data")
     });
     sm->addInput(InputBinding("", 0, ""));
     
