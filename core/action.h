@@ -117,12 +117,14 @@ protected:
     Result async() const;
     //! Tells state machine that something failed.
     Result error(SessionPtr, const std::string & err_key, const std::string & error_message) const;
+    Result error(SessionPtr, ErrorReportPtr) const;
     //! When in async mode, this contacts the state machine and tell we're done.
     void asyncDone(SessionPtr) const;
     //! async counterpart of wait()
     void asyncWait(SessionPtr) const;
     //! async counterpart of error()
     void asyncError(SessionPtr, const std::string & err_key, const std::string & err_message) const;
+    void asyncError(SessionPtr, ErrorReportPtr) const;
     
     //! send request to be executed.
     Result executeSyncRequest(SessionPtr, RequestPtr) const;

@@ -177,6 +177,14 @@ Result Action::error(SessionPtr session, const std::string & err_key, const std:
     return r;
 }
 
+Result Action::error(SessionPtr session, ErrorReportPtr error) const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = EType::Error;
+    r.error = error;
+    return r;
+}
+
 void Action::asyncDone(SessionPtr session) const {
     Result r;
     r.action_id = getActionId();
@@ -198,6 +206,15 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
     r.action_id = getActionId();
     r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
+    
+    getStateMachine().lock()->actionAsyncFinished(session, r);
+}
+
+void Action::asyncError(SessionPtr session, ErrorReportPtr error) const {
+    Result r;
+    r.action_id = getActionId();
+    r.type = EType::Error;
+    r.error = error;
     
     getStateMachine().lock()->actionAsyncFinished(session, r);
 }
