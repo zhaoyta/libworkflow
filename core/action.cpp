@@ -174,6 +174,7 @@ Result Action::error(SessionPtr session, const std::string & err_key, const std:
     r.action_id = getActionId();
     r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
+    r.error->setRequest(session->getOriginalRequest());
     return r;
 }
 
@@ -182,6 +183,7 @@ Result Action::error(SessionPtr session, ErrorReportPtr error) const {
     r.action_id = getActionId();
     r.type = EType::Error;
     r.error = error;
+    r.error->setRequest(session->getOriginalRequest());
     return r;
 }
 
@@ -207,6 +209,8 @@ void Action::asyncError(SessionPtr session, const std::string & err_key, const s
     r.type = EType::Error;
     r.error.reset(new ErrorReport(session->getOriginalRequest()->getTarget(), err_key, error_message));
     
+    r.error->setRequest(session->getOriginalRequest());
+    
     getStateMachine().lock()->actionAsyncFinished(session, r);
 }
 
@@ -215,6 +219,8 @@ void Action::asyncError(SessionPtr session, ErrorReportPtr error) const {
     r.action_id = getActionId();
     r.type = EType::Error;
     r.error = error;
+    
+    r.error->setRequest(session->getOriginalRequest());
     
     getStateMachine().lock()->actionAsyncFinished(session, r);
 }
