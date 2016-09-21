@@ -27,7 +27,7 @@ Result SomeConsummer::perform(SessionPtr session) const {
 
 
 SomeAllowed::SomeAllowed(): Action("SomeAllowed") {
-    defineInput("some_data", CHECKER(SomeContext), true);
+    defineInput("some_data", CHECKER(SomeContext), false);
 }
 
 Result SomeAllowed::perform(SessionPtr session) const {

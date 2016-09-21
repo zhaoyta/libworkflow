@@ -230,15 +230,6 @@ void setGlobalTimeout(double ms) {
 
 void delayed() {
     GLOB_LOGGER("general");
-    
-    BOOST_LOG_SEV(logger, Info) << " Load JSON-ready Action and Contexts... ";
-    ActionFactory::registerAction(new ActionBuilder<SomeProducer>());
-    ActionFactory::registerAction(new ActionBuilder<SomeConsummer>());
-    ActionFactory::registerAction(new ActionBuilder<SomeAllowed>());
-    ActionFactory::registerAction(new ActionBuilder<ErrorAction>());
-    ActionFactory::registerAction(new ActionBuilder<DoNext>());
-    ActionFactory::registerAction(new ActionBuilder<PrintLog>());
-    ContextFactory::registerContext(new ContextBuilder<SomeContext>());
 }
 
 int main(int argc, const char * argv[]) {
@@ -248,6 +239,15 @@ int main(int argc, const char * argv[]) {
     GLOB_LOGGER("general");
     BOOST_LOG_SEV(logger, Info) << " Test Starting !";
     setGlobalTimeout(60000);
+    
+    BOOST_LOG_SEV(logger, Info) << " Load JSON-ready Action and Contexts... ";
+    ActionFactory::registerAction(new ActionBuilder<SomeProducer>());
+    ActionFactory::registerAction(new ActionBuilder<SomeConsummer>());
+    ActionFactory::registerAction(new ActionBuilder<SomeAllowed>());
+    ActionFactory::registerAction(new ActionBuilder<ErrorAction>());
+    ActionFactory::registerAction(new ActionBuilder<DoNext>());
+    ActionFactory::registerAction(new ActionBuilder<PrintLog>());
+    ContextFactory::registerContext(new ContextBuilder<SomeContext>());
     
     test_client.reset(new TestClient());
     
