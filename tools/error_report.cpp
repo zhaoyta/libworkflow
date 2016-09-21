@@ -1,5 +1,5 @@
 #include <tools/error_report.h>
-
+#include <core/request.h>
 
 ErrorReport::ErrorReport(): Jsonable(), boost::enable_shared_from_this<ErrorReport>(){}
 
@@ -73,12 +73,21 @@ const std::vector<ErrorReportPtr> ErrorReport::getAncestry() {
     }
 }
 
+void ErrorReport::setRequest(RequestPtr req) {
+    original = req;
+}
+
+RequestPtr ErrorReport::getRequest() const {
+    return original;
+}
 
 void ErrorReport::save(boost::property_tree::ptree & root) const {
     PUT_CHILD(root, target, "target");
     root.put("message", error_message);
     root.put("key", error_key);
     PUT_CHILD(root, *parent, "parent");
+    if(original)
+        PUT_CHILD(root, *original, "original");
 }
 
 void ErrorReport::load(const boost::property_tree::ptree & root) {
@@ -93,5 +102,11 @@ void ErrorReport::load(const boost::property_tree::ptree & root) {
     if(oparent) {
         parent.reset(new ErrorReport());
         parent->load(*oparent);
+    }
+    
+    auto ooriginal = root.get_child_optional("original");
+    if(ooriginal){
+        original.reset(new Request());
+        original->load(*ooriginal);
     }
 }

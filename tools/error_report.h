@@ -7,6 +7,8 @@
 #include <vector>
 #include <boost/uuid/uuid.hpp>
 
+SHARED_PTR(Request);
+
 #pragma GCC visibility push(default)
 
 SHARED_PTR(ErrorReport);
@@ -18,6 +20,8 @@ SHARED_PTR(ErrorReport);
 class ErrorReport: public Jsonable, public boost::enable_shared_from_this<ErrorReport> {
     //! Whom issued this error.
     Target target;
+    //! Request that triggered this error.
+    RequestPtr original;
     //! Reason, human readble
     std::string error_message;
     //! some key for eventual post processing.
@@ -32,6 +36,10 @@ public:
     //! This is rethrow version, add provided error report to the stack.
     ErrorReport(const Target & target, ErrorReportPtr, const std::string & error_key = "", const std::string & error_msg = "");
     virtual ~ErrorReport();
+    
+    //! If this error is related to a request here it is.
+    void setRequest(RequestPtr);
+    RequestPtr getRequest() const;
     
     //! set error content.
     void setError(const std::string & error_key, const std::string & error_message);
