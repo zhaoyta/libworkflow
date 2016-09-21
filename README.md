@@ -21,8 +21,9 @@ You might also use this library to store your datas, filtering it, transforming 
 ## Features
 
 * Workflow execution engine
-** Action Api: This is where your code base will mostly be. Define a contract the action shall meet and define runtime expected configuration.
-** Ressource Management and Scheduling Api: If you're dealing with limited resources, you can either use provided request schedulers or implement your own. 
+  * Action Api: This is where your code base will mostly be. Define a contract the action shall meet and define runtime expected configuration.
+  * Ressource Management and Scheduling Api: If you're dealing with limited resources, you can either use provided request schedulers or implement your own. 
+  * JSON Workflow building API: Allow you to easily provide a new Workflow to execute, and customize anytime it's execution process.
 * TCP / HTTP / Internal Api interface: This allow easy triggering execution of workflow. 
 * Time based request execution scheduling
 
