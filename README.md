@@ -12,7 +12,7 @@ Problem is, for automation, you need to have a "fixed" workflow.
 If for some reason you get unexpected data, you either would have to do that the old fashion way, or you'll have to develop new algorithm and upgrade your software to work with this data. Even if the alteration isn't that big, it still means, potential bug introduction, testing, and so on. 
 
 This lib, which is probably more a framework than a lib, allows you to have some more freedom in how your workflow work.
-You still will have some developpement to do to have it working, but, this developpement will only be of Business related code: how to access your data, how to process them. And will be way easier to test. 
+You still will have some development to do to have it working, but, this development will only be of Business related code: how to access your data, how to process them. And will be way easier to test. 
 
 The lib will provide communication or binding as to how this code shall be executed. More over, it allows customization of your workflow per request. 
 Thus, you meet unexpected data in your daily workflow, you may either alter your workflow to investigate this unexpected data, or configure it differently to have a better view of the problem. 
@@ -22,12 +22,10 @@ You might also use this library to store your datas, filtering it, transforming 
 
 * Workflow execution engine
   * Action Api: This is where your code base will mostly be. Define a contract the action shall meet and define runtime expected configuration.
-  * Ressource Management and Scheduling Api: If you're dealing with limited resources, you can either use provided request schedulers or implement your own. 
+  * Resources Management and Scheduling Api: If you're dealing with limited resources, you can either use provided request schedulers or implement your own. 
   * JSON Workflow building API: Allow you to easily provide a new Workflow to execute, and customize anytime it's execution process.
 * TCP / HTTP / Internal Api interface: This allow easy triggering execution of workflow. 
 * Time based request execution scheduling
-
-
 
 ## Why ?
 
