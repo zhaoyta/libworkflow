@@ -9,6 +9,7 @@
 #include <actions/tools/fetch_refs.h>
 #include <tools/action_factory.h>
 #include <core/action.h>
+#include <service/input.h>
 
 Server::Server() : ActiveObject("Server", 1,false), controllers_expected(0), clients_expected(0), default_pool(5), clients_done(false), controllers_done(false) {
     
@@ -28,6 +29,10 @@ void Server::addActor(ActorPtr act) {
     clients_expected++;
     act->setStartedFunction(boost::bind(&Server::decreaseClientsCounter, this, _1));
     actors_to_start.push_back(act);
+}
+
+void Server::addInput(InputPtr input) {
+    inputs_to_start.push_back(input);
 }
 
 void Server::startServer() {
@@ -54,11 +59,7 @@ void Server::controllersManagerStarted(ActiveObjectPtr) {
 }
 
 void Server::clientsManagerStarted(ActiveObjectPtr) {
-    auto instance= ClientManager::getInstance();
-    for(const auto & act: actors_to_start) {
-        act->start();
-        instance->addClient(act);
-    }
+    
 }
 
 void Server::stopServer() {
@@ -75,23 +76,46 @@ void Server::setClientsStartedFunction(const boost::function<void()> & fn) {
     clients_started = fn;
 }
 
+void Server::controllerStarted() {
+    if(controllers_done)
+        return;
+    
+    defaultPostControllersActions();
+    postControllersActions();
+    if(controllers_started)
+        controllers_started();
+    controllers_done = true;
+    
+    auto instance= ClientManager::getInstance();
+    for(auto act: actors_to_start) {
+        act->start();
+        instance->addClient(act);
+    }
+}
+
+void Server::clientsStarted() {
+    if(clients_done)
+        return;
+    
+    defaultPostClientsActions();
+    postClientsActions();
+    if(clients_started)
+        clients_started();
+    clients_done = true;
+    
+    for(auto  input: inputs_to_start)
+        input->start();
+}
+
 void Server::decreaseControllersCounter(ActiveObjectPtr) {
     getIOService()->dispatch([&]() {
         if(controllers_expected > 0 ){
             controllers_expected--;
             if(controllers_expected == 0) {
-                defaultPostControllersActions();
-                postControllersActions();
-                if(controllers_started)
-                    controllers_started();
-                controllers_done = true;
+                controllerStarted();
             }
             if(clients_expected == 0 and not clients_done) {
-                defaultPostClientsActions();
-                postClientsActions();
-                if(clients_started)
-                    clients_started();
-                clients_done = true;
+                clientsStarted();
             }
         }
     });
@@ -102,11 +126,7 @@ void Server::decreaseClientsCounter(ActiveObjectPtr) {
         if(clients_expected > 0 ){
             clients_expected--;
             if(clients_expected == 0 and controllers_done and not clients_done) {
-                defaultPostClientsActions();
-                postClientsActions();
-                if(clients_started)
-                    clients_started();
-                clients_done = true;
+                clientsStarted();
             }
         }
     });

@@ -7,6 +7,7 @@
 
 SHARED_PTR(Controller);
 SHARED_PTR(Actor);
+SHARED_PTR(Input);
 
 /**
  Server is a simple Actor, it waits for controller and client manager, and default controllers to be ready.
@@ -26,6 +27,7 @@ class Server : public ActiveObject {
     bool controllers_done;
     std::vector<ActorPtr> actors_to_start;
     std::vector<ControllerPtr> controllers_to_add;
+    std::vector<InputPtr> inputs_to_start;
 public:
     Server();
     virtual ~Server();
@@ -36,6 +38,9 @@ public:
     //! Add an actor to the to start stack.
     //! Note: it's expected that their start to be delayed ...
     void addActor(ActorPtr);
+    //! Add an input to the to start stack :) they'll be started after actors.
+    //! Note: it's expected that their start to be delayed ...
+    void addInput(InputPtr);
     
     //! set number of thread avaible for default and temporary controller.
     void setDefaultControllersPool(uint32_t);
@@ -66,6 +71,9 @@ protected:
     
     void controllersManagerStarted(ActiveObjectPtr);
     void clientsManagerStarted(ActiveObjectPtr);
+    
+    void controllerStarted();
+    void clientsStarted();
 };
 
 #endif // __SERVER_H_
