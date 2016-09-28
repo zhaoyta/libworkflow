@@ -19,11 +19,19 @@ class TCPClient: public Client {
     char data_[max_length];
     std::stringstream buff;
     size_t expected_size;
+    std::string address;
+    int32_t port;
+    
 public:
     TCPClient(IOServicePtr);
     virtual ~TCPClient();
     
     boost::asio::ip::tcp::socket & getSocket();
+    
+    void setConnectionDetails(const std::string & address, int32_t port);
+    
+    void connect() override;
+    void disconnect() override;
     
     void startRead();
     

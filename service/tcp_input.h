@@ -13,8 +13,8 @@ SHARED_PTR(TCPClient);
 class TCPInput: public Input {
     std::string address;
     uint32_t port;
-    boost::asio::ip::tcp::acceptor acceptor;
     boost::asio::ip::tcp::socket socket;
+    boost::asio::ip::tcp::acceptor acceptor;
 
 public:
     TCPInput(const std::string & name, const std::string & address, uint32_t port, bool delay_start = false);

@@ -3,6 +3,8 @@
 #include <iomanip>
 #include <core/request.h>
 
+using boost::asio::ip::tcp;
+
 TCPClient::TCPClient(IOServicePtr s): Client(), service(s), socket(*s) {}
 TCPClient::~TCPClient() {}
 
@@ -69,6 +71,11 @@ void TCPClient::handle_write(const boost::system::error_code& error)
 }
 
 bool TCPClient::doSendRequest(RequestPtr req) {
+    if(not socket.is_open()) {
+        BOOST_LOG_SEV(logger, Error) << this << req->logRequest() << " Can't send request, because client isn't connected.";
+        
+        return false;
+    }
     std::string json;
     req->str_save(json);
     
@@ -92,4 +99,41 @@ bool TCPClient::canSendRequest(RequestPtr req, ErrorReport & err) {
         return true;
     err.setError("tcp.send.empty", "Empty request can't be sent.");
     return false;
+}
+
+void TCPClient::setConnectionDetails(const std::string & add, int32_t p) {
+    address = add;
+    port = p;
+}
+
+void TCPClient::connect() {
+    socket.get_io_service().dispatch(boost::bind<void>([&](){
+        if(socket.is_open()) {
+            BOOST_LOG_SEV(logger, Error) << this << "Can't connect with an already connected socket.";
+            return;
+        }
+        
+        tcp::resolver resolver(socket.get_io_service());
+        tcp::resolver::query query(address, std::to_string(port));
+        tcp::resolver::iterator endpoint_iterator = resolver.resolve(query);
+        boost::system::error_code ec;
+    
+        socket.connect(*endpoint_iterator, ec);
+        if(not ec)
+            return;
+        
+        BOOST_LOG_SEV(logger, Error) << " Socket failed to establish connection to: " << address << " due to: " << ec.message();
+        
+    }));
+}
+
+void TCPClient::disconnect() {
+    socket.get_io_service().dispatch(boost::bind<void>([&](){
+        if(socket.is_open()) {
+            socket.cancel();
+            socket.close();
+        } else
+            BOOST_LOG_SEV(logger, Error) << this << " Can't disconnect an already disconnected Socket.";
+    }));
+                                     
 }

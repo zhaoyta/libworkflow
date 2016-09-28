@@ -12,8 +12,9 @@ TCPInput::TCPInput(const std::string & name,const std::string & address, uint32_
     Input(name, delay),
     address(address),
     port(port),
-    acceptor(*getIOService(), tcp::endpoint(tcp::v4(), port)),
-    socket(*getIOService()) {}
+    socket(*getIOService()),
+acceptor(*getIOService(), tcp::endpoint(boost::asio::ip::address::from_string(address), port))
+{}
 
 TCPInput::~TCPInput() {}
 
@@ -27,12 +28,12 @@ void TCPInput::handle_accept(TCPClientPtr client, const boost::system::error_cod
 {
     if (!error)
     {
+        client->startRead();
         ClientManager::getInstance()->addClient(client);
         
-        auto clt = TCPClientPtr(new TCPClient(getIOService()));
-        acceptor.async_accept(clt->getSocket(),
-                              boost::bind(&TCPInput::handle_accept, this, clt, boost::asio::placeholders::error));
     } else {
         BOOST_LOG_SEV(logger, Error) << this << " Failed to accept new connection: " << error.message();
     }
+    
+    started();
 }
